@@ -1,0 +1,53 @@
+.toggle-icon {
+    background-color: transparent;
+    color: black;
+    border: 0px;
+    font-size: 25px;
+}
+
+.toggle-icon:hover {
+    background-color: transparent;
+    color: black;
+    border: 0px;
+    font-size: 25px;
+}
+
+.toggle-icon:active {
+    background-color: transparent;
+    color: black;
+    border: 0px;
+    font-size: 25px;
+}
+.toggle-icon:hover {
+    background-color: transparent;
+    color: black;
+    border: 0px;
+    font-size: 25px;
+}
+
+.nav-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.nav-menu ul li {
+    float: left;
+}
+.nav-menu {
+    background-color: #EDEDED;
+}
+.nopadding {
+    padding : 0 !important
+}
+.nav-item-left {
+    display: flex; /* Use Flexbox inside this item */
+    justify-content: flex-start; /* Align items to the right */
+    flex-grow: 1; /* Allow this item to grow and take available space */
+  }
+
+  @media only screen and (min-width: 600px) {
+    .pc-margin-right {
+      margin-right: 20px;
+    }
+  }
