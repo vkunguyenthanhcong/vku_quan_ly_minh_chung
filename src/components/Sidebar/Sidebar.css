@@ -1,6 +1,6 @@
 .menu-col {
   background-color: #2A3F54;
-  height: 100vh; /* Full viewport height */
+  height: 200vh; /* Full viewport height */
   overflow-y: auto; /* Enable vertical scrolling */
   transition: width 0.3s; /* Smooth transition for width change */
   color: white
@@ -61,4 +61,7 @@
   .nopadding{
     padding : 0 !important;
   }
+}
+table {
+  background-color: white;
 }

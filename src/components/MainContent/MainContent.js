@@ -3,21 +3,26 @@ import React, { useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import './MainContent.css'
 import { getKdclData , getCtdtData} from '../apiServices'
+import { useNavigate } from 'react-router-dom';
 
 const MainContent = () => {
+  
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const handleButtonClick = (maCtdt, tenCtdt) => {
+    navigate(`/chuongtrinhdaotao?ctdt=${maCtdt}&tenCtdt=${tenCtdt}`);
+  };
 
-  // Define columns for the table
   const columns = React.useMemo(
     () => [
       {
         Header: 'STT',
-        accessor: (_, index) => index + 1 // Row index
+        accessor: (_, index) => index + 1
       },
       {
-        Header: 'Tên Chuẩn đánh giá',
+        Header: 'Tên KDCL',
         accessor: 'tenKdcl'
       },
       {
@@ -25,17 +30,21 @@ const MainContent = () => {
         accessor: 'namBanHanh'
       },
       {
-        Header: 'Tên CTĐT',
+        Header: 'Tên CTDT',
         accessor: 'tenCtdt',
         Cell: ({ value }) => (
           <ul style={{ listStyleType: 'none', padding: 0 }}>
-            {value.map((item, index) => (
-              <li key={index} style={{ marginBottom: '5px' }}>
-                <button onClick={() => alert(`Button clicked for ${item}`)} className='btn-color btn'>
-                  {item}
-                </button>
-              </li>
-            ))}
+            {Array.isArray(value) ? (
+              value.map(({ tenCtdt, maCtdt }, index) => (
+                <li key={index} style={{ marginBottom: '5px' }}>
+                  <button onClick={() => handleButtonClick(maCtdt,tenCtdt)} className='btn-color btn'>
+                    {tenCtdt}
+                  </button>
+                </li>
+              ))
+            ) : (
+              <li>No Data</li>
+            )}
           </ul>
         )
       }
@@ -63,7 +72,11 @@ const MainContent = () => {
         // Combine the data
         const combinedData = kdclData.map(item => ({
           ...item,
-          tenCtdt: (ctdtData[item.maKdcl] || []).map(ctdt => ctdt.tenCtdt || 'No Data') 
+          tenCtdt: (ctdtData[item.maKdcl] || []).map(ctdt => ({
+            tenCtdt: ctdt.tenCtdt || 'No Data', // Default to 'No Data' if tenCtdt is undefined
+            maCtdt: ctdt.maCtdt || 'No ID' ,
+            maKdcl : ctdt.maKdcl || 'NO Data'
+          }))
         }));
 
         setData(combinedData);
@@ -86,38 +99,32 @@ const MainContent = () => {
 
     return (
       <table {...getTableProps()}>
-        <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+      <thead>
+        {headerGroups.map(headerGroup => (
+          <tr {...headerGroup.getHeaderGroupProps()}>
+            {headerGroup.headers.map(column => (
+              <th {...column.getHeaderProps()}>
+                {column.render('Header')}
+              </th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+      <tbody {...getTableBodyProps()}>
+        {rows.map(row => {
+          prepareRow(row);
+          return (
+            <tr {...row.getRowProps()}>
+              {row.cells.map(cell => (
+                <td {...cell.getCellProps()}>
+                  {cell.render('Cell')}
+                </td>
               ))}
             </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => (
-                  <td {...cell.getCellProps()}>
-                    {cell.column.id === 'ten' ? (
-                      <ul>
-                        {cell.value.map((item, index) => (
-                          <li key={index}><a href={`/chuongtrinhdaotao?ctdt=${index}`} className='btn-color btn'>{item}</a></li>
-                        ))}
-                      </ul>
-                    ) : (
-                      cell.render('Cell')
-                    )}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+          );
+        })}
+      </tbody>
+    </table>
     );
   };
 
