@@ -1,12 +1,11 @@
 // src/App.js
 import React, { useEffect } from 'react';
-import HomePage from './components/HomePage/HomePage';
+import HomePage from './pages/HomePage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import MainPage from './components/MainPage/MainPage';
+import MainPage from './pages/MainPage'
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import ChuongTrinhDaoTao from './components/MainContent/ChuongTrinhDaoTao/ChuongTrinhDaoTao';
-import TieuChuan from './components/MainContent/ChuongTrinhDaoTao/TieuChuan/TieuChuan';
+import ChuongTrinhDaoTao from './components/CTDTPage/CtdtPage';
 
 
 const App = () => (
@@ -16,10 +15,8 @@ const App = () => (
   <AuthProvider>
     <Router>
       <Routes>
-        <Route path="/mainpage" element={<ProtectedRoute><MainPage /></ProtectedRoute>} />
-        <Route path="/chuongtrinhdaotao" element={<ProtectedRoute><ChuongTrinhDaoTao /></ProtectedRoute>} />
-        <Route path="/tieuchuan" element={<ProtectedRoute><TieuChuan /></ProtectedRoute>} />
-        
+      <Route path="/quan-ly/chuong-trinh-dao-tao" element={<ProtectedRoute><ChuongTrinhDaoTao /></ProtectedRoute>} />
+        <Route path="/quan-ly" element={<ProtectedRoute><MainPage /></ProtectedRoute>} />
         <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>

@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import './HomePage.css';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from'jwt-decode'
 import {  useAuth } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +17,7 @@ const Homepage = () => {
 
   const handleLoginSuccess = (response) => {
   login();
-  navigate('/mainpage');
+  navigate('/quan-ly/');
   };
   return (
     <Container fluid style={{ height: '100vh' }}>

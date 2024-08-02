@@ -42,5 +42,4 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
 
   );
 };
-
 export default Sidebar;

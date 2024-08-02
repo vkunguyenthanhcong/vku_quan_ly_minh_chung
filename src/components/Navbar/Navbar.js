@@ -19,5 +19,4 @@ const Navbar = ({ toggleMenuWidth }) => {
     </div>
   );
 };
-
 export default Navbar;

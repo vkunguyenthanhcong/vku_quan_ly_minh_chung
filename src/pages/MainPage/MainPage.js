@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './MainPage.css'; // Custom CSS for additional styles
-import Sidebar from '../Sidebar/Sidebar';
-import Navbar from '../Navbar/Navbar';
-import MainContent from '../MainContent/MainContent';
-
-
+import Sidebar from '../../components/Sidebar/Sidebar';
+import Navbar from '../../components/Navbar/Navbar';
+import MainContent from '../../components/MainContent/MainContent';
+import ChuongTrinhDaoTao from '../../components/CTDTPage/CtdtPage';
 
 const App = () => {
   
@@ -22,15 +22,11 @@ const App = () => {
     setIsScreenSmall(window.innerWidth < 576);
   };
   useEffect(() => {
-    // Add event listener for resize
     window.addEventListener('resize', handleResize);
-
-    // Cleanup event listener on component unmount
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
-    // Automatically hide sidebar on small screens
     if (isScreenSmall) {
       setSidebarVisible(false);
     } else {
@@ -49,14 +45,12 @@ const App = () => {
         >
           <Sidebar isMenuExpanded={isMenuExpanded} toggleMenuWidth={toggleMenuWidth} isScreenSmall={isScreenSmall} />
         </Col>
-
         <Col md={isMenuExpanded ? 10 : 11} xs = {isMenuExpanded ? 10 : 12} className="content-col nopadding" style={{background : '#E6E9ED68'}}>
           <Navbar toggleMenuWidth={toggleMenuWidth}/>
-          <MainContent/>
+          <MainContent />
         </Col>
       </Row>
     </Container>
   );
 };
-
 export default App;

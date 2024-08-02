@@ -2,7 +2,28 @@ thead{
     background-color: #2A3F54;
     color: white;
 }
-
+.font-Inter {
+    font-size: 20px !important;
+    font-family: Inter, "Helvetica Neue", Roboto, Arial, sans-serif !important;
+}
+.btnViewCTDT{
+    display: inline-block;
+    background-color: var(--primary-color);
+    border: var(--primary-color);
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+.btnViewCTDT:hover{
+    background-color: var(--primary-color);
+    border: var(--primary-color);
+    color: white;
+}
+.btnViewCTDT:active{
+    background-color: var(--primary-color);
+    border: var(--primary-color);
+    color: white;
+}
 thead tr th {
     padding-left: 20px;
     padding-top: 20px;

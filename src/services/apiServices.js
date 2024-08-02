@@ -25,6 +25,14 @@ export const getKdclData = () => {
         throw error;
       });
   };
+  export const getCtdtDataByMaKDCL = (maKdcl) => {
+    return api.get(`/ctdt/filter/${maKdcl}`) // Endpoint for CTDT data
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching CTDT data:', error);
+        throw error;
+      });
+  };
   export const getThongTinCTDT = (maCtdt) => {
     return api.get(`/details/${maCtdt}`) // Endpoint for CTDT data
       .then(response => response.data)
@@ -53,6 +61,14 @@ export const getKdclData = () => {
   };
   export const getAllTieuChiWithIdTieuChuan = (idTieuChuan) => {
     return api.get(`/tieuchi/${idTieuChuan}`) // Endpoint for CTDT data
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching CTDT data:', error);
+        throw error;
+      });
+  };
+  export const getAllGoiYWithIdTieuChi = (idTieuChi) => {
+    return api.get(`/goiy/${idTieuChi}`) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);

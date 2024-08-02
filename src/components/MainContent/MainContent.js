@@ -1,139 +1,105 @@
-// src/components/MainContent.js
-import React, { useEffect, useState } from 'react';
-import { useTable } from 'react-table';
-import './MainContent.css'
-import { getKdclData , getCtdtData} from '../apiServices'
-import { useNavigate } from 'react-router-dom';
 
-const MainContent = () => {
-  
+import React, { useEffect, useState } from 'react';
+import './MainContent.css'
+import { styled } from '@mui/material/styles';
+import colors from '../color';
+import font from '../font'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { getKdclData, getCtdtDataByMaKDCL } from '../../services/apiServices'
+import { useNavigate } from 'react-router-dom';
+const CustomTableCell = styled(TableCell)(({ theme }) => ({
+  fontSize: '16px',
+  fontFamily : font.inter 
+}));
+
+const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
+  fontSize: '16px',
+  color : 'white',
+  fontFamily : font.inter 
+}));;
+const GenericList = ({ maKdcl, maCtdt, tenCtdt}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const handleButtonClick = (maCtdt, tenCtdt) => {
-    navigate(`/chuongtrinhdaotao?ctdt=${maCtdt}&tenCtdt=${tenCtdt}`);
+  const handleButtonClick = () => {
+    const transfer = { maCtdt: maCtdt, tenCtdt: tenCtdt };
+    localStorage.setItem('data', JSON.stringify(transfer));
+    navigate(`chuong-trinh-dao-tao`);
   };
-
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'STT',
-        accessor: (_, index) => index + 1
-      },
-      {
-        Header: 'Tên KDCL',
-        accessor: 'tenKdcl'
-      },
-      {
-        Header: 'Năm áp dụng',
-        accessor: 'namBanHanh'
-      },
-      {
-        Header: 'Tên CTDT',
-        accessor: 'tenCtdt',
-        Cell: ({ value }) => (
-          <ul style={{ listStyleType: 'none', padding: 0 }}>
-            {Array.isArray(value) ? (
-              value.map(({ tenCtdt, maCtdt }, index) => (
-                <li key={index} style={{ marginBottom: '5px' }}>
-                  <button onClick={() => handleButtonClick(maCtdt,tenCtdt)} className='btn-color btn'>
-                    {tenCtdt}
-                  </button>
-                </li>
-              ))
-            ) : (
-              <li>No Data</li>
-            )}
-          </ul>
-        )
-      }
-    ],
-    []
-  );
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch data from the API services
-        const [kdclResponse, ctdtResponse] = await Promise.all([
-          getKdclData(),
-          getCtdtData(),
-        ]);
-
-        const kdclData = kdclResponse;
-        const ctdtData = ctdtResponse;
-
-        // Ensure ctdtData is an object with arrays
-        if (typeof ctdtData !== 'object') {
-          throw new Error('Invalid ctdtData format');
-        }
-
-        // Combine the data
-        const combinedData = kdclData.map(item => ({
-          ...item,
-          tenCtdt: (ctdtData[item.maKdcl] || []).map(ctdt => ({
-            tenCtdt: ctdt.tenCtdt || 'No Data', // Default to 'No Data' if tenCtdt is undefined
-            maCtdt: ctdt.maCtdt || 'No ID' ,
-            maKdcl : ctdt.maKdcl || 'NO Data'
-          }))
-        }));
-
-        setData(combinedData);
-      } catch (error) {
-        setError(error);
+        const result = await getCtdtDataByMaKDCL(maKdcl);
+        setData(result);
+      } catch (err) {
+        setError(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [maKdcl]);
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data.map((item, index) => (
+        <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={handleButtonClick} className='btn btnViewCTDT'>{item.tenCtdt}</button></li>
+      ))}
+    </ul>
+  );
+};
+const MainContent = () => {
   
-  const Table = ({ columns, data }) => {
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
-      columns,
-      data
-    });
-
-    return (
-      <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>
-                {column.render('Header')}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map(row => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map(cell => (
-                <td {...cell.getCellProps()}>
-                  {cell.render('Cell')}
-                </td>
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-    );
-  };
-
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const fetchDataFromAPI = async () => {
+      try {
+        const result = await getKdclData();
+        setData(result);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDataFromAPI();
+  }, []);
+  
 
   return (
     <div className="content" style={{ background: "white", margin: '20px' }}>
       <p style={{ fontSize: '20px' }}>DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</p>
       <hr />
-      <Table columns={columns} data={data} />
+      <TableContainer  component={Paper}>
+        <Table className='font-Inter'>
+          <TableHead>
+            <TableRow >
+              <CustomTableHeadCell >STT</CustomTableHeadCell>
+              <CustomTableHeadCell>Tên Chuẩn đánh giá</CustomTableHeadCell>
+              <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
+              <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row, index) => (
+              <TableRow key={row.id}>
+                <CustomTableCell>{index + 1}</CustomTableCell>
+                <CustomTableCell>{row.tenKdcl}</CustomTableCell>
+                <CustomTableCell>{row.namBanHanh}</CustomTableCell>
+                <CustomTableCell><GenericList maKdcl={row.maKdcl} maCtdt={row.maCtdt} tenCtdt={row.tenCtdt} /></CustomTableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

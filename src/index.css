@@ -1,4 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+:root {
+  --primary-color: #337ab7; 
+  --secondary-color: #26B99A; 
+  --globalFont : Inter, "Helvetica Neue", Roboto, Arial, sans-serif !important;
+}
 
 body {
   margin: 0;

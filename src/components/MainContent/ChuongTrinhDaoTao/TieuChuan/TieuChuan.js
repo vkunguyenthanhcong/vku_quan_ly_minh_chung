@@ -1,13 +1,13 @@
-// src/components/MainContent.js
+
 import React, { useEffect, useState } from 'react';
 import { useTable } from 'react-table';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Sidebar from '../../../Sidebar/Sidebar';
-import Navbar from '../../../Navbar/Navbar';
+import Sidebar from '../../../../components/Sidebar/Sidebar';
+import Navbar from '../../../../components/Navbar/Navbar';
 import './TieuChuan.css'
-import useQuery from '../../../useQuery';
-import {getAllTieuChiWithIdTieuChuan} from '../../../apiServices'
+import useQuery from '../../../../utils/useQuery';
+import { getAllTieuChiWithIdTieuChuan, getAllGoiYWithIdTieuChi } from '../../../../services/apiServices'
 
 const TieuChuan = () => {
   const query = useQuery();
@@ -17,9 +17,10 @@ const TieuChuan = () => {
   const stt = query.get('stt');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  const idTieuChuan = query.get('idTieuChuan');  
+
+  const idTieuChuan = query.get('idTieuChuan');
   const [data, setData] = useState([]);
+  const [goiy, setGoiY] = useState([]);
   const [isMenuExpanded, setMenuExpanded] = useState(true);
   const [isSidebarVisible, setSidebarVisible] = useState(true);
   const [isScreenSmall, setIsScreenSmall] = useState(window.innerWidth < 576);
@@ -29,6 +30,15 @@ const TieuChuan = () => {
       try {
         const result = await getAllTieuChiWithIdTieuChuan(idTieuChuan);
         setData(result);
+        try {
+          const result_1 = await getAllGoiYWithIdTieuChi(result[0]['idTieuChi']);
+          console.log(result_1);
+          setGoiY(result_1);
+        } catch (error) {
+          setError(error);
+        } finally {
+          setLoading(false);
+        }
       } catch (error) {
         setError(error);
       } finally {
@@ -36,8 +46,9 @@ const TieuChuan = () => {
       }
     }
     fetchDataFromAPI();
-  },[]);
-   
+
+  }, []);
+
   const toggleMenuWidth = () => {
     setMenuExpanded(!isMenuExpanded)
   };
@@ -57,7 +68,7 @@ const TieuChuan = () => {
         accessor: 'tenTieuChi',
         Cell: ({ row }) => (
           <>
-            <b style={{fontSize : '18px'}}>{stt}.{row.index + 1}. </b>
+            <b style={{ fontSize: '18px' }}>{stt}.{row.index + 1}. </b>
             <span>{row.original.tenTieuChi}</span>
           </>
         ),
@@ -74,7 +85,11 @@ const TieuChuan = () => {
       {
         Header: 'Gợi ý nguồn minh chứng',
         accessor: 'count',
-
+        Cell: ({ row }) => (
+          <>
+          
+          </>
+        ),
       },
       {
         Header: 'Minh chứng',
@@ -103,17 +118,49 @@ const TieuChuan = () => {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-              <tr>
-                <td colSpan={5} style={{background : '#E0E0E0', fontSize : '20px'}}>
-                  <p><b>Tiêu chuẩn {stt} : {tenTC}</b></p>
-                </td>
-              </tr>,
+          <tr>
+            <td colSpan={5} style={{ background: '#E0E0E0', fontSize: '20px' }}>
+              <p><b>Tiêu chuẩn {stt} : {tenTC}</b></p>
+            </td>
+          </tr>,
           {rows.map(row => {
             prepareRow(row);
             return (
-              
+
               <tr  {...row.getRowProps()}>
-                
+
+                {row.cells.map(cell => (
+                  <td  {...cell.getCellProps()}>
+                    {cell.render('Cell')}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  };
+  const Table_1 = ({ data }) => {
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+      data
+    });
+
+    return (
+      <table {...getTableProps()}>
+
+        <tbody {...getTableBodyProps()}>
+          <tr>
+            <td colSpan={5} style={{ background: '#E0E0E0', fontSize: '20px' }}>
+              <p><b>Tiêu chuẩn {stt} : {tenTC}</b></p>
+            </td>
+          </tr>,
+          {rows.map(row => {
+            prepareRow(row);
+            return (
+
+              <tr  {...row.getRowProps()}>
+
                 {row.cells.map(cell => (
                   <td  {...cell.getCellProps()}>
                     {cell.render('Cell')}
