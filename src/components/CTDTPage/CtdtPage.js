@@ -4,17 +4,56 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { getThongTinCTDT, getTieuChuanWithMaCtdt, getMinhChung } from '../../services/apiServices';
 import { useNavigate } from 'react-router-dom';
 import './CtdtPage.css'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import font from '../font'
+const CustomTableCell = styled(TableCell)(({ theme }) => ({
+  fontSize: '16px',
+  fontFamily : font.inter 
+}));
 
+const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
+  fontSize: '16px',
+  color : 'white',
+  fontFamily : font.inter 
+}));;
 const ChuongTrinhDaoTao = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ tieuChuan, setTieuChuan] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const transfer = JSON.parse(localStorage.getItem('data'));
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
-        const result = await getThongTinCTDT();
+        const tieuChuanData = await getTieuChuanWithMaCtdt(transfer.maCtdt);
+        const minhChungData = await getMinhChung();
+        const countMap = minhChungData.reduce((acc, item) => {
+          const idTieuChuan = item.idTieuChuan;
+          acc[idTieuChuan] = (acc[idTieuChuan] || 0) + 1;
+          return acc;
+        }, {});
+        const updatedJsonArray2 = tieuChuanData.map(item => {
+          return {
+            ...item,
+            count: countMap[item.idTieuChuan] || 0
+          };
+        });
+        setTieuChuan(updatedJsonArray2);
+        console.log(updatedJsonArray2);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDataFromAPI();
+  }, []);
+  useEffect(() => {
+    const fetchDataFromAPI = async () => {
+      try {
+        const result = await getThongTinCTDT(transfer.maCtdt);
         setData(result);
 
       } catch (error) {
@@ -23,7 +62,6 @@ const ChuongTrinhDaoTao = () => {
         setLoading(false);
       }
     };
-
     fetchDataFromAPI();
   }, []);
   return (
@@ -58,7 +96,30 @@ const ChuongTrinhDaoTao = () => {
       ) : (
         <p>No data available</p>
       )}
+      <TableContainer  component={Paper}>
+        <Table className='font-Inter'>
+          <TableHead>
+            <TableRow >
+              <CustomTableHeadCell >STT</CustomTableHeadCell>
+              <CustomTableHeadCell>Tiêu Chuẩn</CustomTableHeadCell>
+              <CustomTableHeadCell>Minh Chứng</CustomTableHeadCell>
+              <CustomTableHeadCell>Số lượng minh chứng đã thu thập</CustomTableHeadCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {tieuChuan.map((row, index) => (
+              <TableRow key={row.id}>
+                <CustomTableCell>{index + 1}</CustomTableCell>
+                <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
+                <CustomTableCell><button className='btn btnMinhChung'>Quản lý minh chứng</button></CustomTableCell>
+                <CustomTableCell><b>{row.count}</b> minh chứng</CustomTableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
+    
   );
 };
 

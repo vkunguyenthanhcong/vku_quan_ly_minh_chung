@@ -17,12 +17,12 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   color : 'white',
   fontFamily : font.inter 
 }));;
-const GenericList = ({ maKdcl, maCtdt, tenCtdt}) => {
+const GenericList = ({ maKdcl}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const handleButtonClick = () => {
+  const handleButtonClick = (maCtdt, tenCtdt) => {
     const transfer = { maCtdt: maCtdt, tenCtdt: tenCtdt };
     localStorage.setItem('data', JSON.stringify(transfer));
     navigate(`chuong-trinh-dao-tao`);
@@ -38,7 +38,6 @@ const GenericList = ({ maKdcl, maCtdt, tenCtdt}) => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [maKdcl]);
 
@@ -48,7 +47,7 @@ const GenericList = ({ maKdcl, maCtdt, tenCtdt}) => {
   return (
     <ul>
       {data.map((item, index) => (
-        <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={handleButtonClick} className='btn btnViewCTDT'>{item.tenCtdt}</button></li>
+        <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btnViewCTDT'>{item.tenCtdt}</button></li>
       ))}
     </ul>
   );
@@ -94,7 +93,7 @@ const MainContent = () => {
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenKdcl}</CustomTableCell>
                 <CustomTableCell>{row.namBanHanh}</CustomTableCell>
-                <CustomTableCell><GenericList maKdcl={row.maKdcl} maCtdt={row.maCtdt} tenCtdt={row.tenCtdt} /></CustomTableCell>
+                <CustomTableCell><GenericList maKdcl={row.maKdcl}/></CustomTableCell>
               </TableRow>
             ))}
           </TableBody>

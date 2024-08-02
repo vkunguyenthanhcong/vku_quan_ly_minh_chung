@@ -2,6 +2,7 @@
 :root {
   --primary-color: #337ab7; 
   --secondary-color: #26B99A; 
+  --third-color:#e29755;
   --globalFont : Inter, "Helvetica Neue", Roboto, Arial, sans-serif !important;
 }
 
