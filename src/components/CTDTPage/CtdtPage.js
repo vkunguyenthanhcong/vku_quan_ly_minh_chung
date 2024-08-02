@@ -7,6 +7,7 @@ import './CtdtPage.css'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import font from '../font'
+
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
   fontFamily : font.inter 
@@ -17,13 +18,19 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   color : 'white',
   fontFamily : font.inter 
 }));;
+
 const ChuongTrinhDaoTao = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ tieuChuan, setTieuChuan] = useState([]);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const transfer = JSON.parse(localStorage.getItem('data'));
+  const handleClick = (idTieuChuan, tenTieuChuan, stt) => {
+    const transfer = { idTieuChuan: idTieuChuan, tenTieuChuan : tenTieuChuan, stt : stt};
+    localStorage.setItem('tieuChuan', JSON.stringify(transfer));
+    navigate(`../tieu-chi`);
+  };
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
@@ -41,7 +48,6 @@ const ChuongTrinhDaoTao = () => {
           };
         });
         setTieuChuan(updatedJsonArray2);
-        console.log(updatedJsonArray2);
       } catch (error) {
         setError(error);
       } finally {
@@ -111,7 +117,7 @@ const ChuongTrinhDaoTao = () => {
               <TableRow key={row.id}>
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
-                <CustomTableCell><button className='btn btnMinhChung'>Quản lý minh chứng</button></CustomTableCell>
+                <CustomTableCell><button onClick={() => handleClick(row.idTieuChuan, row.tenTieuChuan, index + 1)} className='btn btnMinhChung'>Quản lý minh chứng</button></CustomTableCell>
                 <CustomTableCell><b>{row.count}</b> minh chứng</CustomTableCell>
               </TableRow>
             ))}

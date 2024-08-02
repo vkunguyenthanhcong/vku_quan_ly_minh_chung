@@ -4,6 +4,7 @@ import MainPage from '../pages/MainPage';
 import ChuongTrinhDaoTao from '../components/CTDTPage/CtdtPage';
 import HomePage from '../pages/HomePage';
 import MainContent from '../components/MainContent/MainContent';
+import TieuChi from '../components/TCPage/TCPage';
 
 const routes = [
   {
@@ -12,6 +13,7 @@ const routes = [
     children: [
       { path: "", element: <MainContent /> },
       { path: "chuong-trinh-dao-tao", element: <ChuongTrinhDaoTao /> },
+      { path: "tieu-chi", element: <TieuChi /> },
     ],
   },
   {

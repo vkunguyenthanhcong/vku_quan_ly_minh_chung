@@ -68,14 +68,11 @@ const ChuongTrinhDaoTao = () => {
       try {
         const tieuChuanData = await getTieuChuanWithMaCtdt(ctdt);
         const minhChungData = await getMinhChung();
-  
         const countMap = minhChungData.reduce((acc, item) => {
           const idTieuChuan = item.idTieuChuan;
           acc[idTieuChuan] = (acc[idTieuChuan] || 0) + 1;
           return acc;
         }, {});
-        
-        // Step 2: Add the count to each item in the second JSON array
         const updatedJsonArray2 = tieuChuanData.map(item => {
           return {
             ...item,
@@ -88,10 +85,8 @@ const ChuongTrinhDaoTao = () => {
       } finally {
         setLoading(false);
       }
-      
     }
     fetchDataFromAPI();
-   
   }, []);
   const columns = React.useMemo(
     () => [
