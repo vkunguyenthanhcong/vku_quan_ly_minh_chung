@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { styled } from '@mui/material/styles';
 import font from '../font';
 import { useNavigate } from 'react-router-dom';
-import { getAllGoiYWithIdTieuChi, getAllTieuChiWithIdTieuChuan } from '../../services/apiServices';
+import { getAllGoiYWithIdTieuChi, getAllTieuChiWithIdTieuChuan, getAllMinhChungWithIdGoiY } from '../../services/apiServices';
 import './TCPage.css';
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: '16px',
@@ -23,58 +23,92 @@ const Table_GoiY = ({ idTieuChi }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const result = await getAllGoiYWithIdTieuChi(idTieuChi);
-          setGoiY(result);
-        } catch (err) {
-          setError(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
+        const fetchData = async () => {
+            try {
+                const result = await getAllGoiYWithIdTieuChi(idTieuChi);
+                setGoiY(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
     }, [idTieuChi]);
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
-    console.log(goiY);
     return (
         <>
-        {goiY.map((row, index) => (
-        <TableBody>
-        <TableRow className='border-1' key={row.id}>
-            <CustomTableCell width={150} className='border-1'>{row.tenGoiY}</CustomTableCell>
-            <CustomTableCell width={1000} className='p-5' >
-                <Table >
-                    <TableHead >
-                        <TableRow>
-                            <TableCell className='bg-white p-5'><b>Mã</b></TableCell>
-                            <TableCell className='bg-white p-5'><b>Số hiệu</b></TableCell>
-                            <TableCell className='bg-white p-5'><b>Tên VB</b></TableCell>
-                            <TableCell className='bg-white p-5'><button style={{width : '100%'}} className='btn btn-success'>Bổ sung</button></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell className='p-5'>H.01.01.01</TableCell>
-                            <TableCell  className='p-5'>199/QĐ-ĐHVH</TableCell>
-                            <TableCell  className='p-5'>V/v công bố "sứ mệnh, tầm nhìn, giá trị cốt lõi" Trường Đại học Công nghệ thông tin và truyền thông Việt Hàn</TableCell>
-                            <TableCell width={100}  className='p-5'>
-                                <button style={{width : '100%', marginBottom : '10px'}} className='btn btn-secondary'>Xem</button>
-                                <button style={{width : '100%', marginBottom : '10px'}} className='btn btn-primary'>Chỉnh mã</button>
-                                <button style={{width : '100%'}} className='btn btn-danger'>Xóa</button>
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </CustomTableCell>
-            <CustomTableCell width={1} style={{ border: '1px solid black' }}>{row.total}</CustomTableCell>
-        </TableRow>
-    </TableBody>
-        ))}
+            {goiY.map((row, index) => (
+                <TableBody>
+                    <TableRow key={row.id}>
+                        <CustomTableCell width={150} className='border-1'>{row.tenGoiY}</CustomTableCell>
+                        <CustomTableCell width={1000} className='border-1 p-5' >
+                            <Table_MinhChung idGoiY={row.idGoiY}></Table_MinhChung>
+                        </CustomTableCell>
+                        <CustomTableCell width={1} style={{ border: '1px solid black' }}>{row.total}</CustomTableCell>
+                    </TableRow>
+                </TableBody>
+            ))}
         </>
     );
-  };
+};
+const Table_MinhChung = ({ idGoiY }) => {
+    const [minhChung, setMinhChung] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await getAllMinhChungWithIdGoiY(idGoiY);
+                setMinhChung(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [idGoiY]);
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error.message}</div>;
+    return (
+        <>  <Table>
+            <TableHead>
+                <TableRow>
+                    {minhChung.length > 0 ? 
+                    <>
+                    <TableCell className='bg-white p-5 border-1'><b>Mã</b></TableCell>
+                    <TableCell className='bg-white p-5 border-1'><b>Số hiệu</b></TableCell>
+                    <TableCell className='bg-white p-5 border-1'><b>Tên VB</b></TableCell>
+                    <TableCell className='bg-white p-5 border-1'><button style={{ width: '100%' }} className='btn btn-success'>Bổ sung</button></TableCell>
+                    </> : 
+                    <>
+                    <TableCell width = {1000} colSpan={3} className='bg-white p-5 border-1'><button  className='btn btn-danger'>Thiếu</button></TableCell>
+                    <TableCell  width={100}  style={{float: 'right'}} className='bg-white p-5 border-1'><button className='btn btn-success'>Bổ sung</button></TableCell>
+                    </>
+                    }
+                </TableRow>
+            </TableHead>
+            {minhChung.map((row, index) => (
+                <TableBody>
+                    <TableRow>
+                        <TableCell className='p-5 border-1'>{row.maMc}</TableCell>
+                        <TableCell className='p-5 border-1'>{row.soHieu}</TableCell>
+                        <TableCell className='p-5 border-1'>{row.tenMinhChung}</TableCell>
+                        <TableCell width={100} className='p-5 border-1'>
+                            <button style={{ width: '100%', marginBottom: '10px' }} className='btn btn-secondary'>Xem</button>
+                            <button style={{ width: '100%', marginBottom: '10px' }} className='btn btn-primary'>Chỉnh mã</button>
+                            <button style={{ width: '100%' }} className='btn btn-danger'>Xóa</button>
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+
+            ))}
+        </Table>
+        </>
+    );
+};
 const TieuChi = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

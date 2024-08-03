@@ -75,5 +75,13 @@ export const getKdclData = () => {
         throw error;
       });
   };
+  export const getAllMinhChungWithIdGoiY = (idGoiY) => {
+    return api.get(`/minhchung/${idGoiY}`) // Endpoint for CTDT data
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching CTDT data:', error);
+        throw error;
+      });
+  };
 
 
