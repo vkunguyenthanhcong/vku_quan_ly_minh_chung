@@ -2,14 +2,17 @@
     padding: 1px !important;
     vertical-align: top !important;
 }
-table{
-    background-color: white !important;
-    color: #73879C !important;
-}
 .border-1{
     border: 1px solid black !important;
 }
 .font-Inter {
     font-size: 20px !important;
     font-family: Inter, "Helvetica Neue", Roboto, Arial, sans-serif !important;
+}
+td {
+    color : var(--text-color) !important;
+}
+th {
+    color : var(--text-color) !important;
+    font-weight: bold !important;
 }

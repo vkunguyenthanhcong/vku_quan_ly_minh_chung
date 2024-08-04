@@ -1,7 +1,7 @@
 import axios from 'axios';
 const api = axios.create({
     baseURL: 'http://localhost:1309/api', // Replace with your API base URL
-    timeout: 10000, // Optional: set a timeout for requests
+    timeout: 20000, // Optional: set a timeout for requests
     headers: {
       'Content-Type': 'application/json',
     },
@@ -11,7 +11,7 @@ export const getKdclData = () => {
     return api.get('/chuankdcl') // Endpoint for KDCL data
       .then(response => response.data)
       .catch(error => {
-        console.error('Error fetching KDCL data:', error);
+        console.error('Error :', error);
         throw error;
       });
   };
@@ -84,4 +84,39 @@ export const getKdclData = () => {
       });
   };
 
-
+export const getAllLoaiMinhChung = () => {
+    return api.get(`/loaiminhchung`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const getAllDonViBanHanh = () => {
+    return api.get(`/donvibanhanh`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const uploadMinhChung = (formData) => {
+    return api.post('/uploadToGoogleDrive', formData, {headers: {
+        'Content-Type': 'multipart/form-data',
+    },
+}).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const saveMinhChung = (minhChung) => {
+    return api.post('/khominhchung', minhChung, {headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};

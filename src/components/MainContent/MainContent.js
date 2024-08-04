@@ -14,7 +14,7 @@ const CustomTableCell = styled(TableCell)(({ theme }) => ({
 
 const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
-  color : 'white',
+  color : 'white !important',
   fontFamily : font.inter 
 }));;
 const GenericList = ({ maKdcl}) => {

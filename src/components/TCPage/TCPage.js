@@ -14,11 +14,11 @@ const CustomTableCell = styled(TableCell)(({ theme }) => ({
 }));
 const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     fontSize: '16px',
-    color: 'white',
+    color: 'white !important',
     border: '1px solid #ddd',
-    fontFamily: font.inter
+    fontFamily: font.inter, 
 }));;
-const Table_GoiY = ({ idTieuChi }) => {
+const Table_GoiY = ({ idTieuChi, tenTieuChi }) => {
     const [goiY, setGoiY] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -42,9 +42,9 @@ const Table_GoiY = ({ idTieuChi }) => {
             {goiY.map((row, index) => (
                 <TableBody>
                     <TableRow key={row.id}>
-                        <CustomTableCell width={150} className='border-1'>{row.tenGoiY}</CustomTableCell>
-                        <CustomTableCell width={1000} className='border-1 p-5' >
-                            <Table_MinhChung idGoiY={row.idGoiY}></Table_MinhChung>
+                        <CustomTableCell width={150}  className='border-1'>{row.tenGoiY}</CustomTableCell>
+                        <CustomTableCell  width={1000} className='border-1 p-5' >
+                            <Table_MinhChung idGoiY={row.idGoiY} tenTieuChi = {tenTieuChi} tenGoiY = {row.tenGoiY}></Table_MinhChung>
                         </CustomTableCell>
                         <CustomTableCell width={1} style={{ border: '1px solid black' }}>{row.total}</CustomTableCell>
                     </TableRow>
@@ -53,10 +53,16 @@ const Table_GoiY = ({ idTieuChi }) => {
         </>
     );
 };
-const Table_MinhChung = ({ idGoiY }) => {
+const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY}) => {
     const [minhChung, setMinhChung] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const handleClick = (tenTieuChi, tenGoiY, idGoiY) => {
+        const addMinhChung = { idGoiY: idGoiY, tenGoiY : tenGoiY, tenTieuChi : tenTieuChi};
+        localStorage.setItem('addMinhChung', JSON.stringify(addMinhChung));
+        navigate('/quan-ly/minh-chung');
+    };
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -78,14 +84,14 @@ const Table_MinhChung = ({ idGoiY }) => {
                 <TableRow>
                     {minhChung.length > 0 ? 
                     <>
-                    <TableCell className='bg-white p-5 border-1'><b>Mã</b></TableCell>
+                    <TableCell className='bg-white p-5 border-1' ><b>Mã</b></TableCell>
                     <TableCell className='bg-white p-5 border-1'><b>Số hiệu</b></TableCell>
                     <TableCell className='bg-white p-5 border-1'><b>Tên VB</b></TableCell>
-                    <TableCell className='bg-white p-5 border-1'><button style={{ width: '100%' }} className='btn btn-success'>Bổ sung</button></TableCell>
+                    <TableCell className='bg-white p-5 border-1'><button onClick={() => handleClick(tenTieuChi, tenGoiY, idGoiY)} style={{ width: '100%' }} className='btn btn-success'>Bổ sung</button></TableCell>
                     </> : 
                     <>
                     <TableCell width = {1000} colSpan={3} className='bg-white p-5 border-1'><button  className='btn btn-danger'>Thiếu</button></TableCell>
-                    <TableCell  width={100}  style={{float: 'right'}} className='bg-white p-5 border-1'><button className='btn btn-success'>Bổ sung</button></TableCell>
+                    <TableCell  width={100}  style={{float: 'right'}} className='bg-white p-5 border-1'><button onClick={() => handleClick(tenTieuChi, tenGoiY, idGoiY)} className='btn btn-success'>Bổ sung</button></TableCell>
                     </>
                     }
                 </TableRow>
@@ -155,7 +161,7 @@ const TieuChi = () => {
                                 <CustomTableCell width={150}>{row.yeuCau}</CustomTableCell>
                                 <CustomTableCell width={250}>{row.mocChuan}</CustomTableCell>
                                 <CustomTableCell colSpan={3} className='p-5'>
-                                    <Table_GoiY idTieuChi={row.idTieuChi}></Table_GoiY>
+                                    <Table_GoiY idTieuChi={row.idTieuChi} tenTieuChi={row.tenTieuChi}></Table_GoiY>
                                 </CustomTableCell>
                             </TableRow>
                         ))}
