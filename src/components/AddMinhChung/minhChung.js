@@ -123,7 +123,7 @@ const MinhChung = () => {
         }
     };
     const deleteMC = async (idMc, parentMaMc) => {
-        
+
         const response = await deleteMinhChung(idMc, parentMaMc);
         fetchData();
     }
@@ -314,8 +314,6 @@ const MinhChung = () => {
                                         <TableCell>{row.tenMinhChung}</TableCell>
                                         <TableCell width={150}>
                                             <button className="btn btn-secondary" onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem nhanh</button>
-                                            <br />
-                                            <button className="btn btn-primary space-5">Sửa</button>
                                             <br />
                                             <button onClick={() => deleteMC(row.idMc, row.parentMaMc)}  className="btn btn-danger space-5">Xoá</button>
                                         </TableCell>

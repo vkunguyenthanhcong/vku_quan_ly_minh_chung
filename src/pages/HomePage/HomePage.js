@@ -31,15 +31,7 @@ const Homepage = () => {
           <div className="text-center">
             <img src={'https://my.vku.udn.vn/images/logo2.png'} width='80%' /><br />
             <img src={'https://my.vku.udn.vn/public/images/sict2.jpg'} width='80%' /><br />
-
-            <Button style={{background : 'transparent', border : '0'}}><GoogleLogin
-              onSuccess={handleLoginSuccess}
-              onError={() => {
-                console.log('Login Failed');
-              }}
-              useOneTap
-            /></Button><br/>
-            {/* <Button variant="success"><b><Link className="no-style-link" to={'/mainpage'}>ĐĂNG NHẬP HỆ THỐNG TÁC NGHIỆP</Link></b></Button><br /> */}
+             <Button variant="success"><b>ĐĂNG NHẬP HỆ THỐNG TÁC NGHIỆP</b></Button><br />
             <Button className='btn-2'><b>HỆ THỐNG QUẢN LÝ ĐÀO TẠO</b></Button><br />
             <Button className='btn-2'><b>HỆ THỐNG HỌC TRỰC TUYẾN ELEARNING</b></Button><br />
           </div>

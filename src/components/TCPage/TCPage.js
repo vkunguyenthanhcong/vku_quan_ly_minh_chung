@@ -4,7 +4,12 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import { styled } from '@mui/material/styles';
 import font from '../font';
 import { useNavigate } from 'react-router-dom';
-import { getAllGoiYWithIdTieuChi, getAllTieuChiWithIdTieuChuan, getAllMinhChungWithIdGoiY } from '../../services/apiServices';
+import {
+    getAllGoiYWithIdTieuChi,
+    getAllTieuChiWithIdTieuChuan,
+    getAllMinhChungWithIdGoiY,
+    deleteMinhChung
+} from '../../services/apiServices';
 import './TCPage.css';
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: '16px',
@@ -42,7 +47,7 @@ const Table_GoiY = ({ idTieuChi, tenTieuChi , sttTieuChi }) => {
             {goiY.map((row, index) => (
                 <TableBody>
                     <TableRow key={row.id}>
-                        <CustomTableCell width={150}  className='border-1'>{row.tenGoiY}</CustomTableCell>
+                        <CustomTableCell width={300}  className='border-1'>{row.tenGoiY}</CustomTableCell>
                         <CustomTableCell  width={1000} className='border-1 p-5' >
                             <Table_MinhChung idGoiY={row.idGoiY} tenTieuChi = {tenTieuChi} tenGoiY = {row.tenGoiY} sttTieuChi = {sttTieuChi}></Table_MinhChung>
                         </CustomTableCell>
@@ -63,19 +68,25 @@ const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY , sttTieuChi}) => {
         localStorage.setItem('addMinhChung', JSON.stringify(addMinhChung));
         navigate('/quan-ly/minh-chung');
     };
+    const fetchMinhChung = async () => {
+        try {
+            const result = await getAllMinhChungWithIdGoiY(idGoiY);
+            setMinhChung(result);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await getAllMinhChungWithIdGoiY(idGoiY);
-                setMinhChung(result);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        fetchMinhChung();
     }, [idGoiY]);
+    const deleteMC = async (idMc, parentMaMc) => {
+
+        const response = await deleteMinhChung(idMc, parentMaMc);
+        fetchMinhChung();
+    }
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
     return (
@@ -100,12 +111,11 @@ const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY , sttTieuChi}) => {
                 <TableBody>
                     <TableRow>
                         <TableCell width ={100} className='p-5 border-1'>{row.parentMaMc}{row.childMaMc}</TableCell>
-                        <TableCell  width ={200} className='p-5 border-1'>{row.soHieu}</TableCell>
+                        <TableCell  width ={150} className='p-5 border-1'>{row.soHieu}</TableCell>
                         <TableCell className='p-5 border-1'>{row.tenMinhChung}</TableCell>
                         <TableCell width={100} className='p-5 border-1'>
-                            <button style={{ width: '100%', marginBottom: '10px' }} className='btn btn-secondary'>Xem</button>
-                            <button style={{ width: '100%', marginBottom: '10px' }} className='btn btn-primary'>Chỉnh mã</button>
-                            <button style={{ width: '100%' }} className='btn btn-danger'>Xóa</button>
+                            <button style={{ width: '100%', marginTop : '10px' }} className='btn btn-secondary'>Xem</button>
+                            <button style={{ width: '100%', marginTop : '10px' }} onClick={() => deleteMC(row.idMc, row.parentMaMc)} className='btn btn-danger'>Xóa</button>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -115,6 +125,7 @@ const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY , sttTieuChi}) => {
         </>
     );
 };
+
 const TieuChi = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -146,7 +157,7 @@ const TieuChi = () => {
                             <CustomTableHeadCell>Tiêu Chuẩn/<br />Tiêu Chí</CustomTableHeadCell>
                             <CustomTableHeadCell>Yêu cầu của tiêu chí</CustomTableHeadCell>
                             <CustomTableHeadCell>Mốc chuẩn tham chiếu để đánh giá tiêu chí đạt mức 4</CustomTableHeadCell>
-                            <CustomTableHeadCell style={{ border: '0' }} width={150} >Gợi ý nguồn minh chứng</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0' }} width={300} >Gợi ý nguồn minh chứng</CustomTableHeadCell>
                             <CustomTableHeadCell style={{ border: '0' }}>Minh Chứng</CustomTableHeadCell>
                             <CustomTableHeadCell style={{ border: '0' }} width={1} >Tổng số MC</CustomTableHeadCell>
                         </TableRow>

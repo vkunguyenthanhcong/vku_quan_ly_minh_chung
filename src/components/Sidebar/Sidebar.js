@@ -24,7 +24,6 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
             <Link style={{color : '#EDEDED9B', textDecoration : 'none',}} onClick={logout}>Thoát</Link>
           </Col>
         </Row>
-        <p style={{ fontSize: '12px', marginTop: '20px' }}><b>TUẦN HỌC THỨ 52</b></p>
       </div>
 
       <div className={isScreenSmall ? 'text-center' : ''} style={{ fontSize: '16px', marginTop: '20px' }}>
