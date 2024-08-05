@@ -100,6 +100,40 @@ export const getAllDonViBanHanh = () => {
             throw error;
         });
 };
+export const getAllKhoMinhChung = () => {
+    return api.get(`/khominhchung`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const searchLoaiVanBanByNotDate = (tenMc, soHieu, idLoai) => {
+    return api.get(`/khominhchung/searchByNotDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate) => {
+    return api.get(`/khominhchung/searchByDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}&startDate=${startDate}&endDate=${endDate}`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const deleteMinhChung = (idMc, parentMaMc) => {
+    return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 export const uploadMinhChung = (formData) => {
     return api.post('/uploadToGoogleDrive', formData, {headers: {
         'Content-Type': 'multipart/form-data',
@@ -120,3 +154,14 @@ export const saveMinhChung = (minhChung) => {
             throw error;
         });
 };
+export const saveFromKMCtoMinhChung = (minhChung) => {
+    return api.post('/minhchung', minhChung, {headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+

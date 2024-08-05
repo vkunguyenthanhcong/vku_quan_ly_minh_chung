@@ -18,7 +18,7 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     border: '1px solid #ddd',
     fontFamily: font.inter, 
 }));;
-const Table_GoiY = ({ idTieuChi, tenTieuChi }) => {
+const Table_GoiY = ({ idTieuChi, tenTieuChi , sttTieuChi }) => {
     const [goiY, setGoiY] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -44,7 +44,7 @@ const Table_GoiY = ({ idTieuChi, tenTieuChi }) => {
                     <TableRow key={row.id}>
                         <CustomTableCell width={150}  className='border-1'>{row.tenGoiY}</CustomTableCell>
                         <CustomTableCell  width={1000} className='border-1 p-5' >
-                            <Table_MinhChung idGoiY={row.idGoiY} tenTieuChi = {tenTieuChi} tenGoiY = {row.tenGoiY}></Table_MinhChung>
+                            <Table_MinhChung idGoiY={row.idGoiY} tenTieuChi = {tenTieuChi} tenGoiY = {row.tenGoiY} sttTieuChi = {sttTieuChi}></Table_MinhChung>
                         </CustomTableCell>
                         <CustomTableCell width={1} style={{ border: '1px solid black' }}>{row.total}</CustomTableCell>
                     </TableRow>
@@ -53,13 +53,13 @@ const Table_GoiY = ({ idTieuChi, tenTieuChi }) => {
         </>
     );
 };
-const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY}) => {
+const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY , sttTieuChi}) => {
     const [minhChung, setMinhChung] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const handleClick = (tenTieuChi, tenGoiY, idGoiY) => {
-        const addMinhChung = { idGoiY: idGoiY, tenGoiY : tenGoiY, tenTieuChi : tenTieuChi};
+    const handleClick = (tenTieuChi, tenGoiY, idGoiY, stt) => {
+        const addMinhChung = { idGoiY: idGoiY, tenGoiY : tenGoiY, tenTieuChi : tenTieuChi, stt : sttTieuChi};
         localStorage.setItem('addMinhChung', JSON.stringify(addMinhChung));
         navigate('/quan-ly/minh-chung');
     };
@@ -99,8 +99,8 @@ const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY}) => {
             {minhChung.map((row, index) => (
                 <TableBody>
                     <TableRow>
-                        <TableCell className='p-5 border-1'>{row.maMc}</TableCell>
-                        <TableCell className='p-5 border-1'>{row.soHieu}</TableCell>
+                        <TableCell width ={100} className='p-5 border-1'>{row.parentMaMc}{row.childMaMc}</TableCell>
+                        <TableCell  width ={200} className='p-5 border-1'>{row.soHieu}</TableCell>
                         <TableCell className='p-5 border-1'>{row.tenMinhChung}</TableCell>
                         <TableCell width={100} className='p-5 border-1'>
                             <button style={{ width: '100%', marginBottom: '10px' }} className='btn btn-secondary'>Xem</button>
@@ -161,7 +161,7 @@ const TieuChi = () => {
                                 <CustomTableCell width={150}>{row.yeuCau}</CustomTableCell>
                                 <CustomTableCell width={250}>{row.mocChuan}</CustomTableCell>
                                 <CustomTableCell colSpan={3} className='p-5'>
-                                    <Table_GoiY idTieuChi={row.idTieuChi} tenTieuChi={row.tenTieuChi}></Table_GoiY>
+                                    <Table_GoiY sttTieuChi ={index + 1} idTieuChi={row.idTieuChi} tenTieuChi={row.tenTieuChi}></Table_GoiY>
                                 </CustomTableCell>
                             </TableRow>
                         ))}
