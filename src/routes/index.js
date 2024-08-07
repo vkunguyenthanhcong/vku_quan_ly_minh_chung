@@ -6,7 +6,9 @@ import HomePage from '../pages/HomePage';
 import MainContent from '../components/MainContent/MainContent';
 import TieuChi from '../components/TCPage/TCPage';
 import MinhChung from "../components/AddMinhChung/minhChung";
-import NewMinhChung from "../components/AddNewMinhChung/NewMinhChung";
+import StandardManagement from "../components/StandardManagement/StandardManagement";
+import ListStandard from "../components/ListStandard/ListStandard";
+import NewMinhChung from "../components/ManageEvidence/AddNewMinhChung/NewMinhChung";
 
 const routes = [
   {
@@ -18,8 +20,20 @@ const routes = [
       { path: "tieu-chi", element: <TieuChi /> },
       { path: "minh-chung", element: <MinhChung /> },
       { path: "them-minh-chung", element: <NewMinhChung /> },
+      {
+        path: "quan-ly-tieu-chuan",
+        element: <StandardManagement />,
+
+      },
+      {
+        path: "tieu-chuan",
+        element: <ListStandard />,
+
+      },
+
     ],
-  },
+  }
+,
   {
     path: "/",
     element: <HomePage />,

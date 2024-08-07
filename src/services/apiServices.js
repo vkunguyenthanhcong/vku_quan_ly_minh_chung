@@ -154,6 +154,16 @@ export const saveMinhChung = (minhChung) => {
             throw error;
         });
 };
+export const saveGoiY = (goiY) => {
+    return api.post('/goiy', goiY, {headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 export const saveFromKMCtoMinhChung = (minhChung) => {
     return api.post('/minhchung', minhChung, {headers: {
             'Content-Type': 'application/json',

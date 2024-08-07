@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import Alert from '@mui/material/Alert';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import './NewMinhChung.css';
 import { useNavigate } from "react-router-dom";
-import {getAllDonViBanHanh, getAllLoaiMinhChung, saveMinhChung, uploadMinhChung} from "../../services/apiServices";
+import {getAllDonViBanHanh, getAllLoaiMinhChung, saveMinhChung, uploadMinhChung} from "../../../services/apiServices";
 
 function LoadingProcess(props) {
     const { open } = props;
@@ -91,6 +90,7 @@ const NewMinhChung = () =>{
     return (
         <div className="content" style={{margin: '20px', padding: '20px'}}>
 
+
             <label htmlFor="loaiCongVan"><b>Loại công văn</b></label>
             <select id="loaiCongVan" className='form-select' value={selectedLoai}
                     onChange={(e) => setSelectedLoai(e.target.value)} required>
@@ -130,10 +130,10 @@ const NewMinhChung = () =>{
                    onChange={(e) => setNgayPhatHanh(e.target.value)} required/>
             <br/>
             <label htmlFor="fileUpload"><b>File</b></label>
-            <input required id="fileUpload" className='form-control' type="file" onChange={(e) => setFile(e.target.files[0])}/>
+            <input required id="fileUpload" className='form-control' type="file"
+                   onChange={(e) => setFile(e.target.files[0])}/>
             <br/>
             <button onClick={handleUpload} className='btn btn-success'>Thêm</button>
-
             <LoadingProcess
                 open={open}
             />
