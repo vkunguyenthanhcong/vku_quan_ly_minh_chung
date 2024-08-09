@@ -1,0 +1,27 @@
+.simple-table thead {
+    background-color: transparent !important;
+}
+.simple-table {
+    border : 1px solid black !important;
+    color: black !important;
+}
+
+.simple-table td{    border : 1px solid black !important;
+    color: black !important;
+}
+
+.simple-table th{    border : 1px solid black !important;
+    color: black !important;
+    font-weight : bold !important;
+}
+.bold {
+    font-weight: bold !important;
+}
+.bold-italic {
+    font-weight: bold !important;
+    font-style: italic;
+}
+.simple-table, .font
+{
+    font-family: "Times New Roman", Times, serif !important;
+}

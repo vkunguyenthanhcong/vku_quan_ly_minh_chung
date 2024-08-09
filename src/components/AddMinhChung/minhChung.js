@@ -20,7 +20,6 @@ import {
     getAllLoaiMinhChung,
     getAllMinhChungWithIdGoiY,
     saveFromKMCtoMinhChung,
-    saveMinhChung,
     searchLoaiVanBanByDate,
     searchLoaiVanBanByNotDate,
 } from "../../services/apiServices";
@@ -64,7 +63,7 @@ const MinhChung = () => {
 
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate("/quan-ly/them-minh-chung");
+        navigate("/quan-ly/quan-ly-minh-chung");
     };
     const handleClickViewPDF = (link) => {
         setLink(link);
@@ -126,6 +125,9 @@ const MinhChung = () => {
 
         const response = await deleteMinhChung(idMc, parentMaMc);
         fetchData();
+    }
+    const handleClickEdit =  (EvidenceID) =>{
+        navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}`);
     }
     return (
         <div
@@ -257,7 +259,7 @@ const MinhChung = () => {
                                             </b>
                                             <br />
                                             <b>
-                                                <button className="btn btn-success space-5">Sửa</button>
+                                                <button className="btn btn-success space-5" onClick={() => handleClickEdit(row.idKhoMinhChung)}>Sửa</button>
                                             </b>
                                             <br />
 

@@ -126,6 +126,36 @@ export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate
             throw error;
         });
 };
+
+export const getKhoMinhChungWithId = (EvidenceID) => {
+    return api.get(`/khominhchung/findById/${EvidenceID}`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const getMinhChungWithIdTieuChi = (criteriaID) => {
+    return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const updateKhoMinhChung = (EvidenceID, minhChung) => {
+    return api.put(`/khominhchung/edit/${EvidenceID}`, minhChung, {headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
 export const deleteMinhChung = (idMc, parentMaMc) => {
     return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`)
         .then(response => response.data)

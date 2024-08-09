@@ -46,9 +46,9 @@ const Table_GoiY = ({ idTieuChi, tenTieuChi , sttTieuChi }) => {
         <>
             {goiY.map((row, index) => (
                 <TableBody>
-                    <TableRow key={row.id}>
-                        <CustomTableCell width={300}  className='border-1'>{row.tenGoiY}</CustomTableCell>
-                        <CustomTableCell  width={1000} className='border-1 p-5' >
+                    <TableRow key={row.id} >
+                        <CustomTableCell width={200}  className='border-1'>{row.tenGoiY}</CustomTableCell>
+                        <CustomTableCell width={750} className='border-1 p-5' >
                             <Table_MinhChung idGoiY={row.idGoiY} tenTieuChi = {tenTieuChi} tenGoiY = {row.tenGoiY} sttTieuChi = {sttTieuChi}></Table_MinhChung>
                         </CustomTableCell>
                         <CustomTableCell width={1} style={{ border: '1px solid black' }}>{row.total}</CustomTableCell>
@@ -91,7 +91,7 @@ const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY , sttTieuChi}) => {
     if (error) return <div>Error: {error.message}</div>;
     return (
         <>  <Table>
-            <TableHead>
+            <TableBody >
                 <TableRow>
                     {minhChung.length > 0 ? 
                     <>
@@ -101,12 +101,12 @@ const Table_MinhChung = ({ idGoiY, tenTieuChi, tenGoiY , sttTieuChi}) => {
                     <TableCell className='bg-white p-5 border-1'><button onClick={() => handleClick(tenTieuChi, tenGoiY, idGoiY)} style={{ width: '100%' }} className='btn btn-success'>Bổ sung</button></TableCell>
                     </> : 
                     <>
-                    <TableCell width = {1000} colSpan={3} className='bg-white p-5 border-1'><button  className='btn btn-danger'>Thiếu</button></TableCell>
-                    <TableCell  width={100}  style={{float: 'right'}} className='bg-white p-5 border-1'><button onClick={() => handleClick(tenTieuChi, tenGoiY, idGoiY)} className='btn btn-success'>Bổ sung</button></TableCell>
+                    <TableCell width = {1000} colSpan={3} className='bg-white p-5' style={{border : '0 !important'}}><button  className='btn btn-danger'>Thiếu</button></TableCell>
+                    <TableCell  width={100}  style={{float: 'right'}} className='bg-white p-5'style={{border : '0 !important'}}><button onClick={() => handleClick(tenTieuChi, tenGoiY, idGoiY)} className='btn btn-success'>Bổ sung</button></TableCell>
                     </>
                     }
                 </TableRow>
-            </TableHead>
+            </TableBody>
             {minhChung.map((row, index) => (
                 <TableBody>
                     <TableRow>

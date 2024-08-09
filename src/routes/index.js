@@ -8,7 +8,8 @@ import TieuChi from '../components/TCPage/TCPage';
 import MinhChung from "../components/AddMinhChung/minhChung";
 import StandardManagement from "../components/StandardManagement/StandardManagement";
 import ListStandard from "../components/ListStandard/ListStandard";
-import NewMinhChung from "../components/ManageEvidence/AddNewMinhChung/NewMinhChung";
+import ManageEvidence from "../components/ManageEvidence/ManageEvidence";
+import ListEvidence from "../pages/ListEvidence";
 
 const routes = [
   {
@@ -19,7 +20,7 @@ const routes = [
       { path: "chuong-trinh-dao-tao", element: <ChuongTrinhDaoTao /> },
       { path: "tieu-chi", element: <TieuChi /> },
       { path: "minh-chung", element: <MinhChung /> },
-      { path: "them-minh-chung", element: <NewMinhChung /> },
+      { path: "quan-ly-minh-chung", element: <ManageEvidence /> },
       {
         path: "quan-ly-tieu-chuan",
         element: <StandardManagement />,
@@ -37,6 +38,10 @@ const routes = [
   {
     path: "/",
     element: <HomePage />,
+  },
+  {
+    path: "/danh-muc-minh-chung",
+    element: <ListEvidence />,
   },
 ];
 
