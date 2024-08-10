@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import font from '../font';
+import font from '../../../../components/font';
 import { useNavigate } from 'react-router-dom';
 import {
     getAllGoiYWithIdTieuChi,
     getAllTieuChiWithIdTieuChuan,
     getAllMinhChungWithIdGoiY,
     deleteMinhChung
-} from '../../services/apiServices';
+} from '../../../../services/apiServices';
 import './TCPage.css';
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: '16px',

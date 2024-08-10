@@ -10,7 +10,7 @@ import {
     Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import font from "../font";
+import font from "../../../../components/font";
 import "./minhChung.css";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
@@ -22,9 +22,9 @@ import {
     saveFromKMCtoMinhChung,
     searchLoaiVanBanByDate,
     searchLoaiVanBanByNotDate,
-} from "../../services/apiServices";
-import PdfPreview from "../../services/PdfPreview";
-import { createMaMinhChung, format2Number } from "../../services/formatNumber";
+} from "../../../../services/apiServices";
+import PdfPreview from "../../../../services/PdfPreview";
+import { createMaMinhChung, format2Number } from "../../../../services/formatNumber";
 const MinhChung = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);

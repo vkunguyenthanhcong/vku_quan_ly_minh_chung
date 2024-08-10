@@ -156,6 +156,29 @@ export const updateKhoMinhChung = (EvidenceID, minhChung) => {
         });
 };
 
+export const updateTenKdcl = (tenKdcl, idKdcl) => {
+    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&idKdcl=${idKdcl}`).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const updateNamBanHanh = (namBanHanh, idKdcl) => {
+    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&idKdcl=${idKdcl}`).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const deleteChuanKDCL = (idKdcl) => {
+    return api.delete(`/chuankdcl/deleteChuanKDCL?idKdcl=${idKdcl}`).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
 export const deleteMinhChung = (idMc, parentMaMc) => {
     return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`)
         .then(response => response.data)

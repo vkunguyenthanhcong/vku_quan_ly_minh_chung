@@ -1,12 +1,12 @@
-// src/components/MainContent.js
+// src/components/AdminMainContent.js
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getThongTinCTDT, getTieuChuanWithMaCtdt, getMinhChung } from '../../services/apiServices';
+import { getThongTinCTDT, getTieuChuanWithMaCtdt, getMinhChung } from '../../../../services/apiServices';
 import { useNavigate } from 'react-router-dom';
 import './CtdtPage.css'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import font from '../font'
+import font from '../../../../components/font'
 
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
@@ -106,7 +106,7 @@ const ChuongTrinhDaoTao = () => {
         <Table className='font-Inter'>
           <TableHead>
             <TableRow >
-              <CustomTableHeadCell >STT</CustomTableHeadCell>
+              <CustomTableHeadCell>STT</CustomTableHeadCell>
               <CustomTableHeadCell>Tiêu Chuẩn</CustomTableHeadCell>
               <CustomTableHeadCell>Minh Chứng</CustomTableHeadCell>
               <CustomTableHeadCell>Số lượng minh chứng đã thu thập</CustomTableHeadCell>

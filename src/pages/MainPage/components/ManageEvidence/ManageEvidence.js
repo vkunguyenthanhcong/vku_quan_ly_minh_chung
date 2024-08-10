@@ -13,8 +13,8 @@ import {
     getKhoMinhChungWithId,
     saveMinhChung, updateKhoMinhChung,
     uploadMinhChung
-} from "../../services/apiServices";
-import PdfPreview from "../../services/PdfPreview";
+} from "../../../../services/apiServices";
+import PdfPreview from "../../../../services/PdfPreview";
 
 function LoadingProcess(props) {
     const { open } = props;

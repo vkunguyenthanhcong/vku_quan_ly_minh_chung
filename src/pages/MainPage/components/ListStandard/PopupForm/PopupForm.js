@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './PopupForm.css';
-import {saveGoiY, saveMinhChung} from "../../../services/apiServices"; // Optional: for styling
+import {saveGoiY, saveMinhChung} from "../../../../../services/apiServices"; // Optional: for styling
 
 const PopupForm = ({ isVisible, onClose, idTieuChi , fetchGoiY }) => {
     const [inputValue, setInputValue] = useState('');

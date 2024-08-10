@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import './ListStandard.css'
 import { styled } from '@mui/material/styles';
-import colors from '../color';
-import font from '../font'
+import colors from '../../../../components/color';
+import font from '../../../../components/font'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import {
     getAllKhoMinhChung,
     getAllTieuChiWithIdTieuChuan,
     getTieuChuanWithMaCtdt
-} from "../../services/apiServices";
+} from "../../../../services/apiServices";
 import PopupForm from "./PopupForm/PopupForm";
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: '16px',

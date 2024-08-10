@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import './MainContent.css'
 import { styled } from '@mui/material/styles';
-import colors from '../color';
-import font from '../font'
+import colors from '../../../../components/color';
+import font from '../../../../components/font'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { getKdclData, getCtdtDataByMaKDCL } from '../../services/apiServices'
+import { getKdclData, getCtdtDataByMaKDCL } from '../../../../services/apiServices'
 import { useNavigate } from 'react-router-dom';
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
@@ -81,7 +81,7 @@ const MainContent = () => {
         <Table className='font-Inter'>
           <TableHead>
             <TableRow >
-              <CustomTableHeadCell >STT</CustomTableHeadCell>
+              <CustomTableHeadCell>STT</CustomTableHeadCell>
               <CustomTableHeadCell>Tên Chuẩn đánh giá</CustomTableHeadCell>
               <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
               <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
