@@ -4,7 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import './ManageEvidence.css';
+import './QuanLyMinhChung.css';
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import {
@@ -29,10 +29,14 @@ function LoadingProcess(props) {
 }
 
 
-const ManageEvidence = () =>{
+const QuanLyMinhChung = () =>{
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const EvidenceID = queryParams.get('EvidenceID');
+
+    const GoiY_ID = queryParams.get('GoiY_ID');
+    const TieuChi_ID = queryParams.get('TieuChi_ID');
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -53,28 +57,37 @@ const ManageEvidence = () =>{
     const [ngayPhatHanh, setNgayPhatHanh] = useState('');
     const [file, setFile] = useState(null);
     const [uploadedFile, setUploadedFile] = useState(null);
+
+
+
     const handleClickViewPDF = () => {
         openModal();
     };
     const fetchData = async () => {
+        setLoading(true); // Set loading state at the beginning
         try {
-            const loaiMinhChungResponse = await getAllLoaiMinhChung();
-            const donViBanHanhResponse = await getAllDonViBanHanh();
-            setDonViBanHanh(donViBanHanhResponse);
+            const [loaiMinhChungResponse, donViBanHanhResponse] = await Promise.all([
+                getAllLoaiMinhChung(),
+                getAllDonViBanHanh(),
+            ]);
+
             setLoaiMinhChung(loaiMinhChungResponse);
+            setDonViBanHanh(donViBanHanhResponse);
+
         } catch (error) {
-            setError(error);
+            setError(error.message || 'An error occurred while fetching data.');
         } finally {
-            setLoading(false);
+            setLoading(false); // Ensure loading state is turned off after the operation
         }
     };
+
     const fetchDataFromIdGoiY = async () => {
         if(EvidenceID == null) {
             return;
         }else{
             const response = await getKhoMinhChungWithId(EvidenceID);
             if(response == ''){
-                navigate('quan-ly/minh-chung');
+                navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
             }else{
                 setSelectedLoai(response.idLoai);
                 setSelectedDonVi(response.idDvbh);
@@ -111,7 +124,7 @@ const ManageEvidence = () =>{
 
                 const response_1 = await updateKhoMinhChung(EvidenceID, minhChung);
                 setOpen(false);
-                navigate('/quan-ly/minh-chung');
+                navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
             }else{
                 const formData = new FormData();
                 formData.append("file", file);
@@ -137,7 +150,7 @@ const ManageEvidence = () =>{
 
                         const response_1 = await updateKhoMinhChung(EvidenceID,minhChung);
                         setOpen(false);
-                        navigate('/quan-ly/minh-chung');
+                        navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
                     } catch (error) {
 
                     }
@@ -174,7 +187,7 @@ const ManageEvidence = () =>{
 
                     const response_1 = await saveMinhChung(minhChung);
                     setOpen(false);
-                    navigate('/quan-ly/minh-chung');
+                    navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
                 } catch (error) {
 
                 }
@@ -243,4 +256,4 @@ const ManageEvidence = () =>{
         </div>
     );
 }
-export default ManageEvidence;
+export default QuanLyMinhChung;

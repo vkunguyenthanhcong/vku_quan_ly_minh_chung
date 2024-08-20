@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import './StandardManagement.css'
+import './QuanLyTieuChuan.css'
 import { styled } from '@mui/material/styles';
 import colors from '../../../../components/color';
 import font from '../../../../components/font'
@@ -23,8 +23,6 @@ const GenericList = ({ maKdcl}) => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const handleButtonClick = (maCtdt, tenCtdt) => {
-        const transfer = { maCtdt: maCtdt, tenCtdt: tenCtdt };
-        localStorage.setItem('data', JSON.stringify(transfer));
         navigate(`../tieu-chuan?KhungChuongTrinhID=${maCtdt}`);
     };
     useEffect(() => {
@@ -52,7 +50,7 @@ const GenericList = ({ maKdcl}) => {
         </ul>
     );
 };
-const StandardManagement = () => {
+const QuanLyTieuChuan = () => {
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -103,4 +101,4 @@ const StandardManagement = () => {
     );
 };
 
-export default StandardManagement;
+export default QuanLyTieuChuan;

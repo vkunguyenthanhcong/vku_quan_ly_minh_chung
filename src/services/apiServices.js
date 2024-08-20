@@ -15,6 +15,7 @@ export const getKdclData = () => {
         throw error;
       });
   };
+
   
   // Fetch CTDT data
   export const getCtdtData = () => {
@@ -25,6 +26,7 @@ export const getKdclData = () => {
         throw error;
       });
   };
+
   export const getCtdtDataByMaKDCL = (maKdcl) => {
     return api.get(`/ctdt/filter/${maKdcl}`) // Endpoint for CTDT data
       .then(response => response.data)
@@ -33,17 +35,43 @@ export const getKdclData = () => {
         throw error;
       });
   };
+
+export const getTieuChiByMaCtdt = (maCtdt) => {
+    return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+
   export const getThongTinCTDT = (maCtdt) => {
-    return api.get(`/details/${maCtdt}`) // Endpoint for CTDT data
+    return api.get(`/ctdt/thongtinchitiet/${maCtdt}`) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
         throw error;
       });
   };
+export const getGoiYById = (idGoiY) => {
+    return api.get(`/goiy/findById/${idGoiY}`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+export const getTieuChiById = (idTieuChi) => {
+    return api.get(`/tieuchi/findById/${idTieuChi}`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
 
   export const getTieuChuanWithMaCtdt = (maCtdt) => {
-    return api.get(`/tieuchuan/filterMaCtdt/${maCtdt}`) // Endpoint for CTDT data
+    return api.get(`/tieuchuan/listandcount/${maCtdt}`) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
@@ -51,7 +79,16 @@ export const getKdclData = () => {
       });
   };
 
-  export const getMinhChung = () => {
+export const getTieuChuanById = (TieuChuan_ID) => {
+    return api.get(`/tieuchuan/${TieuChuan_ID}`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+
+export const getMinhChung = () => {
     return api.get(`/minhchung`) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
@@ -59,6 +96,14 @@ export const getKdclData = () => {
         throw error;
       });
   };
+export const getMinhChungByMaCtdt = (maCtdt) => {
+    return api.get(`/minhchung/findByMaCtdt/${maCtdt}`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
   export const getAllTieuChiWithIdTieuChuan = (idTieuChuan) => {
     return api.get(`/tieuchi/${idTieuChuan}`) // Endpoint for CTDT data
       .then(response => response.data)
@@ -67,14 +112,22 @@ export const getKdclData = () => {
         throw error;
       });
   };
-  export const getAllGoiYWithIdTieuChi = (idTieuChi) => {
-    return api.get(`/goiy/${idTieuChi}`) // Endpoint for CTDT data
+  export const getAllGoiYWithIdMocChuan = (idMocChuan) => {
+    return api.get(`/goiy/${idMocChuan}`) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
-        console.error('Error fetching CTDT data:', error);
+        console.error(error);
         throw error;
       });
   };
+export const getAllMocChuanWithIdTieuChi = (idTieuChi) => {
+    return api.get(`/mocchuan/findByIdTieuChi/${idTieuChi}`) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error(error);
+            throw error;
+        });
+};
   export const getAllMinhChungWithIdGoiY = (idGoiY) => {
     return api.get(`/minhchung/${idGoiY}`) // Endpoint for CTDT data
       .then(response => response.data)
@@ -102,6 +155,14 @@ export const getAllDonViBanHanh = () => {
 };
 export const getAllKhoMinhChung = () => {
     return api.get(`/khominhchung`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const getAllMinhChung = () => {
+    return api.get(`/minhchung`)
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);

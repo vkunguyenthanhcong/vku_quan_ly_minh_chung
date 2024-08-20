@@ -9,16 +9,14 @@ import {
     TableRow,
     Paper,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import font from "../../../../components/font";
 import "./minhChung.css";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
 import {
     deleteMinhChung,
     getAllKhoMinhChung,
-    getAllLoaiMinhChung,
-    getAllMinhChungWithIdGoiY,
+    getAllLoaiMinhChung, getAllMinhChung,
+    getAllMinhChungWithIdGoiY, getGoiYById, getTieuChiById, getTieuChuanById,
     saveFromKMCtoMinhChung,
     searchLoaiVanBanByDate,
     searchLoaiVanBanByNotDate,
@@ -38,18 +36,43 @@ const MinhChung = () => {
     const [loaiVanBan, setLoaiVanBan] = useState([]);
     const [khoMinhChung, setKhoMinhChung] = useState([]);
     const [minhChung, setMinhChung] = useState([]);
+    const [allMinhChung, setAllMinhChung] = useState([]);
+    const [goiY, setGoiY] = useState([]);
+    const [tieuChi, setTieuChi] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const addMinhChung = JSON.parse(localStorage.getItem("addMinhChung"));
-    const tieuChuan = JSON.parse(localStorage.getItem("tieuChuan"));
+
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const GoiY_ID = queryParams.get('GoiY_ID');
+    const TieuChi_ID = queryParams.get('TieuChi_ID');
+
     const fetchData = async () => {
+        setLoading(true);
         try {
-            const result = await getAllKhoMinhChung();
-            const loaiMC = await getAllLoaiMinhChung();
-            const mC = await getAllMinhChungWithIdGoiY(addMinhChung.idGoiY);
-            setMinhChung(mC);
-            setLoaiVanBan(loaiMC);
-            setKhoMinhChung(result);
+            const [
+                allMinhChungData,
+                minhChungData,
+                loaiVanBanData,
+                khoMinhChungData,
+                goiYData,
+                tieuChiData,
+            ] = await Promise.all([
+                getAllMinhChung(),
+                getAllMinhChungWithIdGoiY(GoiY_ID),
+                getAllLoaiMinhChung(),
+                getAllKhoMinhChung(),
+                getGoiYById(GoiY_ID),
+                getTieuChiById(TieuChi_ID),
+            ]);
+            setAllMinhChung(allMinhChungData);
+            setMinhChung(minhChungData);
+            setLoaiVanBan(loaiVanBanData);
+            setKhoMinhChung(khoMinhChungData);
+            setGoiY(goiYData);
+            setTieuChi(tieuChiData);
+
         } catch (err) {
             setError(err);
         } finally {
@@ -57,13 +80,14 @@ const MinhChung = () => {
         }
     };
 
+    console.log(allMinhChung);
     useEffect(() => {
         fetchData();
-    }, []);
 
+    }, []);
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate("/quan-ly/quan-ly-minh-chung");
+        navigate(`/quan-ly/quan-ly-minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${GoiY_ID}`);
     };
     const handleClickViewPDF = (link) => {
         setLink(link);
@@ -104,30 +128,46 @@ const MinhChung = () => {
     };
 
     const saveFromKMCtoMC = async (idKmc) => {
-        const dataMinhChung = new FormData();
-        const parentMaMc = createMaMinhChung({
-            sttTieuChuan: format2Number(tieuChuan.stt),
-            sttTieuChi: format2Number(addMinhChung.stt),
-        });
-        dataMinhChung.append("idKmc", idKmc);
-        dataMinhChung.append("idTieuChuan", tieuChuan.idTieuChuan);
-        dataMinhChung.append("idGoiY", addMinhChung.idGoiY);
-        dataMinhChung.append("parentMaMc", parentMaMc);
-        dataMinhChung.append("childMaMc", format2Number(minhChung.length + 1));
-        try {
-            const response = await saveFromKMCtoMinhChung(dataMinhChung);
-            fetchData();
-        } catch (err) {
-            setError(err);
+        if (tieuChi !== "") {
+            try {
+                const response = await getTieuChuanById(tieuChi.idTieuChuan);
+
+                if (response) {
+                    const dataMinhChung = new FormData();
+                    const parentMaMc = createMaMinhChung({
+                        sttTieuChuan: format2Number(response.stt),
+                        sttTieuChi: format2Number(tieuChi.stt),
+                    });
+
+                    dataMinhChung.append("idKmc", idKmc);
+                    dataMinhChung.append("idTieuChuan", response.idTieuChuan);
+                    dataMinhChung.append("idGoiY", goiY.idGoiY);
+                    dataMinhChung.append("parentMaMc", parentMaMc);
+                    dataMinhChung.append("childMaMc", format2Number(minhChung.length + 1));
+
+                    await saveFromKMCtoMinhChung(dataMinhChung);
+                    fetchData();
+                }
+            } catch (err) {
+                setError(err);
+            }
         }
+
     };
     const deleteMC = async (idMc, parentMaMc) => {
-
-        const response = await deleteMinhChung(idMc, parentMaMc);
-        fetchData();
-    }
+        try {
+            const response = await deleteMinhChung(idMc, parentMaMc);
+            if (response) { // Assuming the response has a 'success' field
+                fetchData(); // Refresh the data only if deletion was successful
+            } else {
+                setError('Failed to delete Minh Chung.'); // Handle any failure in response
+            }
+        } catch (err) {
+            setError(err.message || 'An error occurred while deleting Minh Chung.');
+        }
+    };
     const handleClickEdit =  (EvidenceID) =>{
-        navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}`);
+        navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}&GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     }
     return (
         <div
@@ -263,25 +303,9 @@ const MinhChung = () => {
                                             </b>
                                             <br />
 
-                                            {minhChung.length > 0 ? (
-                                                minhChung.find(
-                                                    (item) => item.idKmc === row.idKhoMinhChung
-                                                ) ? null : (
-                                                    <button
-                                                        className="btn btn-info space-5"
-                                                        onClick={() => saveFromKMCtoMC(row.idKhoMinhChung)}
-                                                    >
-                                                        Thêm
-                                                    </button>
-                                                )
-                                            ) : (
-                                                <button
-                                                    className="btn btn-info space-5"
-                                                    onClick={() => saveFromKMCtoMC(row.idKhoMinhChung)}
-                                                >
-                                                    Thêm
-                                                </button>
-                                            )}
+                                            
+
+
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -292,12 +316,12 @@ const MinhChung = () => {
                 <Col xs={12} md={6}>
                     <p>Minh chứng đang có</p>
                     <p>
-                        <b>- Tên tiêu chí: </b>
-                        {addMinhChung.tenTieuChi}{" "}
+                    <b>- Tên tiêu chí: </b>
+                        {tieuChi.tenTieuChi}
                     </p>
                     <p>
                         <b>- Nguồn minh chứng: </b>
-                        {addMinhChung.tenGoiY}
+                        {goiY.tenGoiY}
                     </p>
                     <br />
                     <TableContainer component={Paper}>

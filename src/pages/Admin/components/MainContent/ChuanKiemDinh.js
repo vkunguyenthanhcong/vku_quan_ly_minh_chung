@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./AdminMainContent.css";
+import "./ChuanKiemDinh.css";
 import { styled } from "@mui/material/styles";
 import font from "../../../../components/font";
 import {
@@ -30,15 +30,14 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     fontFamily: font.inter,
 }));
 const GenericList = ({ maKdcl }) => {
+
     const [edit, setEdit] = useState(false);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const handleButtonClick = (maCtdt, tenCtdt) => {
-        const transfer = { maCtdt: maCtdt, tenCtdt: tenCtdt };
-        localStorage.setItem("data", JSON.stringify(transfer));
-        navigate(`chuong-trinh-dao-tao`);
+    const handleButtonClick = (maCtdt) => {
+        navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
     };
     useEffect(() => {
         const fetchData = async () => {
@@ -65,36 +64,19 @@ const GenericList = ({ maKdcl }) => {
     return (
         <ul>
             {data.map((item, index) => (
-                <li style={{ marginBottom: "20px", marginTop: "20px" }} key={index}>
-                    <Row>
-                        <Col sm={1}>
-                            <button style={{padding : '0'}}
-
-                                className="btn"
-                            >
-                                <i style={{ fontSize: "20px" }} className="fas fa-edit"></i>
-                            </button>
-                            <br />
-                            <button style={{padding : '0'}} className='btn'>
-                                <i style={{fontSize: "20px"}} className="fas fa-remove"></i>
-                            </button>
-                        </Col>
-                        <Col sm={11}>
-
-                                <button
-                                    onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)}
-                                    className="btn btnViewCTDT"
-                                >
-                                    {item.tenCtdt}
-                                </button>
-                        </Col>
-                    </Row>
+                <li style={{marginBottom: "20px", marginTop: "20px"}} key={index}>
+                    <button
+                        onClick={() => handleButtonClick(item.maCtdt)}
+                        className="btn btnViewCTDT"
+                    >
+                        {item.tenCtdt}
+                    </button>
                 </li>
             ))}
         </ul>
     );
 };
-const AdminMainContent = () => {
+const ChuanKiemDinh = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -190,6 +172,7 @@ const AdminMainContent = () => {
                             <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
                             <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
                             <CustomTableHeadCell>Tuỳ Chỉnh</CustomTableHeadCell>
+                            <CustomTableHeadCell><button className='btn btn-success'>+</button></CustomTableHeadCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -229,7 +212,6 @@ const AdminMainContent = () => {
                                     <GenericList maKdcl={row.maKdcl} />
                                 </CustomTableCell>
                                 <CustomTableCell className="button-edit">
-                                    <button className="btn btn-success">Bổ sung</button>
                                     <br />
                                     <button
                                         className="btn btn-primary"
@@ -251,4 +233,4 @@ const AdminMainContent = () => {
     );
 };
 
-export default AdminMainContent;
+export default ChuanKiemDinh;

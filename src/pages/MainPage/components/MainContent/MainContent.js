@@ -22,10 +22,8 @@ const GenericList = ({ maKdcl}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const handleButtonClick = (maCtdt, tenCtdt) => {
-    const transfer = { maCtdt: maCtdt, tenCtdt: tenCtdt };
-    localStorage.setItem('data', JSON.stringify(transfer));
-    navigate(`chuong-trinh-dao-tao`);
+  const handleButtonClick = (maCtdt) => {
+    navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
   };
   useEffect(() => {
     const fetchData = async () => {

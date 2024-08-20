@@ -1,19 +1,21 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import MainPage from '../pages/MainPage';
-import ChuongTrinhDaoTao from '../pages/MainPage/components/CTDTPage/CtdtPage';
+import ChuongTrinhDaoTao from '../pages/MainPage/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao';
 import HomePage from '../pages/HomePage';
 import MainContent from '../pages/MainPage/components/MainContent/MainContent';
-import TieuChi from '../pages/MainPage/components/TCPage/TCPage';
-import MinhChung from "../pages/MainPage/components/AddMinhChung/minhChung";
-import StandardManagement from "../pages/MainPage/components/StandardManagement/StandardManagement";
-import ListStandard from "../pages/MainPage/components/ListStandard/ListStandard";
-import ManageEvidence from "../pages/MainPage/components/ManageEvidence/ManageEvidence";
+import TieuChi from '../pages/MainPage/components/TieuChi/TieuChi';
+import MinhChung from "../pages/MainPage/components/MinhChung/minhChung";
+import QuanLyTieuChuan from "../pages/MainPage/components/QuanLyTieuChuan/QuanLyTieuChuan";
+import DanhSachTieuChuan from "../pages/MainPage/components/DanhSachTieuChuan/DanhSachTieuChuan";
+import QuanLyMinhChung from "../pages/MainPage/components/QuanLyMinhChung/QuanLyMinhChung";
 import ListEvidence from "../pages/ListEvidence";
 import Admin from "../pages/Admin";
 
 //admin
-import AdminMainContent from "../pages/Admin/components/MainContent/AdminMainContent";
+import ChuanKiemDinh from "../pages/Admin/components/MainContent/ChuanKiemDinh";
+import AdminChuongTrinhDaoTao from "../pages/Admin/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao";
+import TrangChu from "../pages/Admin/components/TrangChu/TrangChu";
 
 const routes = [
   {
@@ -24,16 +26,15 @@ const routes = [
       { path: "chuong-trinh-dao-tao", element: <ChuongTrinhDaoTao /> },
       { path: "tieu-chi", element: <TieuChi /> },
       { path: "minh-chung", element: <MinhChung /> },
-      { path: "quan-ly-minh-chung", element: <ManageEvidence /> },
+      { path: "quan-ly-minh-chung", element: <QuanLyMinhChung /> },
       {
         path: "quan-ly-tieu-chuan",
-        element: <StandardManagement />,
+        element: <QuanLyTieuChuan />,
 
       },
       {
         path: "tieu-chuan",
-        element: <ListStandard />,
-
+        element: <DanhSachTieuChuan />,
       },
 
     ],
@@ -51,22 +52,9 @@ const routes = [
     path: "/admin/",
     element: <Admin />,
     children: [
-      { path: "", element: <AdminMainContent /> },
-      { path: "chuong-trinh-dao-tao", element: <ChuongTrinhDaoTao /> },
-      { path: "tieu-chi", element: <TieuChi /> },
-      { path: "minh-chung", element: <MinhChung /> },
-      { path: "quan-ly-minh-chung", element: <ManageEvidence /> },
-      {
-        path: "quan-ly-tieu-chuan",
-        element: <StandardManagement />,
-
-      },
-      {
-        path: "tieu-chuan",
-        element: <ListStandard />,
-
-      },
-
+      { path: "", element: <TrangChu /> },
+      { path: "chuan-kiem-dinh", element: <ChuanKiemDinh /> },
+      { path: "chuong-trinh-dao-tao", element: <AdminChuongTrinhDaoTao /> },
     ],
   }
 ];
