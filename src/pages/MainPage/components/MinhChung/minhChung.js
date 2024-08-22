@@ -10,19 +10,22 @@ import {
     Paper,
 } from "@mui/material";
 import "./minhChung.css";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
 import {
     deleteMinhChung,
     getAllKhoMinhChung,
     getAllLoaiMinhChung, getAllMinhChung,
+    getAllMinhChungAndCtdt,
     getAllMinhChungWithIdGoiY, getGoiYById, getTieuChiById, getTieuChuanById,
     saveFromKMCtoMinhChung,
+    saveMinhChungDungChung,
     searchLoaiVanBanByDate,
     searchLoaiVanBanByNotDate,
 } from "../../../../services/apiServices";
 import PdfPreview from "../../../../services/PdfPreview";
 import { createMaMinhChung, format2Number } from "../../../../services/formatNumber";
+
 const MinhChung = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -37,6 +40,7 @@ const MinhChung = () => {
     const [khoMinhChung, setKhoMinhChung] = useState([]);
     const [minhChung, setMinhChung] = useState([]);
     const [allMinhChung, setAllMinhChung] = useState([]);
+
     const [goiY, setGoiY] = useState([]);
     const [tieuChi, setTieuChi] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -47,6 +51,7 @@ const MinhChung = () => {
     const queryParams = new URLSearchParams(location.search);
     const GoiY_ID = queryParams.get('GoiY_ID');
     const TieuChi_ID = queryParams.get('TieuChi_ID');
+    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
     const fetchData = async () => {
         setLoading(true);
@@ -59,7 +64,7 @@ const MinhChung = () => {
                 goiYData,
                 tieuChiData,
             ] = await Promise.all([
-                getAllMinhChung(),
+                getAllMinhChungAndCtdt(),
                 getAllMinhChungWithIdGoiY(GoiY_ID),
                 getAllLoaiMinhChung(),
                 getAllKhoMinhChung(),
@@ -73,21 +78,19 @@ const MinhChung = () => {
             setGoiY(goiYData);
             setTieuChi(tieuChiData);
 
+
         } catch (err) {
             setError(err);
         } finally {
             setLoading(false);
         }
     };
-
-    console.log(allMinhChung);
     useEffect(() => {
         fetchData();
-
     }, []);
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/quan-ly/quan-ly-minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${GoiY_ID}`);
+        navigate(`/quan-ly/quan-ly-minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     };
     const handleClickViewPDF = (link) => {
         setLink(link);
@@ -128,6 +131,7 @@ const MinhChung = () => {
     };
 
     const saveFromKMCtoMC = async (idKmc) => {
+
         if (tieuChi !== "") {
             try {
                 const response = await getTieuChuanById(tieuChi.idTieuChuan);
@@ -135,6 +139,7 @@ const MinhChung = () => {
                 if (response) {
                     const dataMinhChung = new FormData();
                     const parentMaMc = createMaMinhChung({
+                        sttTC: response.stt,
                         sttTieuChuan: format2Number(response.stt),
                         sttTieuChi: format2Number(tieuChi.stt),
                     });
@@ -143,9 +148,32 @@ const MinhChung = () => {
                     dataMinhChung.append("idTieuChuan", response.idTieuChuan);
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("parentMaMc", parentMaMc);
-                    dataMinhChung.append("childMaMc", format2Number(minhChung.length + 1));
+                    const filter = minhChung.filter(item => item.maDungChung == 0)
+                    dataMinhChung.append("childMaMc", format2Number(filter.length + 1));
 
                     await saveFromKMCtoMinhChung(dataMinhChung);
+                    fetchData();
+                }
+            } catch (err) {
+                setError(err);
+            }
+        }
+
+    };
+    const saveDungChung = async (idKmc, idMc) => {
+        if (tieuChi !== "") {
+            try {
+                const response = await getTieuChuanById(tieuChi.idTieuChuan);
+
+                if (response) {
+                    const dataMinhChung = new FormData();
+
+                    dataMinhChung.append("idKmc", idKmc);
+                    dataMinhChung.append("idTieuChuan", response.idTieuChuan);
+                    dataMinhChung.append("idGoiY", goiY.idGoiY);
+                    dataMinhChung.append("maDungChung", idMc);
+
+                    await saveMinhChungDungChung(dataMinhChung);
                     fetchData();
                 }
             } catch (err) {
@@ -166,9 +194,41 @@ const MinhChung = () => {
             setError(err.message || 'An error occurred while deleting Minh Chung.');
         }
     };
-    const handleClickEdit =  (EvidenceID) =>{
+    const handleClickEdit = (EvidenceID) => {
         navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}&GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     }
+    const Button_Them = ({ idKMC }) => {
+        const daCo = minhChung.filter(item => item.idKmc === idKMC);
+        const dungChung = allMinhChung.filter(item => item.idKmc === idKMC && item.idGoiY != GoiY_ID)
+   
+        if (loading) return <div>Loading...</div>;
+        if (error) return <div>Error: {error.message}</div>;
+
+        return (
+            <>
+                {daCo.length > 0 ? null : (
+                    dungChung.length > 0 ? (
+                        <button
+                            onClick={() => saveDungChung(idKMC, dungChung[0].idMc)}  // Use the first item in `dungChung`
+                            className="btn btn-success"
+                            style={{ marginTop: '5px' }}
+                        >
+                            Dùng Chung
+                        </button>
+                    ) : (
+                        <button
+                            style={{ marginTop: '5px' }}
+                            className="btn btn-success"
+                            onClick={() => saveFromKMCtoMC(idKMC)}
+                        >
+                            Thêm
+                        </button>
+                    )
+                )}
+
+            </>
+        );
+    };
     return (
         <div
             className="content"
@@ -299,13 +359,10 @@ const MinhChung = () => {
                                             </b>
                                             <br />
                                             <b>
-                                                <button className="btn btn-success space-5" onClick={() => handleClickEdit(row.idKhoMinhChung)}>Sửa</button>
+                                                <button className="btn btn-primary space-5" onClick={() => handleClickEdit(row.idKhoMinhChung)}>Sửa</button>
                                             </b>
                                             <br />
-
-                                            
-
-
+                                            <Button_Them idKMC={row.idKhoMinhChung} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -316,7 +373,7 @@ const MinhChung = () => {
                 <Col xs={12} md={6}>
                     <p>Minh chứng đang có</p>
                     <p>
-                    <b>- Tên tiêu chí: </b>
+                        <b>- Tên tiêu chí: </b>
                         {tieuChi.tenTieuChi}
                     </p>
                     <p>
@@ -334,18 +391,57 @@ const MinhChung = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {minhChung.map((row, index) => (
-                                    <TableRow>
-                                        <TableCell width = {150}>{row.parentMaMc}{row.childMaMc}</TableCell>
-                                        <TableCell>{row.tenMinhChung}</TableCell>
-                                        <TableCell width={150}>
-                                            <button className="btn btn-secondary" onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem nhanh</button>
-                                            <br />
-                                            <button onClick={() => deleteMC(row.idMc, row.parentMaMc)}  className="btn btn-danger space-5">Xoá</button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                                {minhChung.map((row) => {
+                                    // Function to determine what to display in the first TableCell
+                                    const getCellContent = () => {
+                                        if (row.maDungChung === 0) {
+                                            return (
+                                                <>
+                                                    {row.parentMaMc}
+                                                    {row.childMaMc}
+                                                </>
+                                            );
+                                        } else {
+                                            const matchedItem = allMinhChung.find(item => item.idMc === row.maDungChung); // Debugging output
+
+                                            return matchedItem ? (
+                                                <>
+                                                    {matchedItem.parentMaMc}
+                                                    {matchedItem.childMaMc}
+                                                </>
+                                            ) : (
+                                                <span>No match found</span> // Fallback if no match is found
+                                            );
+                                        }
+                                    };
+
+                                    return (
+                                        <TableRow key={row.idMc}> {/* Ensure each row has a unique key */}
+                                            <TableCell width={150}>
+                                                {getCellContent()}
+                                            </TableCell>
+                                            <TableCell>{row.tenMinhChung}</TableCell>
+                                            <TableCell width={150}>
+                                                <button
+                                                    className="btn btn-secondary"
+                                                    onClick={() => handleClickViewPDF(row.linkLuuTru)}
+                                                >
+                                                    Xem nhanh
+                                                </button>
+                                                <br />
+                                                <button
+                                                    onClick={() => deleteMC(row.idMc, row.parentMaMc)}
+                                                    className="btn btn-danger space-5"
+                                                >
+                                                    Xoá
+                                                </button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
+
+
                         </Table>
                     </TableContainer>
                 </Col>

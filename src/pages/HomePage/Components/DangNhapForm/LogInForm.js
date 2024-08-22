@@ -1,16 +1,47 @@
 import React, { useState } from 'react';
 import './LogInForm.css';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import { login } from '../../../../services/apiServices';
+import { useNavigate } from 'react-router-dom';
 const LogInForm = ({ isVisible, onClose }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('')
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+    try {
+        const userData = await login(email, password)
+        console.log(userData)
+        if (userData.token) {
+            localStorage.setItem('token', userData.token)
+            localStorage.setItem('role', userData.role)
+            navigate('/quan-ly')
+        }else{
+            setError(userData.message)
+        }
+        
+    } catch (error) {
+        console.log(error)
+        setError(error.message)
+        setTimeout(()=>{
+            setError('');
+        }, 5000);
+    }
+    }
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    };
     const [showPassword, setShowPassword] = useState(false);
 
     const handleTogglePassword = () => {
         setShowPassword(!showPassword);
-    };
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        onClose();
     };
 
     if (!isVisible) return null;
@@ -25,15 +56,23 @@ const LogInForm = ({ isVisible, onClose }) => {
                                                 alt=""/></p>
                 <br/>
                 <label htmlFor="">Email</label><br/>
-                <input type="email" className='form-control' required/><br/><br/>
+                <input
+                    type="email"
+                    className="form-control"
+                    value={email}
+                    onChange={handleEmailChange}
+                    required
+                /><br/><br/>
 
                 <label htmlFor="">Mật khẩu</label><br/>
                 <div className="password-container">
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        className="form-control"
-                        required
-                    />
+                <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="form-control"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    required
+                />
                     <button type="button" className="eye-icon" onClick={handleTogglePassword}>
                         {showPassword ? <i className='fas fa-eye' style={{}}></i> :
                             <i className='fas fa-eye-slash' style={{}}></i>}

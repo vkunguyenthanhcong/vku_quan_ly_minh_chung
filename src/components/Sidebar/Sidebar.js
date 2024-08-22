@@ -31,9 +31,7 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
         <ul className='list-style responsive-text'>
           <p className={isScreenSmall ? 'd-flex align-items-center justify-content-center' : isMenuExpanded ? '' : 'd-flex align-items-center justify-content-center'} ><i className='fas fa-university' style={{ fontSize: '20px', marginRight : isScreenSmall ? '' : isMenuExpanded ? '10px' : '0px' }}></i><b className='text-center' style={{fontSize: '16px' }}>ĐẢM BẢO CHẤT LƯỢNG</b></p>
           <br/>
-          <li className={isScreenSmall ? 'd-flex align-items-center justify-content-center' : isMenuExpanded ? '' : 'd-flex align-items-center justify-content-center'}><i className='fas fa-graduation-cap'></i> <span className='text-center'><Link style={{textDecoration: 'none', color: 'white'}} to={'/quan-ly'}>Định Nghĩa Tiêu Chuẩn</Link></span></li>
-          <li className={isScreenSmall ? 'd-flex align-items-center justify-content-center' : isMenuExpanded ? '' : 'd-flex align-items-center justify-content-center'}><i className='fas fa-graduation-cap'></i> <span className='text-center'><Link style={{textDecoration: 'none', color: 'white'}} to={'/quan-ly/quan-ly-tieu-chuan'}>Quản lý tiêu chuẩn</Link></span></li>
-          <li className={isScreenSmall ? 'd-flex align-items-center justify-content-center' : isMenuExpanded ? '' : 'd-flex align-items-center justify-content-center'}><i className='fas fa-graduation-cap'></i> <span className='text-center'>Định Nghĩa Tiêu Chuẩn</span></li>
+          <li className={isScreenSmall ? 'd-flex align-items-center justify-content-center' : isMenuExpanded ? '' : 'd-flex align-items-center justify-content-center'}><i className='fas fa-graduation-cap'></i> <span className='text-center'><Link style={{textDecoration: 'none', color: 'white'}} to={'/quan-ly'}>Quản lý tiêu chuẩn</Link></span></li>
           <li className={isScreenSmall ? 'd-flex align-items-center justify-content-center' : isMenuExpanded ? '' : 'd-flex align-items-center justify-content-center'}><i className='fas fa-graduation-cap'></i> <span className='text-center'>Báo cáo tự đánh giá</span></li>
         </ul>
       </div>
