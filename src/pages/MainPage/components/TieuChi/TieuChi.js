@@ -13,7 +13,7 @@ import {
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
-    fontSize: '16px',
+    fontSize: '16px',   
     fontFamily: font.inter,
     verticalAlign: 'top',
     border: '1px solid #ddd'
@@ -35,11 +35,14 @@ const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
     const [minhChung, setMinhChung] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
 
     const navigate = useNavigate();
     const handleClick = (idGoiY,idTieuChi ) => {
-        navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}`);
+        navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}`);
     };
     const deleteMC = async (idMc, parentMaMc) => {
         const response = await deleteMinhChung(idMc, parentMaMc);
@@ -62,47 +65,54 @@ const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
     return (
-        <>  <Table >
+        <>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'auto'}}>
+        <Table style={{ tableLayout: 'fixed', width: '100%' }}>
             <TableHead>
-                <TableRow>
+                <TableRow style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
                     {minhChung.length > 0 ?
                         <>
-                            <TableCell style={{ width: '20%', maxWidth: '100%' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '20%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <b>Mã</b>
                             </TableCell>
-                            <TableCell style={{ width: '20%', maxWidth: '100%' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '20%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <b>Số hiệu</b>
                             </TableCell>
-                            <TableCell style={{ width: '45%', maxWidth: '100%' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '45%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <b>Tên VB</b>
                             </TableCell>
-                            <TableCell style={{ width: '15%', maxWidth: '100%' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '15%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <button style={{ width: '100%' }} className='btn btn-success' onClick={() => handleClick(idGoiY, idTieuChi)}>Bổ sung</button>
                             </TableCell>
                         </> :
                         <>
-                            <TableCell style={{ width: '75%', maxWidth: '100%', border : '0 !important' }} colSpan={3} className='bg-white p-5'><button  className='btn btn-danger'>Thiếu</button></TableCell>
-                            <TableCell style={{ width: '25%', maxWidth: '100%',  }}  width={100}  className='bg-white p-5'><button onClick={() => handleClick(idGoiY, idTieuChi)} className='btn btn-success' style={{float: 'right', right : '0'}}>Bổ sung</button></TableCell>
+                            <TableCell style={{ width: '75%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis', border: 'none' }} colSpan={3} className='bg-white p-5'>
+                                <button className='btn btn-danger'>Thiếu</button>
+                            </TableCell>
+                            <TableCell style={{ width: '25%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5'>
+                                <button onClick={() => handleClick(idGoiY, idTieuChi)} className='btn btn-success' style={{ float: 'right' }}>Bổ sung</button>
+                            </TableCell>
                         </>
                     }
                 </TableRow>
             </TableHead>
-            {minhChung.map((row, index) => (
-                <TableBody>
-                    <TableRow>
-                        <TableCell className='p-5 border-1'>{row.parentMaMc}{row.childMaMc}</TableCell>
-                        <TableCell className='p-5 border-1'>{row.soHieu}</TableCell>
-                        <TableCell className='p-5 border-1'>{row.tenMinhChung}</TableCell>
-                        <TableCell  className='p-5 border-1'>
-                            <button style={{ width: '100%', marginTop : '10px' }} className='btn btn-secondary'>Xem</button>
-                            <button style={{ width: '100%', marginTop : '10px' }}  className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
+            <TableBody>
+                {minhChung.map((row, index) => (
+                    <TableRow key={index}>
+                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.parentMaMc}{row.childMaMc}</TableCell>
+                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.soHieu}</TableCell>
+                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.tenMinhChung}</TableCell>
+                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>
+                            <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary'>Xem</button>
+                            <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
                         </TableCell>
                     </TableRow>
-                </TableBody>
-
-            ))}
+                ))}
+            </TableBody>
         </Table>
-        </>
+    </div>
+</>
+
     );
 };
 const Table_GoiY= ({ idMocChuan, idTieuChi }) => {
@@ -127,11 +137,14 @@ const Table_GoiY= ({ idMocChuan, idTieuChi }) => {
     return (
         <>
             {goiY.map((row, index) => (
-                    <TableRow key={row.id} style={{maxWidth: '100%'}}>
-                        <CustomTableCell style={{maxWidth: '100%', width :'25%'}} className='border-1'>{row.tenGoiY}</CustomTableCell>
-                        <CustomTableCellNoPadding style={{padding : '0px !important',maxWidth : '100%'}}><Table_MinhChung idTieuChi={idTieuChi} idGoiY={row.idGoiY}/></CustomTableCellNoPadding>
-                    </TableRow>
-
+                <TableRow key={row.id} style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
+                    <CustomTableCell style={{ maxWidth: '100%', width: '25%', border: 'none' }}>
+                        <span>{row.tenGoiY}</span>
+                    </CustomTableCell>
+                    <CustomTableCellNoPadding style={{ padding: 0, width: '75%', maxWidth: '100%', border: 'none', height : '100%' }}>
+                        <Table_MinhChung idTieuChi={idTieuChi} idGoiY={row.idGoiY} />
+                    </CustomTableCellNoPadding>
+                </TableRow>
             ))}
         </>
     );
@@ -160,8 +173,8 @@ const Table_MocChuan = ({ idTieuChi }) => {
             {mocChuan.map((row, index) => (
                 <TableBody>
                     <TableRow key={row.id} >
-                        <CustomTableCell width={250}  className='border-1'>{index+1}. {row.tenMocChuan}</CustomTableCell>
-                        <CustomTableCell className='border-1 p-5' width={1000}>
+                        <CustomTableCell style={{width : '20%'}} className='border-1'>{index+1}. {row.tenMocChuan}</CustomTableCell>
+                        <CustomTableCell className='border-1 p-5' style={{width : '80%'}}>
                             <Table_GoiY idMocChuan={row.idMocChuan} idTieuChi={idTieuChi}/>
                         </CustomTableCell>
                     </TableRow>

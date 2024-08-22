@@ -48,12 +48,11 @@ const QuanLyMinhChung = () =>{
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [caNhan, setCaNhan] = useState('');
     const [selectedLoai, setSelectedLoai] = useState('');
     const [selectedDonVi, setSelectedDonVi] = useState('');
     const [soCongVan, setSoCongVan] = useState('');
     const [trichYeu, setTrichYeu] = useState('');
-    const [tomTat, setTomTat] = useState('');
+
     const [ngayPhatHanh, setNgayPhatHanh] = useState('');
     const [file, setFile] = useState(null);
     const [uploadedFile, setUploadedFile] = useState(null);
@@ -93,8 +92,6 @@ const QuanLyMinhChung = () =>{
                 setSelectedDonVi(response.idDvbh);
                 setSoCongVan(response.soHieu);
                 setTrichYeu(response.tenMinhChung);
-                setTomTat(response.moTa);
-                setCaNhan(response.caNhan);
                 setNgayPhatHanh(response.thoigian);
                 setUploadedFile(response.linkLuuTru);
             }
@@ -105,7 +102,7 @@ const QuanLyMinhChung = () =>{
         fetchDataFromIdGoiY();
     }, []);
     const handleEditEvidence = async () => {
-        if (!selectedLoai || !selectedDonVi || !soCongVan || !trichYeu || !tomTat || !ngayPhatHanh || !caNhan) {
+        if (!selectedLoai || !selectedDonVi || !soCongVan || !trichYeu  || !ngayPhatHanh) {
             alert('Vui lòng điền đầy đủ thông tin.');
             return;
         }else{
@@ -117,8 +114,6 @@ const QuanLyMinhChung = () =>{
                 minhChung.append('idDvbh', selectedDonVi);
                 minhChung.append('soHieu', soCongVan);
                 minhChung.append('tenMinhChung', trichYeu);
-                minhChung.append('moTa', tomTat);
-                minhChung.append('caNhan', caNhan);
                 minhChung.append('thoigian', ngayPhatHanh);
                 minhChung.append('linkLuuTru', uploadedFile);
 
@@ -143,9 +138,9 @@ const QuanLyMinhChung = () =>{
                         minhChung.append('idDvbh', selectedDonVi);
                         minhChung.append('soHieu', soCongVan);
                         minhChung.append('tenMinhChung', trichYeu);
-                        minhChung.append('moTa', tomTat);
+
                         minhChung.append('thoigian', ngayPhatHanh);
-                        minhChung.append('caNhan', caNhan);
+                        
                         minhChung.append('linkLuuTru', response.url);
 
                         const response_1 = await updateKhoMinhChung(EvidenceID,minhChung);
@@ -159,7 +154,7 @@ const QuanLyMinhChung = () =>{
         }
     };
     const handleUpload = async () => {
-        if (!selectedLoai || !selectedDonVi || !soCongVan || !trichYeu || !tomTat || !ngayPhatHanh || !file || !caNhan)  {
+        if (!selectedLoai || !selectedDonVi || !soCongVan || !trichYeu || !ngayPhatHanh || !file)  {
             alert('Vui lòng điền đầy đủ thông tin.');
             return;
         }else{
@@ -180,8 +175,6 @@ const QuanLyMinhChung = () =>{
                     minhChung.append('idDvbh', selectedDonVi);
                     minhChung.append('soHieu', soCongVan);
                     minhChung.append('tenMinhChung', trichYeu);
-                    minhChung.append('moTa', tomTat);
-                    minhChung.append('caNhan', caNhan)
                     minhChung.append('thoigian', ngayPhatHanh);
                     minhChung.append('linkLuuTru', response.url);
 
@@ -219,10 +212,6 @@ const QuanLyMinhChung = () =>{
                 ))}
             </select>
             <br/>
-            <label htmlFor="soCongVan"><b>Cá nhân thực hành</b></label>
-            <input id="soCongVan" className='form-control' type="text" value={caNhan}
-                   onChange={(e) => setCaNhan(e.target.value)} required/>
-            <br/>
             <label htmlFor="soCongVan"><b>Số công văn (ví dụ: Số 112/QĐ - ĐHĐN)</b></label>
             <input id="soCongVan" className='form-control' type="text" value={soCongVan}
                    onChange={(e) => setSoCongVan(e.target.value)} required/>
@@ -230,10 +219,7 @@ const QuanLyMinhChung = () =>{
             <label htmlFor="trichYeu"><b>Trích yếu (ví dụ: V/v quyết định ...)</b></label>
             <input id="trichYeu" className='form-control' type="text" value={trichYeu}
                    onChange={(e) => setTrichYeu(e.target.value)} required/>
-            <br/>
-            <label htmlFor="tomTat"><b>Tóm tắt mô tả nội dung chính của văn bản</b></label>
-            <textarea id="tomTat" className='form-control' name="Text1" cols="40" rows="5" value={tomTat}
-                      onChange={(e) => setTomTat(e.target.value)} required></textarea>
+           
             <br/>
             <label htmlFor="ngayPhatHanh"><b>Ngày phát hành</b></label>
             <input id="ngayPhatHanh" className='form-control' type="date" value={ngayPhatHanh}

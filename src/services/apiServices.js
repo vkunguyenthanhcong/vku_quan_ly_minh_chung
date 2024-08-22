@@ -7,8 +7,10 @@ const api = axios.create({
     },
   });
 
-export const getKdclData = () => {
-    return api.get('/chuankdcl') // Endpoint for KDCL data
+export const getKdclData = (token) => {
+    return api.get('/chuankdcl', {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for KDCL data
       .then(response => response.data)
       .catch(error => {
         console.error('Error :', error);
@@ -27,8 +29,10 @@ export const getKdclData = () => {
       });
   };
 
-  export const getCtdtDataByMaKDCL = (maKdcl) => {
-    return api.get(`/ctdt/filter/${maKdcl}`) // Endpoint for CTDT data
+  export const getCtdtDataByMaKDCL = (maKdcl, token) => {
+    return api.get(`/ctdt/filter/${maKdcl}`,{
+        headers : {Authorization: `Bearer ${token}`}
+        }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
@@ -205,6 +209,14 @@ export const getMinhChungWithIdTieuChi = (criteriaID) => {
             throw error;
         });
 };
+export const getAllMinhChungAndCtdt = () => {
+    return api.get(`/minhchung/MinhChungAndCtdt`)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 
 export const updateKhoMinhChung = (EvidenceID, minhChung) => {
     return api.put(`/khominhchung/edit/${EvidenceID}`, minhChung, {headers: {
@@ -283,6 +295,25 @@ export const saveFromKMCtoMinhChung = (minhChung) => {
             'Content-Type': 'application/json',
         },
     }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const saveMinhChungDungChung = (minhChung) => {
+    return api.post('/minhchung/dungchung', minhChung, {headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+
+export const login = (email, password) => {
+    return api.post('http://localhost:1309/auth/login', {email, password}).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;

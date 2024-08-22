@@ -17,7 +17,8 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   color : 'white !important',
   fontFamily : font.inter 
 }));;
-const GenericList = ({ maKdcl}) => {
+
+const GenericList = ({ maKdcl, token}) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +29,7 @@ const GenericList = ({ maKdcl}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getCtdtDataByMaKDCL(maKdcl);
+        const result = await getCtdtDataByMaKDCL(maKdcl, token);
         setData(result);
       } catch (err) {
         setError(err);
@@ -51,7 +52,7 @@ const GenericList = ({ maKdcl}) => {
   );
 };
 const MainContent = () => {
-  
+  const token = localStorage.getItem('token');
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -59,7 +60,7 @@ const MainContent = () => {
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
-        const result = await getKdclData();
+        const result = await getKdclData(token);
         setData(result);
       } catch (error) {
         setError(error);
@@ -91,7 +92,7 @@ const MainContent = () => {
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenKdcl}</CustomTableCell>
                 <CustomTableCell>{row.namBanHanh}</CustomTableCell>
-                <CustomTableCell><GenericList maKdcl={row.maKdcl}/></CustomTableCell>
+                <CustomTableCell><GenericList maKdcl={row.maKdcl} token={token}/></CustomTableCell>
               </TableRow>
             ))}
           </TableBody>
