@@ -24,7 +24,7 @@
     "google-login": "^2.1.7",
     "jwt-decode": "^4.0.0",
     "oidc-client": "^1.11.5",
-    "pdfjs-dist": "^4.5.136",
+    "pdfjs-dist": "^3.11.174",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.3.1",

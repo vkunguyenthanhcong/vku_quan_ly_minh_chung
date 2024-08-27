@@ -23,7 +23,7 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     color : 'white !important',
     fontFamily : font.inter
 }));;
-const ListGoiY = ({ idMocChuan }) => {
+const ListGoiY = ({ idMocChuan , token}) => {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     const showPopup = () => setIsPopupVisible(true);
@@ -34,7 +34,7 @@ const ListGoiY = ({ idMocChuan }) => {
     const [error, setError] = useState(null);
     const fetchGoiY = async () => {
         try {
-            const result = await getAllGoiYWithIdMocChuan(idMocChuan);
+            const result = await getAllGoiYWithIdMocChuan(idMocChuan, token);
             setGoiY(result);
         } catch (error) {
             setError(error);
@@ -58,18 +58,18 @@ const ListGoiY = ({ idMocChuan }) => {
             <div className='d-flex justify-content-center'>
             <button onClick={showPopup} className='btn'><i className='fas fa-edit'> </i> <span>  Bổ sung thêm gợi ý minh chứng</span></button>
             </div>
-            <PopupForm isVisible={isPopupVisible} onClose={hidePopup} idMocChuan={idMocChuan} fetchGoiY ={fetchGoiY} />
+            <PopupForm isVisible={isPopupVisible} onClose={hidePopup} idMocChuan={idMocChuan} fetchGoiY ={fetchGoiY} token={token} />
         </>
     );
 };
-const ListMocChuan = ({ idTieuChi }) => {
+const ListMocChuan = ({ idTieuChi, token }) => {
     const [mocChuan, setMocChuan] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchTieuChi = async () => {
             try {
-                const result = await getAllMocChuanWithIdTieuChi(idTieuChi);
+                const result = await getAllMocChuanWithIdTieuChi(idTieuChi, token);
                 setMocChuan(result);
             } catch (error) {
                 setError(error);
@@ -86,20 +86,20 @@ const ListMocChuan = ({ idTieuChi }) => {
             {mocChuan.map((row, index) => (
                 <TableRow>
                     <TableCell style={{width : '50%'}}>{row.tenMocChuan}</TableCell>
-                    <TableCell style={{width : '50%'}}><ListGoiY idMocChuan={row.idMocChuan}/></TableCell>
+                    <TableCell style={{width : '50%'}}><ListGoiY idMocChuan={row.idMocChuan} token={token}/></TableCell>
                 </TableRow>
             ))}
         </>
     );
 };
-const ListTieuChi = ({ idTieuChuan, stt }) => {
+const ListTieuChi = ({ idTieuChuan, stt, token }) => {
     const [tieuChi, setTieuChi] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchTieuChi = async () => {
             try {
-                const result = await getAllTieuChiWithIdTieuChuan(idTieuChuan);
+                const result = await getAllTieuChiWithIdTieuChuan(idTieuChuan, token);
                 setTieuChi(result);
             } catch (error) {
                 setError(error);
@@ -117,7 +117,7 @@ const ListTieuChi = ({ idTieuChuan, stt }) => {
                 <TableRow>
                     <TableCell><b>{stt}.{index+1}</b> {row.tenTieuChi}</TableCell>
                     <TableCell>{row.yeuCau}</TableCell>
-                    <TableCell colSpan={2}><ListMocChuan idTieuChi={row.idTieuChi} /></TableCell>
+                    <TableCell colSpan={2}><ListMocChuan idTieuChi={row.idTieuChi} token ={token} /></TableCell>
                 </TableRow>
             ))}
         </>
@@ -125,6 +125,7 @@ const ListTieuChi = ({ idTieuChuan, stt }) => {
 };
 
 const DanhSachTieuChuan = () => {
+    const token = localStorage.getItem('token');
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const KhungChuongTrinhID = queryParams.get('KhungChuongTrinhID');
@@ -136,8 +137,8 @@ const DanhSachTieuChuan = () => {
     const [error, setError] = useState(null);
     const fetchData = async () => {
         try {
-            const result = await getTieuChuanWithMaCtdt(KhungChuongTrinhID);
-            const result_1 = await getThongTinCTDT(KhungChuongTrinhID);
+            const result = await getTieuChuanWithMaCtdt(KhungChuongTrinhID, token);
+            const result_1 = await getThongTinCTDT(KhungChuongTrinhID, token);
             setTieuChuan(result);
             setChuongTrinhDaoTao(result_1);
         } catch (error) {
@@ -169,7 +170,7 @@ const DanhSachTieuChuan = () => {
                             <TableRow>
                                 <TableCell style={{backgroundColor : colors.grayColorLess, fontSize : '16px'}} colSpan={4}><b>Tiêu chuẩn {index + 1}. {row.tenTieuChuan}</b></TableCell>
                             </TableRow>
-                            <ListTieuChi idTieuChuan={row.idTieuChuan} stt = {index + 1} />
+                            <ListTieuChi idTieuChuan={row.idTieuChuan} stt = {index + 1} token = {token}/>
                     </TableBody>
                     ))}
                 </Table>

@@ -30,6 +30,7 @@ function LoadingProcess(props) {
 
 
 const QuanLyMinhChung = () =>{
+    const token = localStorage.getItem('token');
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const EvidenceID = queryParams.get('EvidenceID');
@@ -66,8 +67,8 @@ const QuanLyMinhChung = () =>{
         setLoading(true); // Set loading state at the beginning
         try {
             const [loaiMinhChungResponse, donViBanHanhResponse] = await Promise.all([
-                getAllLoaiMinhChung(),
-                getAllDonViBanHanh(),
+                getAllLoaiMinhChung(token),
+                getAllDonViBanHanh(token),
             ]);
 
             setLoaiMinhChung(loaiMinhChungResponse);
@@ -84,7 +85,7 @@ const QuanLyMinhChung = () =>{
         if(EvidenceID == null) {
             return;
         }else{
-            const response = await getKhoMinhChungWithId(EvidenceID);
+            const response = await getKhoMinhChungWithId(EvidenceID, token);
             if(response == ''){
                 navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
             }else{
@@ -117,7 +118,7 @@ const QuanLyMinhChung = () =>{
                 minhChung.append('thoigian', ngayPhatHanh);
                 minhChung.append('linkLuuTru', uploadedFile);
 
-                const response_1 = await updateKhoMinhChung(EvidenceID, minhChung);
+                const response_1 = await updateKhoMinhChung(EvidenceID, minhChung, token);
                 setOpen(false);
                 navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
             }else{
@@ -130,7 +131,7 @@ const QuanLyMinhChung = () =>{
                     try {
                         setOpen(true);
 
-                        const response = await uploadMinhChung(formData);
+                        const response = await uploadMinhChung(formData, token);
 
                         const minhChung = new FormData();
 
@@ -143,7 +144,7 @@ const QuanLyMinhChung = () =>{
                         
                         minhChung.append('linkLuuTru', response.url);
 
-                        const response_1 = await updateKhoMinhChung(EvidenceID,minhChung);
+                        const response_1 = await updateKhoMinhChung(EvidenceID,minhChung, token);
                         setOpen(false);
                         navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
                     } catch (error) {
@@ -167,7 +168,7 @@ const QuanLyMinhChung = () =>{
                 try {
                     setOpen(true);
 
-                    const response = await uploadMinhChung(formData);
+                    const response = await uploadMinhChung(formData, token);
 
                     const minhChung = new FormData();
 
@@ -178,7 +179,7 @@ const QuanLyMinhChung = () =>{
                     minhChung.append('thoigian', ngayPhatHanh);
                     minhChung.append('linkLuuTru', response.url);
 
-                    const response_1 = await saveMinhChung(minhChung);
+                    const response_1 = await saveMinhChung(minhChung, token);
                     setOpen(false);
                     navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
                 } catch (error) {

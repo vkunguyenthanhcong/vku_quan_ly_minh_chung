@@ -1,14 +1,45 @@
 // src/components/Sidebar.js
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Sidebar.css'; // Import custom CSS for sidebar styling
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getThongTinDangNhap } from '../../services/apiServices';
+
 
 const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
-  const { logout } = useAuth();
 
+  const token = localStorage.getItem('token');
+  const [user, setUser] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const Logout = () => {
+    
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');    
+    navigate('/');
+};
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+        const [
+            userData
+        ] = await Promise.all([
+            getThongTinDangNhap(token)
+        ]);
+        setUser(userData.user);
+    } catch (err) {
+        setError(err);
+    } finally {
+        setLoading(false);
+    }
+  };
+  useEffect(() => {
+      fetchData();
+  }, []);
   return (
     <div className={isScreenSmall ? "menu-scroll no-padding text-center" : "menu-scroll no-padding"} >
       <i className='fas fa-university' style={{ marginTop : '20px',fontSize: '26px', border: '1px solid white', padding: '5px', borderRadius: '50%'}}></i>
@@ -20,8 +51,10 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
           </Col>
           <Col md={8} className='text-left align-content-center'>
             <span>Xin chào,</span><br />
-            <p>Nguyễn Thành Công</p>
-            <Link style={{color : '#EDEDED9B', textDecoration : 'none',}} onClick={logout}>Thoát</Link>
+            {user && (
+              <p>{user.fullName}</p>
+            )}
+            <Link style={{color : '#EDEDED9B', textDecoration : 'none',}} onClick={Logout}>Thoát</Link>
           </Col>
         </Row>
       </div>

@@ -18,7 +18,11 @@ const LogInForm = ({ isVisible, onClose }) => {
         if (userData.token) {
             localStorage.setItem('token', userData.token)
             localStorage.setItem('role', userData.role)
-            navigate('/quan-ly')
+            if(userData.role == "ADMIN"){
+                navigate('/admin');
+            }else if(userData.role == "USER"){
+                navigate('/quan-ly');
+            }
         }else{
             setError(userData.message)
         }

@@ -27,6 +27,7 @@ import PdfPreview from "../../../../services/PdfPreview";
 import { createMaMinhChung, format2Number } from "../../../../services/formatNumber";
 
 const MinhChung = () => {
+    const token = localStorage.getItem('token');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -64,12 +65,12 @@ const MinhChung = () => {
                 goiYData,
                 tieuChiData,
             ] = await Promise.all([
-                getAllMinhChungAndCtdt(),
-                getAllMinhChungWithIdGoiY(GoiY_ID),
-                getAllLoaiMinhChung(),
-                getAllKhoMinhChung(),
-                getGoiYById(GoiY_ID),
-                getTieuChiById(TieuChi_ID),
+                getAllMinhChungAndCtdt(token),
+                getAllMinhChungWithIdGoiY(GoiY_ID, token),
+                getAllLoaiMinhChung(token),
+                getAllKhoMinhChung(token),
+                getGoiYById(GoiY_ID, token),
+                getTieuChiById(TieuChi_ID, token),
             ]);
             setAllMinhChung(allMinhChungData);
             setMinhChung(minhChungData);
@@ -102,7 +103,8 @@ const MinhChung = () => {
                 const result = await searchLoaiVanBanByNotDate(
                     trichDan,
                     soVanBan,
-                    selectedId
+                    selectedId,
+                    token
                 );
                 setKhoMinhChung(result);
             } catch (err) {
@@ -119,7 +121,8 @@ const MinhChung = () => {
                     soVanBan,
                     selectedId,
                     startDate,
-                    endDate
+                    endDate,
+                    token
                 );
                 setKhoMinhChung(result);
             } catch (err) {
@@ -134,7 +137,7 @@ const MinhChung = () => {
 
         if (tieuChi !== "") {
             try {
-                const response = await getTieuChuanById(tieuChi.idTieuChuan);
+                const response = await getTieuChuanById(tieuChi.idTieuChuan, token);
 
                 if (response) {
                     const dataMinhChung = new FormData();
@@ -151,7 +154,7 @@ const MinhChung = () => {
                     const filter = minhChung.filter(item => item.maDungChung == 0)
                     dataMinhChung.append("childMaMc", format2Number(filter.length + 1));
 
-                    await saveFromKMCtoMinhChung(dataMinhChung);
+                    await saveFromKMCtoMinhChung(dataMinhChung, token);
                     fetchData();
                 }
             } catch (err) {
@@ -163,7 +166,7 @@ const MinhChung = () => {
     const saveDungChung = async (idKmc, idMc) => {
         if (tieuChi !== "") {
             try {
-                const response = await getTieuChuanById(tieuChi.idTieuChuan);
+                const response = await getTieuChuanById(tieuChi.idTieuChuan, token);
 
                 if (response) {
                     const dataMinhChung = new FormData();
@@ -173,7 +176,7 @@ const MinhChung = () => {
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("maDungChung", idMc);
 
-                    await saveMinhChungDungChung(dataMinhChung);
+                    await saveMinhChungDungChung(dataMinhChung, token);
                     fetchData();
                 }
             } catch (err) {
@@ -184,7 +187,7 @@ const MinhChung = () => {
     };
     const deleteMC = async (idMc, parentMaMc) => {
         try {
-            const response = await deleteMinhChung(idMc, parentMaMc);
+            const response = await deleteMinhChung(idMc, parentMaMc, token);
             if (response) { // Assuming the response has a 'success' field
                 fetchData(); // Refresh the data only if deletion was successful
             } else {
@@ -199,7 +202,8 @@ const MinhChung = () => {
     }
     const Button_Them = ({ idKMC }) => {
         const daCo = minhChung.filter(item => item.idKmc === idKMC);
-        const dungChung = allMinhChung.filter(item => item.idKmc === idKMC && item.idGoiY != GoiY_ID)
+        const dungChung = allMinhChung.filter(item => item.idKmc === idKMC && item.idGoiY != GoiY_ID && item.maCtdt == KhungCTDT_ID)
+        console.log(dungChung);
    
         if (loading) return <div>Loading...</div>;
         if (error) return <div>Error: {error.message}</div>;
@@ -340,7 +344,7 @@ const MinhChung = () => {
                         Tìm kiếm
                     </button>
                     <hr style={{ border: "1px solid black" }} />
-                    <TableContainer component={Paper} className="shadow-none">
+                    <TableContainer component={Paper} className="shadow-none scrollable-table-container">
                         <Table className="font-Inter">
                             <TableBody>
                                 {khoMinhChung.map((row, index) => (

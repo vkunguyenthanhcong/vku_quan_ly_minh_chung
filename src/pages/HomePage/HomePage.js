@@ -4,9 +4,11 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import './HomePage.css';
 import { useNavigate } from 'react-router-dom';
 import LogInForm from './Components/DangNhapForm/LogInForm';
+import useAuth from '../../services/useAuth';
 
 
 const Homepage = () => {
+  useAuth();
   const [isLogInVisiable, setIsLogInVisiable] = useState(false);
 
   const showLogIn = () => setIsLogInVisiable(true);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./ChuanKiemDinh.css";
 import { styled } from "@mui/material/styles";
+import { Modal, Button, Form } from 'react-bootstrap';
 import font from "../../../../components/font";
 import {
     Table,
@@ -29,6 +30,76 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     color: "white !important",
     fontFamily: font.inter,
 }));
+const PopupForm = ({ show, handleClose }) => {
+    const [formData, setFormData] = useState({
+      tenchuandanhgia: '',
+      year: '',
+      makdcl: ''
+    });
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData({ ...formData, [name]: value });
+    };
+  
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      console.log('Form data submitted:', formData);
+      // You can handle form submission here (e.g., send data to an API)
+      handleClose(); // Close the modal after submission
+    };
+  
+    return (
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Bổ sung Chuẩn kiểm định</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="formName">
+              <Form.Label>Tên Chuẩn đánh giá</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="tenchuandanhgia"
+                value={formData.tenchuandanhgia}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+  
+            <Form.Group controlId="formEmail">
+              <Form.Label>Năm áp dụng</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder=""
+                name="year"
+                value={formData.year}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+  
+            <Form.Group controlId="formAge">
+              <Form.Label>Mã Chuẩn đánh giá</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder=""
+                name="makdcl"
+                value={formData.makdcl}
+                onChange={handleChange}
+                required
+              />
+            </Form.Group>
+            
+            <Button variant="success" type="submit" className="mt-3">
+                Xác nhận
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+    );
+  };
 const GenericList = ({ maKdcl }) => {
 
     const [edit, setEdit] = useState(false);
@@ -80,6 +151,10 @@ const ChuanKiemDinh = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const fetchDataFromAPI = async () => {
         try {
             const result = await getKdclData();
@@ -159,6 +234,7 @@ const ChuanKiemDinh = () => {
 
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
+        <PopupForm show={show} handleClose={handleClose} />
             <p style={{ fontSize: "20px" }}>
                 DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG
             </p>
@@ -172,7 +248,7 @@ const ChuanKiemDinh = () => {
                             <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
                             <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
                             <CustomTableHeadCell>Tuỳ Chỉnh</CustomTableHeadCell>
-                            <CustomTableHeadCell><button className='btn btn-success'>+</button></CustomTableHeadCell>
+                            <CustomTableHeadCell><button className='btn btn-success' onClick={handleShow}>+</button></CustomTableHeadCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

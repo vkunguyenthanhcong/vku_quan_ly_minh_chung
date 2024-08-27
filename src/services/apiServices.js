@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+
 const api = axios.create({
     baseURL: 'http://localhost:1309/api', // Replace with your API base URL
     timeout: 20000, // Optional: set a timeout for requests
@@ -6,6 +8,47 @@ const api = axios.create({
       'Content-Type': 'application/json',
     },
   });
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+
+    try {
+        const decoded = jwtDecode(token);
+        const currentTime = Date.now() / 1000; // Current time in seconds
+        return decoded.exp < currentTime; // Check if token is expired
+    } catch (error) {
+        return true; // If token is invalid, consider it expired
+    }
+};
+api.interceptors.request.use(
+    config => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const isExpired = isTokenExpired(token);
+            if (isExpired) {
+                localStorage.removeItem('token'); // Clear the expired token
+                window.location.href = '/'; // Redirect to login page
+            } else {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    },
+    error => Promise.reject(error)
+);
+
+  export const getThongTinDangNhap = (token) => {
+    return api.get(`http://localhost:1309/adminuser/get-profile`, {  // Corrected URL
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    .then(response => response.data)
+    .catch(error => {
+        console.error('Error fetching data:', error);
+        throw error;
+    });
+};
+
 
 export const getKdclData = (token) => {
     return api.get('/chuankdcl', {
@@ -17,11 +60,25 @@ export const getKdclData = (token) => {
         throw error;
       });
   };
+  
+
+  export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
+    return api.get(`/minhchung/CountMinhChungWithTieuChi/${idTieuChi}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for KDCL data
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error :', error);
+        throw error;
+      });
+  };
 
   
   // Fetch CTDT data
-  export const getCtdtData = () => {
-    return api.get('/ctdt/grouped') // Endpoint for CTDT data
+  export const getCtdtData = (token) => {
+    return api.get('/ctdt/grouped', {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
@@ -40,8 +97,10 @@ export const getKdclData = (token) => {
       });
   };
 
-export const getTieuChiByMaCtdt = (maCtdt) => {
-    return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`) // Endpoint for CTDT data
+export const getTieuChiByMaCtdt = (maCtdt, token) => {
+    return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
@@ -49,42 +108,30 @@ export const getTieuChiByMaCtdt = (maCtdt) => {
         });
 };
 
-  export const getThongTinCTDT = (maCtdt) => {
-    return api.get(`/ctdt/thongtinchitiet/${maCtdt}`) // Endpoint for CTDT data
+  export const getThongTinCTDT = (maCtdt, token) => {
+    return api.get(`/ctdt/thongtinchitiet/${maCtdt}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
         throw error;
       });
   };
-export const getGoiYById = (idGoiY) => {
-    return api.get(`/goiy/findById/${idGoiY}`) // Endpoint for CTDT data
+export const getGoiYById = (idGoiY, token) => {
+    return api.get(`/goiy/findById/${idGoiY}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
             throw error;
         });
 };
-export const getTieuChiById = (idTieuChi) => {
-    return api.get(`/tieuchi/findById/${idTieuChi}`) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
-
-  export const getTieuChuanWithMaCtdt = (maCtdt) => {
-    return api.get(`/tieuchuan/listandcount/${maCtdt}`) // Endpoint for CTDT data
-      .then(response => response.data)
-      .catch(error => {
-        console.error('Error fetching CTDT data:', error);
-        throw error;
-      });
-  };
-
-export const getTieuChuanById = (TieuChuan_ID) => {
-    return api.get(`/tieuchuan/${TieuChuan_ID}`) // Endpoint for CTDT data
+export const getTieuChiById = (idTieuChi, token) => {
+    return api.get(`/tieuchi/findById/${idTieuChi}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
@@ -92,48 +139,82 @@ export const getTieuChuanById = (TieuChuan_ID) => {
         });
 };
 
-export const getMinhChung = () => {
-    return api.get(`/minhchung`) // Endpoint for CTDT data
+  export const getTieuChuanWithMaCtdt = (maCtdt, token) => {
+    return api.get(`/tieuchuan/listandcount/${maCtdt}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
         throw error;
       });
   };
-export const getMinhChungByMaCtdt = (maCtdt) => {
-    return api.get(`/minhchung/findByMaCtdt/${maCtdt}`) // Endpoint for CTDT data
+
+export const getTieuChuanById = (TieuChuan_ID, token) => {
+    return api.get(`/tieuchuan/${TieuChuan_ID}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
             throw error;
         });
 };
-  export const getAllTieuChiWithIdTieuChuan = (idTieuChuan) => {
-    return api.get(`/tieuchi/${idTieuChuan}`) // Endpoint for CTDT data
+
+export const getMinhChung = (token) => {
+    return api.get(`/minhchung`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
         throw error;
       });
   };
-  export const getAllGoiYWithIdMocChuan = (idMocChuan) => {
-    return api.get(`/goiy/${idMocChuan}`) // Endpoint for CTDT data
+export const getMinhChungByMaCtdt = (maCtdt, token) => {
+    return api.get(`/minhchung/findByMaCtdt/${maCtdt}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+  export const getAllTieuChiWithIdTieuChuan = (idTieuChuan, token) => {
+    return api.get(`/tieuchi/${idTieuChuan}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
+      .then(response => response.data)
+      .catch(error => {
+        console.error('Error fetching CTDT data:', error);
+        throw error;
+      });
+  };
+  export const getAllGoiYWithIdMocChuan = (idMocChuan, token) => {
+    return api.get(`/goiy/${idMocChuan}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error(error);
         throw error;
       });
   };
-export const getAllMocChuanWithIdTieuChi = (idTieuChi) => {
-    return api.get(`/mocchuan/findByIdTieuChi/${idTieuChi}`) // Endpoint for CTDT data
+export const getAllMocChuanWithIdTieuChi = (idTieuChi, token) => {
+    return api.get(`/mocchuan/findByIdTieuChi/${idTieuChi}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
         .then(response => response.data)
         .catch(error => {
             console.error(error);
             throw error;
         });
 };
-  export const getAllMinhChungWithIdGoiY = (idGoiY) => {
-    return api.get(`/minhchung/${idGoiY}`) // Endpoint for CTDT data
+  export const getAllMinhChungWithIdGoiY = (idGoiY, token) => {
+    return api.get(`/minhchung/${idGoiY}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
       .then(response => response.data)
       .catch(error => {
         console.error('Error fetching CTDT data:', error);
@@ -141,50 +222,40 @@ export const getAllMocChuanWithIdTieuChi = (idTieuChi) => {
       });
   };
 
-export const getAllLoaiMinhChung = () => {
-    return api.get(`/loaiminhchung`) // Endpoint for CTDT data
+export const getAllLoaiMinhChung = (token) => {
+    return api.get(`/loaiminhchung`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }) // Endpoint for CTDT data
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-export const getAllDonViBanHanh = () => {
-    return api.get(`/donvibanhanh`)
+export const getAllDonViBanHanh = (token) => {
+    return api.get(`/donvibanhanh`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-export const getAllKhoMinhChung = () => {
-    return api.get(`/khominhchung`)
+export const getAllKhoMinhChung = (token) => {
+    return api.get(`/khominhchung`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-export const getAllMinhChung = () => {
-    return api.get(`/minhchung`)
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-
-export const searchLoaiVanBanByNotDate = (tenMc, soHieu, idLoai) => {
-    return api.get(`/khominhchung/searchByNotDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}`)
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-
-export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate) => {
-    return api.get(`/khominhchung/searchByDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}&startDate=${startDate}&endDate=${endDate}`)
+export const getAllMinhChung = (token) => {
+    return api.get(`/minhchung`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
@@ -192,8 +263,10 @@ export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate
         });
 };
 
-export const getKhoMinhChungWithId = (EvidenceID) => {
-    return api.get(`/khominhchung/findById/${EvidenceID}`)
+export const searchLoaiVanBanByNotDate = (tenMc, soHieu, idLoai, token) => {
+    return api.get(`/khominhchung/searchByNotDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
@@ -201,16 +274,10 @@ export const getKhoMinhChungWithId = (EvidenceID) => {
         });
 };
 
-export const getMinhChungWithIdTieuChi = (criteriaID) => {
-    return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`)
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-export const getAllMinhChungAndCtdt = () => {
-    return api.get(`/minhchung/MinhChungAndCtdt`)
+export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate, token) => {
+    return api.get(`/khominhchung/searchByDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}&startDate=${startDate}&endDate=${endDate}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
@@ -218,7 +285,39 @@ export const getAllMinhChungAndCtdt = () => {
         });
 };
 
-export const updateKhoMinhChung = (EvidenceID, minhChung) => {
+export const getKhoMinhChungWithId = (EvidenceID, token) => {
+    return api.get(`/khominhchung/findById/${EvidenceID}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const getMinhChungWithIdTieuChi = (criteriaID, token) => {
+    return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const getAllMinhChungAndCtdt = (token) => {
+    return api.get(`/minhchung/MinhChungAndCtdt`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const updateKhoMinhChung = (EvidenceID, minhChung, token) => {
     return api.put(`/khominhchung/edit/${EvidenceID}`, minhChung, {headers: {
             'Content-Type': 'application/json',
         },
@@ -229,40 +328,50 @@ export const updateKhoMinhChung = (EvidenceID, minhChung) => {
         });
 };
 
-export const updateTenKdcl = (tenKdcl, idKdcl) => {
-    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&idKdcl=${idKdcl}`).then(response => response.data)
+export const updateTenKdcl = (tenKdcl, idKdcl, token) => {
+    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&idKdcl=${idKdcl}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-export const updateNamBanHanh = (namBanHanh, idKdcl) => {
-    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&idKdcl=${idKdcl}`).then(response => response.data)
+export const updateNamBanHanh = (namBanHanh, idKdcl, token) => {
+    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&idKdcl=${idKdcl}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
 
-export const deleteChuanKDCL = (idKdcl) => {
-    return api.delete(`/chuankdcl/deleteChuanKDCL?idKdcl=${idKdcl}`).then(response => response.data)
+export const deleteChuanKDCL = (idKdcl, token) => {
+    return api.delete(`/chuankdcl/deleteChuanKDCL?idKdcl=${idKdcl}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    }).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
 
-export const deleteMinhChung = (idMc, parentMaMc) => {
-    return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`)
+export const deleteMinhChung = (idMc, parentMaMc, token) => {
+    return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`, {
+        headers : {Authorization: `Bearer ${token}`}
+    })
         .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-export const uploadMinhChung = (formData) => {
+export const uploadMinhChung = (formData, token) => {
     return api.post('/uploadToGoogleDrive', formData, {headers: {
-        'Content-Type': 'multipart/form-data',
+        Authorization : `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+        
     },
 }).then(response => response.data)
         .catch(error => {
@@ -270,9 +379,10 @@ export const uploadMinhChung = (formData) => {
             throw error;
         });
 };
-export const saveMinhChung = (minhChung) => {
+export const saveMinhChung = (minhChung, token) => {
     return api.post('/khominhchung', minhChung, {headers: {
             'Content-Type': 'application/json',
+            Authorization : `Bearer ${token}`
         },
     }).then(response => response.data)
         .catch(error => {
@@ -280,9 +390,10 @@ export const saveMinhChung = (minhChung) => {
             throw error;
         });
 };
-export const saveGoiY = (goiY) => {
+export const saveGoiY = (goiY, token) => {
     return api.post('/goiy', goiY, {headers: {
             'Content-Type': 'application/json',
+            Authorization : `Bearer ${token}`
         },
     }).then(response => response.data)
         .catch(error => {
@@ -290,9 +401,10 @@ export const saveGoiY = (goiY) => {
             throw error;
         });
 };
-export const saveFromKMCtoMinhChung = (minhChung) => {
+export const saveFromKMCtoMinhChung = (minhChung, token) => {
     return api.post('/minhchung', minhChung, {headers: {
             'Content-Type': 'application/json',
+            Authorization : `Bearer ${token}`
         },
     }).then(response => response.data)
         .catch(error => {
@@ -300,9 +412,10 @@ export const saveFromKMCtoMinhChung = (minhChung) => {
             throw error;
         });
 };
-export const saveMinhChungDungChung = (minhChung) => {
+export const saveMinhChungDungChung = (minhChung, token) => {
     return api.post('/minhchung/dungchung', minhChung, {headers: {
             'Content-Type': 'application/json',
+            Authorization : `Bearer ${token}`
         },
     }).then(response => response.data)
         .catch(error => {

@@ -8,7 +8,8 @@ import {
     getAllTieuChiWithIdTieuChuan,
     getTieuChuanById,
     getThongTinCTDT,
-    getAllMocChuanWithIdTieuChi, getAllGoiYWithIdMocChuan, getAllMinhChungWithIdGoiY, deleteMinhChung
+    getAllMocChuanWithIdTieuChi, getAllGoiYWithIdMocChuan, getAllMinhChungWithIdGoiY, deleteMinhChung,
+    getTotalMinhChungWithTieuChi
 } from '../../../../services/apiServices';
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
@@ -31,7 +32,7 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     border: '1px solid #ddd',
     fontFamily: font.inter, 
 }));;
-const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
+const Table_MinhChung = ({ idTieuChi, idGoiY, token}) => {
     const [minhChung, setMinhChung] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -45,12 +46,12 @@ const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
         navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}`);
     };
     const deleteMC = async (idMc, parentMaMc) => {
-        const response = await deleteMinhChung(idMc, parentMaMc);
+        deleteMinhChung(idMc, parentMaMc, token);
         fetchData();
     }
     const fetchData = async () => {
         try {
-            const result = await getAllMinhChungWithIdGoiY(idGoiY);
+            const result = await getAllMinhChungWithIdGoiY(idGoiY, token);
             setMinhChung(result);
         } catch (err) {
             setError(err);
@@ -66,22 +67,22 @@ const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
     if (error) return <div>Error: {error.message}</div>;
     return (
         <>
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'auto'}}>
-        <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: '100%' }}>
+        <Table style={{ tableLayout: 'fixed', width: '100%', height: '100%', maxHeight: '100%' }}>
             <TableHead>
                 <TableRow style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
                     {minhChung.length > 0 ?
                         <>
-                            <TableCell style={{ width: '20%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '20%', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <b>Mã</b>
                             </TableCell>
-                            <TableCell style={{ width: '20%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '20%', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <b>Số hiệu</b>
                             </TableCell>
-                            <TableCell style={{ width: '45%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '45%', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <b>Tên VB</b>
                             </TableCell>
-                            <TableCell style={{ width: '15%', maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
+                            <TableCell style={{ width: '15%', overflow: 'hidden', textOverflow: 'ellipsis' }} className='bg-white p-5 border-1'>
                                 <button style={{ width: '100%' }} className='btn btn-success' onClick={() => handleClick(idGoiY, idTieuChi)}>Bổ sung</button>
                             </TableCell>
                         </> :
@@ -99,10 +100,10 @@ const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
             <TableBody>
                 {minhChung.map((row, index) => (
                     <TableRow key={index}>
-                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.parentMaMc}{row.childMaMc}</TableCell>
-                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.soHieu}</TableCell>
-                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.tenMinhChung}</TableCell>
-                        <TableCell style={{ maxHeight: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>
+                        <TableCell style={{ overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.parentMaMc}{row.childMaMc}</TableCell>
+                        <TableCell style={{ overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.soHieu}</TableCell>
+                        <TableCell style={{ overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>{row.tenMinhChung}</TableCell>
+                        <TableCell style={{ overflow: 'hidden', textOverflow: 'ellipsis' }} className='p-5 border-1'>
                             <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary'>Xem</button>
                             <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
                         </TableCell>
@@ -115,14 +116,14 @@ const Table_MinhChung = ({ idTieuChi, idGoiY}) => {
 
     );
 };
-const Table_GoiY= ({ idMocChuan, idTieuChi }) => {
+const Table_GoiY= ({ idMocChuan, idTieuChi , token}) => {
     const [goiY, setGoiY] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await getAllGoiYWithIdMocChuan(idMocChuan);
+                const result = await getAllGoiYWithIdMocChuan(idMocChuan, token);
                 setGoiY(result);
             } catch (err) {
                 setError(err);
@@ -137,26 +138,30 @@ const Table_GoiY= ({ idMocChuan, idTieuChi }) => {
     return (
         <>
             {goiY.map((row, index) => (
-                <TableRow key={row.id} style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
-                    <CustomTableCell style={{ maxWidth: '100%', width: '25%', border: 'none' }}>
-                        <span>{row.tenGoiY}</span>
-                    </CustomTableCell>
-                    <CustomTableCellNoPadding style={{ padding: 0, width: '75%', maxWidth: '100%', border: 'none', height : '100%' }}>
-                        <Table_MinhChung idTieuChi={idTieuChi} idGoiY={row.idGoiY} />
-                    </CustomTableCellNoPadding>
-                </TableRow>
+                <React.Fragment key={row.id}>
+                    <TableRow style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
+                        <CustomTableCell style={{ maxWidth: '100%', width: '25%', border: 'none' }}>
+                            <span>{row.tenGoiY}</span>
+                        </CustomTableCell>
+                        <CustomTableCellNoPadding style={{ padding: 0, width: '75%', maxWidth: '100%', border: 'none', height: '100%' }}>
+                            <Table_MinhChung idTieuChi={idTieuChi} idGoiY={row.idGoiY} token={token} />
+                        </CustomTableCellNoPadding>
+                    </TableRow>
+                    {index < goiY.length - 1 && <hr style={{border : '1px solid black'}}/>}
+                </React.Fragment>
             ))}
         </>
+
     );
 };
-const Table_MocChuan = ({ idTieuChi }) => {
+const Table_MocChuan = ({ idTieuChi, token }) => {
     const [mocChuan, setMocChuan] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await getAllMocChuanWithIdTieuChi(idTieuChi);
+                const result = await getAllMocChuanWithIdTieuChi(idTieuChi, token);
                 setMocChuan(result);
             } catch (err) {
                 setError(err);
@@ -175,7 +180,7 @@ const Table_MocChuan = ({ idTieuChi }) => {
                     <TableRow key={row.id} >
                         <CustomTableCell style={{width : '20%'}} className='border-1'>{index+1}. {row.tenMocChuan}</CustomTableCell>
                         <CustomTableCell className='border-1 p-5' style={{width : '80%'}}>
-                            <Table_GoiY idMocChuan={row.idMocChuan} idTieuChi={idTieuChi}/>
+                            <Table_GoiY idMocChuan={row.idMocChuan} idTieuChi={idTieuChi} token={token}/>
                         </CustomTableCell>
                     </TableRow>
                 </TableBody>
@@ -185,6 +190,7 @@ const Table_MocChuan = ({ idTieuChi }) => {
 };
 
 const TieuChi = () => {
+    const token = localStorage.getItem('token');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tieuChi, setTieuChi] = useState([]);
@@ -196,13 +202,41 @@ const TieuChi = () => {
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
+    const TotalTieuChi = ({idTieuChi}) => {
+        
+        const [total, setTotal] = useState([]);
+        useEffect(() => {
+            const fetchDataFromAPI = async () => {
+                try {
+                    const result = await getTotalMinhChungWithTieuChi(idTieuChi, token);
+                    setTotal(result);
+                } catch (error) {
+                    setError(error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchDataFromAPI();
+        }, [idTieuChi]);
+        return (
+            <>
+            {total.length > 0 ? (
+                
+                 total.map((item) => (
+                    <p>{item.total}</p>
+                 ))
+                
+            ):(null)}
+            </>
+        )
+    }
 
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
-                const result = await getAllTieuChiWithIdTieuChuan(TieuChuan_ID);
-                const result_1 = await getTieuChuanById(TieuChuan_ID);
-                const result_2 = await getThongTinCTDT(KhungCTDT_ID);
+                const result = await getAllTieuChiWithIdTieuChuan(TieuChuan_ID, token);
+                const result_1 = await getTieuChuanById(TieuChuan_ID, token);
+                const result_2 = await getThongTinCTDT(KhungCTDT_ID, token);
                 setTieuChi(result);
                 setTieuChuan(result_1);
                 setChuongTrinhDaoTao(result_2);
@@ -226,12 +260,12 @@ const TieuChi = () => {
                 <Table className='font-Inter'>
                     <TableHead>
                     <TableRow >
-                            <CustomTableHeadCell>Tiêu Chuẩn/<br />Tiêu Chí</CustomTableHeadCell>
-                            <CustomTableHeadCell>Yêu cầu của tiêu chí</CustomTableHeadCell>
-                            <CustomTableHeadCell style={{ border: '0' }} width={250}>Mốc chuẩn tham chiếu để đánh giá tiêu chí đạt mức 4</CustomTableHeadCell>
-                            <CustomTableHeadCell style={{ border: '0' }} width={250} >Gợi ý nguồn minh chứng</CustomTableHeadCell>
-                            <CustomTableHeadCell style={{ border: '0' }}>Minh Chứng</CustomTableHeadCell>
-                            <CustomTableHeadCell style={{ border: '0' }} width={1} >Tổng số MC</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0', width : '10%' }}>Tiêu Chuẩn/<br />Tiêu Chí</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0', width : '10%' }}>Yêu cầu của tiêu chí</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0', width : '10%' }}>Mốc chuẩn tham chiếu để đánh giá tiêu chí đạt mức 4</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0', width : '10%' }}>Gợi ý nguồn minh chứng</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0', width : '30%' }}>Minh Chứng</CustomTableHeadCell>
+                            <CustomTableHeadCell style={{ border: '0', width : '1%' }}>Tổng số MC</CustomTableHeadCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -240,12 +274,14 @@ const TieuChi = () => {
                         </TableRow>
                         {tieuChi.map((row, index) => (
                             <TableRow key={row.id}>
-                                <CustomTableCell width={200}><b>{tieuChuan.stt}.{index + 1}</b> {row.tenTieuChi}</CustomTableCell>
-                                <CustomTableCell width={200}>{row.yeuCau}</CustomTableCell>
+                                <CustomTableCell><b>{tieuChuan.stt}.{index + 1}</b> {row.tenTieuChi}</CustomTableCell>
+                                <CustomTableCell>{row.yeuCau.split(/(?=\d+\.\s)/).map((item, index) => (
+                                    <p key={index}>{item.trim()}</p>
+                                ))}</CustomTableCell>
                                 <CustomTableCell colSpan={3} className='p-5'>
-                                    <Table_MocChuan idTieuChi={row.idTieuChi} />
+                                    <Table_MocChuan idTieuChi={row.idTieuChi} token={token} />
                                 </CustomTableCell>
-                                <CustomTableCell>0</CustomTableCell>
+                                <CustomTableCell><TotalTieuChi idTieuChi={row.idTieuChi}/></CustomTableCell>
                             </TableRow>
                         ))}
                     </TableBody>

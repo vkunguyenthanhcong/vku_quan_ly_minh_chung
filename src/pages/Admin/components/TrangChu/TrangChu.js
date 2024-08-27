@@ -17,7 +17,7 @@ const TrangChu = () => {
             <br/><br/>
             <p>QUẢN LÝ CHƯƠNG TRÌNH ĐÀO TẠO</p>
             <hr/>
-            <button className='btn btn-success' onClick={goToChuongTrinhDaoTao}>Quản lý</button>
+            <button style={{marginRight : '10px'}} className='btn btn-success' onClick={goToChuongTrinhDaoTao}>Quản lý</button>
             <button className='btn btn-primary'>Thêm</button>
             <br/><br/>
             <p>QUẢN LÝ CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</p>

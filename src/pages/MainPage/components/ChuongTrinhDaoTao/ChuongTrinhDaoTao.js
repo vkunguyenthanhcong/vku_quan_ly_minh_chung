@@ -20,6 +20,7 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
 }));;
 
 const ChuongTrinhDaoTao = () => {
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,8 +38,8 @@ const ChuongTrinhDaoTao = () => {
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
-        const result = await getThongTinCTDT(KhungCTDT_ID);
-        const result_1 = await getTieuChuanWithMaCtdt(KhungCTDT_ID);
+        const result = await getThongTinCTDT(KhungCTDT_ID, token);
+        const result_1 = await getTieuChuanWithMaCtdt(KhungCTDT_ID, token);
         setData(result);
         setTieuChuan(result_1);
 
