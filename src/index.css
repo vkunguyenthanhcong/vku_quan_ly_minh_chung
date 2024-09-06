@@ -20,3 +20,27 @@ body {
   border: 1px solid #ccc; /* Optional: Add a border for clarity */
 }
 
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border : var(--primary-color) !important;
+}
+.btn-success {
+  background-color: var(--secondary-color) !important;
+  border : var(--secondary-color) !important;
+}
+.btn-light{
+  background-color: var(--third-color) !important;
+  border : var(--third-color) !important;
+}
+.border-1-solid-black {
+  border: 1px solid black !important;
+}
+.border-1-solid-white {
+  border: 1px solid white !important;
+}
+.border-top-1-solid-white {
+  border-top: 1px solid white !important;
+}
+.border-right-1-solid-white {
+  border-right: 1px solid white !important;
+}

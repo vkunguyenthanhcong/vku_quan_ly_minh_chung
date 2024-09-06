@@ -4,26 +4,25 @@ import ProtectedRoute from '../services/ProtectedRoute';
 import MainPage from '../pages/MainPage';
 import ChuongTrinhDaoTao from '../pages/MainPage/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao';
 import HomePage from '../pages/HomePage';
-import MainContent from '../pages/MainPage/components/MainContent/MainContent';
 import TieuChi from '../pages/MainPage/components/TieuChi/TieuChi';
 import MinhChung from "../pages/MainPage/components/MinhChung/minhChung";
 import QuanLyTieuChuan from "../pages/MainPage/components/QuanLyTieuChuan/QuanLyTieuChuan";
 import DanhSachTieuChuan from "../pages/MainPage/components/DanhSachTieuChuan/DanhSachTieuChuan";
 import QuanLyMinhChung from "../pages/MainPage/components/QuanLyMinhChung/QuanLyMinhChung";
 import ListEvidence from "../pages/ListEvidence";
-import Admin from "../pages/Admin";
 
+import TrangChu from '../pages/MainPage/components/TrangChu/TrangChu';
 //admin
 import ChuanKiemDinh from "../pages/Admin/components/MainContent/ChuanKiemDinh";
 import AdminChuongTrinhDaoTao from "../pages/Admin/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao";
-import TrangChu from "../pages/Admin/components/TrangChu/TrangChu";
 import DanhSachMinhChung from '../pages/MainPage/components/DanhSachMinhChung/DanhSachMinhChung';
+import Admin from "../pages/Admin";
 const routes = [
   {
     path: "/quan-ly/",
     element: <ProtectedRoute element={<MainPage />} requiredRole="USER" />, // Example role check for non-admin sections
     children: [
-      { path: "", element: <ProtectedRoute element={<MainContent />} requiredRole="USER" /> },
+      { path: "", element: <ProtectedRoute element={<TrangChu />} requiredRole="USER" /> },
       { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChuongTrinhDaoTao />} requiredRole="USER" /> },
       { path: "tieu-chi", element: <ProtectedRoute element={<TieuChi />} requiredRole="USER" /> },
       { path: "minh-chung", element: <ProtectedRoute element={<MinhChung />} requiredRole="USER" /> },

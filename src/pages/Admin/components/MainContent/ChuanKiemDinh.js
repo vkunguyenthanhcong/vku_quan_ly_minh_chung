@@ -17,9 +17,9 @@ import {
     getCtdtDataByMaKDCL,
     updateTenKdcl,
     updateNamBanHanh, deleteChuanKDCL,
+    insertNewChuanKdcl,
 } from "../../../../services/apiServices";
 import { useNavigate } from "react-router-dom";
-import { Col, Row } from "react-bootstrap";
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: "16px",
     fontFamily: font.inter,
@@ -30,24 +30,30 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     color: "white !important",
     fontFamily: font.inter,
 }));
-const PopupForm = ({ show, handleClose }) => {
+const PopupForm = ({ show, handleClose, fetchData }) => {
     const [formData, setFormData] = useState({
-      tenchuandanhgia: '',
-      year: '',
-      makdcl: ''
+      tenKdcl: '',
+      namBanHanh: '',
+      maKdcl: ''
     });
   
     const handleChange = (e) => {
       const { name, value } = e.target;
       setFormData({ ...formData, [name]: value });
     };
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      console.log('Form data submitted:', formData);
-      // You can handle form submission here (e.g., send data to an API)
-      handleClose(); // Close the modal after submission
-    };
+    
+      
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          await insertNewChuanKdcl(formData); // Đợi insertNewChuanKdcl hoàn tất
+          handleClose(); // Đóng popup sau khi hoàn tất chèn dữ liệu
+          await fetchData(); // Đợi fetchData thực thi và cập nhật dữ liệu mới
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          // Xử lý lỗi nếu cần
+        }
+      };
   
     return (
       <Modal show={show} onHide={handleClose}>
@@ -56,42 +62,29 @@ const PopupForm = ({ show, handleClose }) => {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="formName">
+            <Form.Group controlId="tenKdcl">
               <Form.Label>Tên Chuẩn đánh giá</Form.Label>
               <Form.Control
                 type="text"
-                placeholder=""
-                name="tenchuandanhgia"
-                value={formData.tenchuandanhgia}
+                placeholder="" 
+                name="tenKdcl"
+                value={formData.tenKdcl}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
   
-            <Form.Group controlId="formEmail">
+            <Form.Group controlId="namBanHanh">
               <Form.Label>Năm áp dụng</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder=""
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-  
-            <Form.Group controlId="formAge">
-              <Form.Label>Mã Chuẩn đánh giá</Form.Label>
               <Form.Control
                 type="text"
                 placeholder=""
-                name="makdcl"
-                value={formData.makdcl}
+                name="namBanHanh"
+                value={formData.namBanHanh}
                 onChange={handleChange}
                 required
               />
             </Form.Group>
-            
             <Button variant="success" type="submit" className="mt-3">
                 Xác nhận
             </Button>
@@ -156,6 +149,7 @@ const ChuanKiemDinh = () => {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const fetchDataFromAPI = async () => {
+        
         try {
             const result = await getKdclData();
             const initializedData = result.map((item) => ({
@@ -170,7 +164,6 @@ const ChuanKiemDinh = () => {
         }
     };
     useEffect(() => {
-
         fetchDataFromAPI();
     }, []);
     // Hàm xử lý khi nhấn vào nút Edit
@@ -234,7 +227,7 @@ const ChuanKiemDinh = () => {
 
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
-        <PopupForm show={show} handleClose={handleClose} />
+        <PopupForm show={show} handleClose={handleClose} fetchData={fetchDataFromAPI}/>
             <p style={{ fontSize: "20px" }}>
                 DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG
             </p>

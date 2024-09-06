@@ -1,6 +1,6 @@
 .menu-col {
   background-color: #2A3F54;
-  height: 200vh; /* Full viewport height */
+  height: 100vh; /* Full viewport height */
   overflow-y: auto; /* Enable vertical scrolling */
   transition: width 0.3s; /* Smooth transition for width change */
   color: white
