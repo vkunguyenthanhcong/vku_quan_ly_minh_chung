@@ -1,47 +1,45 @@
 // src/components/ChuanKiemDinh.js
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getThongTinCTDT, getTieuChuanWithMaCtdt, getMinhChung } from '../../../../services/apiServices';
+import { getThongTinCTDT, getTieuChuanWithMaCtdt } from '../../../../services/apiServices';
 import {useLocation, useNavigate} from 'react-router-dom';
-import './ChuongTrinhDaoTao.css'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import font from '../../../../components/font'
 
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
-  fontSize: '16px',
-  fontFamily : font.inter 
+  fontSize: '16px'
 }));
 
 const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
-  color : 'white !important',
-  fontFamily : font.inter 
+  color : 'white !important'
 }));;
 
 const ChuongTrinhDaoTao = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [tieuChuan, setTieuChuan] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [ tieuChuan, setTieuChuan] = useState([]);
   const [error, setError] = useState(null);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
-  const handleClick = (idTieuChuan, stt) => {
+  const handleClick = (idTieuChuan) => {
     navigate(`../tieu-chi?KhungCTDT_ID=${KhungCTDT_ID}&TieuChuan_ID=${idTieuChuan}`);
   };
 
   useEffect(() => {
     const fetchDataFromAPI = async () => {
+      setLoading(true);
       try {
-        const result = await getThongTinCTDT(KhungCTDT_ID);
-        const result_1 = await getTieuChuanWithMaCtdt(KhungCTDT_ID);
+        const [result, result_1] = await Promise.all([
+          getThongTinCTDT(KhungCTDT_ID),
+          getTieuChuanWithMaCtdt(KhungCTDT_ID)
+        ]);
         setData(result);
         setTieuChuan(result_1);
-
       } catch (error) {
         setError(error);
       } finally {
@@ -49,9 +47,11 @@ const ChuongTrinhDaoTao = () => {
       }
     };
     fetchDataFromAPI();
-  }, []);
+  }, [KhungCTDT_ID]);
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
   return (
-    <div className="content" style={{ background: "white", margin: '20px', padding: '20px' }}>
+    <div className="content bg-white m-3 p-4">
       {data.length > 0 ? (
         data.map((item, index) => (
           <div key={index}>
@@ -80,9 +80,9 @@ const ChuongTrinhDaoTao = () => {
           </div>
         ))
       ) : (
-        <p>No data available</p>
+        <p>Trường Đại học Công nghệ Thông tin và Truyền thông Việt - Hàn</p>
       )}
-      <TableContainer  component={Paper}>
+      <TableContainer>
         <Table className='font-Inter'>
           <TableHead>
             <TableRow >
@@ -97,7 +97,7 @@ const ChuongTrinhDaoTao = () => {
               <TableRow key={row.id}>
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
-                <CustomTableCell><button onClick={() => handleClick(row.idTieuChuan, index + 1)} className='btn btnMinhChung'>Quản lý minh chứng</button></CustomTableCell>
+                <CustomTableCell><button onClick={() => handleClick(row.idTieuChuan)} className='btn btn-light text-white'>Quản lý minh chứng</button></CustomTableCell>
                 <CustomTableCell><b>{row.total}</b> minh chứng</CustomTableCell>
               </TableRow>
             ))}

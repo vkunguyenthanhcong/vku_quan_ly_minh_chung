@@ -1,66 +1,27 @@
 
 import React, { useEffect, useState } from 'react';
-import './MainContent.css'
 import { styled } from '@mui/material/styles';
-import colors from '../../../../components/color';
-import font from '../../../../components/font'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { getKdclData, getCtdtDataByMaKDCL } from '../../../../services/apiServices'
+import { getKdclData, getCtdtDataByMaKDCL } from '../../../../services/apiServices';
 import { useNavigate } from 'react-router-dom';
 const CustomTableCell = styled(TableCell)(({ theme }) => ({
-  fontSize: '16px',
-  fontFamily : font.inter 
+  fontSize: '16px'
 }));
 
 const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
-  color : 'white !important',
-  fontFamily : font.inter 
+  color : 'white !important'
 }));;
 
-const GenericList = ({ maKdcl, token}) => {
+const TrangChu = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
-  const handleButtonClick = (maCtdt) => {
-    navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
-  };
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await getCtdtDataByMaKDCL(maKdcl, token);
-        setData(result);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [maKdcl]);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <ul>
-      {data.map((item, index) => (
-        <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btnViewCTDT'>{item.tenCtdt}</button></li>
-      ))}
-    </ul>
-  );
-};
-const MainContent = () => {
-  const token = localStorage.getItem('token');
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
+  //danh sach chuan kiem dinh chat luong
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
-        const result = await getKdclData(token);
+        const result = await getKdclData();
         setData(result);
       } catch (error) {
         setError(error);
@@ -71,6 +32,37 @@ const MainContent = () => {
     fetchDataFromAPI();
   }, []);
   
+
+  //danh sach chuong trinh dao tao
+  const GenericList = ({ maKdcl}) => {
+    const [data, setData] = useState([]);
+    const navigate = useNavigate();
+    const handleButtonClick = (maCtdt) => {
+      navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
+    };
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const result = await getCtdtDataByMaKDCL(maKdcl);
+          setData(result);
+        } catch (err) {
+          setError(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }, [maKdcl]);
+    return (
+      <ul>
+        {data.map((item, index) => (
+          <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btn-primary'>{item.tenCtdt}</button></li>
+        ))}
+      </ul>
+    );
+  };
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="content" style={{ background: "white", margin: '20px' }}>
@@ -92,7 +84,7 @@ const MainContent = () => {
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenKdcl}</CustomTableCell>
                 <CustomTableCell>{row.namBanHanh}</CustomTableCell>
-                <CustomTableCell><GenericList maKdcl={row.maKdcl} token={token}/></CustomTableCell>
+                <CustomTableCell><GenericList maKdcl={row.maKdcl}/></CustomTableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -102,4 +94,4 @@ const MainContent = () => {
   );
 };
 
-export default MainContent;
+export default TrangChu;
