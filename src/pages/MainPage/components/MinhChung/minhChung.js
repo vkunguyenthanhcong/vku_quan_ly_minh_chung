@@ -65,21 +65,20 @@ const MinhChung = () => {
                 goiYData,
                 tieuChiData,
             ] = await Promise.all([
-                getAllMinhChungAndCtdt(token),
-                getAllMinhChungWithIdGoiY(GoiY_ID, token),
-                getAllLoaiMinhChung(token),
-                getAllKhoMinhChung(token),
-                getGoiYById(GoiY_ID, token),
-                getTieuChiById(TieuChi_ID, token),
+                getAllMinhChungAndCtdt(),
+                getAllMinhChungWithIdGoiY(GoiY_ID),
+                getAllLoaiMinhChung(),
+                getAllKhoMinhChung(),
+                getGoiYById(GoiY_ID),
+                getTieuChiById(TieuChi_ID),
             ]);
+            
             setAllMinhChung(allMinhChungData);
             setMinhChung(minhChungData);
             setLoaiVanBan(loaiVanBanData);
             setKhoMinhChung(khoMinhChungData);
             setGoiY(goiYData);
             setTieuChi(tieuChiData);
-
-
         } catch (err) {
             setError(err);
         } finally {
@@ -137,7 +136,7 @@ const MinhChung = () => {
 
         if (tieuChi !== "") {
             try {
-                const response = await getTieuChuanById(tieuChi.idTieuChuan, token);
+                const response = await getTieuChuanById(tieuChi.idTieuChuan);
 
                 if (response) {
                     const dataMinhChung = new FormData();
@@ -151,10 +150,10 @@ const MinhChung = () => {
                     dataMinhChung.append("idTieuChuan", response.idTieuChuan);
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("parentMaMc", parentMaMc);
-                    const filter = minhChung.filter(item => item.maDungChung == 0)
+                    const filter = minhChung.filter(item => item.maDungChung === 0);
                     dataMinhChung.append("childMaMc", format2Number(filter.length + 1));
 
-                    await saveFromKMCtoMinhChung(dataMinhChung, token);
+                    await saveFromKMCtoMinhChung(dataMinhChung);
                     fetchData();
                 }
             } catch (err) {
@@ -166,7 +165,7 @@ const MinhChung = () => {
     const saveDungChung = async (idKmc, idMc) => {
         if (tieuChi !== "") {
             try {
-                const response = await getTieuChuanById(tieuChi.idTieuChuan, token);
+                const response = await getTieuChuanById(tieuChi.idTieuChuan);
 
                 if (response) {
                     const dataMinhChung = new FormData();
@@ -176,7 +175,7 @@ const MinhChung = () => {
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("maDungChung", idMc);
 
-                    await saveMinhChungDungChung(dataMinhChung, token);
+                    await saveMinhChungDungChung(dataMinhChung);
                     fetchData();
                 }
             } catch (err) {
@@ -187,11 +186,11 @@ const MinhChung = () => {
     };
     const deleteMC = async (idMc, parentMaMc) => {
         try {
-            const response = await deleteMinhChung(idMc, parentMaMc, token);
-            if (response) { // Assuming the response has a 'success' field
-                fetchData(); // Refresh the data only if deletion was successful
+            const response = await deleteMinhChung(idMc, parentMaMc);
+            if (response) { 
+                fetchData(); 
             } else {
-                setError('Failed to delete Minh Chung.'); // Handle any failure in response
+                setError('Failed to delete Minh Chung.'); 
             }
         } catch (err) {
             setError(err.message || 'An error occurred while deleting Minh Chung.');
@@ -202,7 +201,7 @@ const MinhChung = () => {
     }
     const Button_Them = ({ idKMC }) => {
         const daCo = minhChung.filter(item => item.idKmc === idKMC);
-        const dungChung = allMinhChung.filter(item => item.idKmc === idKMC && item.idGoiY != GoiY_ID && item.maCtdt == KhungCTDT_ID)
+        const dungChung = allMinhChung.filter(item => item.idKmc === idKMC && item.idGoiY !== GoiY_ID && item.maCtdt === KhungCTDT_ID)
         console.log(dungChung);
    
         if (loading) return <div>Loading...</div>;
