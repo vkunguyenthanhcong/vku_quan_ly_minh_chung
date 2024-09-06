@@ -41,6 +41,10 @@ const TieuChi = () => {
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+    const handleClickViewPDF = (link) => {
+        setLink(link);
+        openModal();
+    };
 
     const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
         const [minhChung, setMinhChung] = useState([]);
@@ -131,7 +135,7 @@ const TieuChi = () => {
                                     <TableCell className='p-1 border-1-solid-black'>{row.soHieu}</TableCell>
                                     <TableCell className='p-1 border-1-solid-black'>{row.tenMinhChung}</TableCell>
                                     <TableCell className='p-0 border-right-1-solid-white border-1-solid-black'>
-                                        <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary'>Xem</button>
+                                        <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary' onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem</button>
                                         <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
                                     </TableCell>
                                 </TableRow>
