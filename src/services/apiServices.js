@@ -99,7 +99,7 @@ export const getTieuChiByMaCtdt = (maCtdt, token) => {
 };
 
 export const getThongTinCTDT = (maCtdt, token) => {
-    return api.get(`/ctdt/thongtinchitiet/${maCtdt}`, {
+    return api.get(`/ctdt/detail/${maCtdt}`, {
         headers: { Authorization: `Bearer ${token}` }
     }) // Endpoint for CTDT data
         .then(response => response.data)

@@ -24,8 +24,7 @@ const checkAuthAndRole = (requiredRole) => {
         return false; // Token is either missing or expired
     }
 
-    const userRole = localStorage.getItem('role'); // Retrieve the stored role
-    console.log('User role:', userRole);
+    const userRole = localStorage.getItem('role');
     return userRole === requiredRole;
 };
 
