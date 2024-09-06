@@ -35,6 +35,14 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+    const [link, setLink] = useState("");
+    const handleClickViewPDF = (link) => {
+        setLink(link);
+        openModal();
+    };
 
 
     const navigate = useNavigate();
@@ -119,8 +127,9 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
                                 <TableCell className='p-1 border-1-solid-black'>{row.soHieu}</TableCell>
                                 <TableCell className='p-1 border-1-solid-black'>{row.tenMinhChung}</TableCell>
                                 <TableCell className='p-0 border-right-1-solid-white border-1-solid-black'>
-                                    <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary'>Xem</button>
+                                    <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary' onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem</button>
                                     <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
+                                    <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
                                 </TableCell>
                             </TableRow>
                         ))}
