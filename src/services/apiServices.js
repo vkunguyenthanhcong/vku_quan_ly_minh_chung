@@ -74,7 +74,7 @@ export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
         });
 };
 
-//
+//Data Chuong Trinh Dao Tao theo Ma Kiem Dinh Chat Luong
 export const getCtdtDataByMaKDCL = (maKdcl, token) => {
     return api.get(`/ctdt/filter/${maKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -86,6 +86,7 @@ export const getCtdtDataByMaKDCL = (maKdcl, token) => {
         });
 };
 
+//Data Tieu Chi Theo Ma Chuong Trinh Dao Tao
 export const getTieuChiByMaCtdt = (maCtdt, token) => {
     return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`, {
         headers: { Authorization: `Bearer ${token}` }
