@@ -54,22 +54,53 @@ export const getThongTinDangNhap = (token) => {
 export const getKdclData = (token) => {
     return api.get('/chuankdcl', {
         headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for KDCL data
+    }) 
         .then(response => response.data)
         .catch(error => {
             console.error('Error :', error);
             throw error;
         });
 };
-
-//Tong minh chung trong tieu chi
-export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
-    return api.get(`/minhchung/CountMinhChungWithTieuChi/${idTieuChi}`, {
+// Sua ten chuan kiem dinh chat luong
+export const updateTenKdcl = (tenKdcl, idKdcl, token) => {
+    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&idKdcl=${idKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }) 
-        .then(response => response.data)
+    }).then(response => response.data)
         .catch(error => {
-            console.error('Error :', error);
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Sua nam ban hanh cua chuan kiem dinh chat luong
+export const updateNamBanHanh = (namBanHanh, idKdcl, token) => {
+    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&idKdcl=${idKdcl}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Xoa chuan kiem dinh chat luong
+export const deleteChuanKDCL = (idKdcl, token) => {
+    return api.delete(`/chuankdcl/deleteChuanKDCL?idKdcl=${idKdcl}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Them chuan kiem dinh chat luong moi
+export const insertNewChuanKdcl = (formData, token) => {
+    return api.post('/chuankdcl/insert', formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
             throw error;
         });
 };
@@ -78,7 +109,7 @@ export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
 export const getCtdtDataByMaKDCL = (maKdcl, token) => {
     return api.get(`/ctdt/filter/${maKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
+    })  
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
@@ -90,212 +121,47 @@ export const getCtdtDataByMaKDCL = (maKdcl, token) => {
 export const getTieuChiByMaCtdt = (maCtdt, token) => {
     return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
+    })  
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
             throw error;
         });
 };
-
+// Lay Data Chuong Trinh Dao Tao
 export const getThongTinCTDT = (maCtdt, token) => {
-    return api.get(`/ctdt/thongtinchitiet/${maCtdt}`, {
+    return api.get(`/ctdt/detail/${maCtdt}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
+    })  
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
             throw error;
         });
 };
-export const getGoiYById = (idGoiY, token) => {
-    return api.get(`/goiy/findById/${idGoiY}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
-export const getTieuChiById = (idTieuChi, token) => {
-    return api.get(`/tieuchi/findById/${idTieuChi}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
-
+// Data Tieu Chuan Theo Ma Chuong Trinh Dao Tao
 export const getTieuChuanWithMaCtdt = (maCtdt, token) => {
     return api.get(`/tieuchuan/listandcount/${maCtdt}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
+    })  
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
             throw error;
         });
 };
-
-export const getTieuChuanById = (TieuChuan_ID, token) => {
-    return api.get(`/tieuchuan/${TieuChuan_ID}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
-
-export const getMinhChung = (token) => {
-    return api.get(`/minhchung`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
+// Data Minh Chung theo Chuong Trinh Dao Tao
 export const getMinhChungByMaCtdt = (maCtdt, token) => {
     return api.get(`/minhchung/findByMaCtdt/${maCtdt}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
+    })  
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching CTDT data:', error);
             throw error;
         });
 };
-export const getAllTieuChiWithIdTieuChuan = (idTieuChuan, token) => {
-    return api.get(`/tieuchi/${idTieuChuan}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
-export const getAllGoiYWithIdMocChuan = (idMocChuan, token) => {
-    return api.get(`/goiy/${idMocChuan}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error(error);
-            throw error;
-        });
-};
-export const getAllMocChuanWithIdTieuChi = (idTieuChi, token) => {
-    return api.get(`/mocchuan/findByIdTieuChi/${idTieuChi}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error(error);
-            throw error;
-        });
-};
-export const getAllMinhChungWithIdGoiY = (idGoiY, token) => {
-    return api.get(`/minhchung/${idGoiY}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
-
-export const getAllLoaiMinhChung = (token) => {
-    return api.get(`/loaiminhchung`, {
-        headers: { Authorization: `Bearer ${token}` }
-    }) // Endpoint for CTDT data
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-export const getAllDonViBanHanh = (token) => {
-    return api.get(`/donvibanhanh`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-export const getAllKhoMinhChung = (token) => {
-    return api.get(`/khominhchung`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-export const getAllMinhChung = (token) => {
-    return api.get(`/minhchung`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-
-export const searchLoaiVanBanByNotDate = (tenMc, soHieu, idLoai, token) => {
-    return api.get(`/khominhchung/searchByNotDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-
-export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate, token) => {
-    return api.get(`/khominhchung/searchByDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}&startDate=${startDate}&endDate=${endDate}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-
-export const getKhoMinhChungWithId = (EvidenceID, token) => {
-    return api.get(`/khominhchung/findById/${EvidenceID}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-
-export const getMinhChungWithIdTieuChi = (criteriaID, token) => {
-    return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
+//Lay tat ca data Minh Chung va Chuong Trinh Dao Tao 
 export const getAllMinhChungAndCtdt = (token) => {
     return api.get(`/minhchung/MinhChungAndCtdt`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -307,6 +173,163 @@ export const getAllMinhChungAndCtdt = (token) => {
         });
 };
 
+//Data thong tin cua Tieu Chuan
+export const getTieuChuanById = (TieuChuan_ID, token) => {
+    return api.get(`/tieuchuan/${TieuChuan_ID}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+// Data Tieu Chi theo Tieu Chuan
+export const getAllTieuChiWithIdTieuChuan = (idTieuChuan, token) => {
+    return api.get(`/tieuchi/${idTieuChuan}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+// Data thong tin cua Tieu Chi
+export const getTieuChiById = (idTieuChi, token) => {
+    return api.get(`/tieuchi/findById/${idTieuChi}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+//Tong minh chung trong tieu chi
+export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
+    return api.get(`/minhchung/CountMinhChungWithTieuChi/${idTieuChi}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    }) 
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error :', error);
+            throw error;
+        });
+};
+// Data Moc Chuan theo Tieu Chi
+export const getAllMocChuanWithIdTieuChi = (idTieuChi, token) => {
+    return api.get(`/mocchuan/findByIdTieuChi/${idTieuChi}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error(error);
+            throw error;
+        });
+};
+//Data Minh Chung theo Tieu Chi
+export const getMinhChungWithIdTieuChi = (criteriaID, token) => {
+    return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Data thoong tin Goi Y
+export const getGoiYById = (idGoiY, token) => {
+    return api.get(`/goiy/findById/${idGoiY}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+// Data Goi Y theo Moc Chuan
+export const getAllGoiYWithIdMocChuan = (idMocChuan, token) => {
+    return api.get(`/goiy/${idMocChuan}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error(error);
+            throw error;
+        });
+};
+// Lay data cua tat ca Minh Chung theo Goi Y
+export const getAllMinhChungWithIdGoiY = (idGoiY, token) => {
+    return api.get(`/minhchung/${idGoiY}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+//Luu Goi Y
+export const saveGoiY = (goiY, token) => {
+    return api.post('/goiy', goiY, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Lay data cua Loai Minh Chung
+export const getAllLoaiMinhChung = (token) => {
+    return api.get(`/loaiminhchung`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })  
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Lay data cua Don vi ban hanh
+export const getAllDonViBanHanh = (token) => {
+    return api.get(`/donvibanhanh`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Lay data cua Kho Minh Chung
+export const getAllKhoMinhChung = (token) => {
+    return api.get(`/khominhchung`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Lay thong tin Kho Minh Chung
+export const getKhoMinhChungWithId = (EvidenceID, token) => {
+    return api.get(`/khominhchung/findById/${EvidenceID}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// Cap nhat Kho Minh Chung
 export const updateKhoMinhChung = (EvidenceID, minhChung, token) => {
     return api.put(`/khominhchung/edit/${EvidenceID}`, minhChung, {
         headers: {
@@ -318,36 +341,40 @@ export const updateKhoMinhChung = (EvidenceID, minhChung, token) => {
             throw error;
         });
 };
-
-export const updateTenKdcl = (tenKdcl, idKdcl, token) => {
-    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&idKdcl=${idKdcl}`, {
+// Lay data cua Minh Chung
+export const getAllMinhChung = (token) => {
+    return api.get(`/minhchung`, {
         headers: { Authorization: `Bearer ${token}` }
-    }).then(response => response.data)
+    })
+        .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-export const updateNamBanHanh = (namBanHanh, idKdcl, token) => {
-    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&idKdcl=${idKdcl}`, {
+// Tim kiem Minh Chung theo Loai van ban khong xet den thoi gian
+export const searchLoaiVanBanByNotDate = (tenMc, soHieu, idLoai, token) => {
+    return api.get(`/khominhchung/searchByNotDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }).then(response => response.data)
+    })
+        .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-
-export const deleteChuanKDCL = (idKdcl, token) => {
-    return api.delete(`/chuankdcl/deleteChuanKDCL?idKdcl=${idKdcl}`, {
+// Tim kiem Minh Chung theo Loai Van Ban trong khoan thoi gian nhat dinh
+export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate, token) => {
+    return api.get(`/khominhchung/searchByDate?tenMc=${tenMc}&soHieu=${soHieu}&idLoai=${idLoai}&startDate=${startDate}&endDate=${endDate}`, {
         headers: { Authorization: `Bearer ${token}` }
-    }).then(response => response.data)
+    })
+        .then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
         });
 };
-
+// Xoa Minh Chung
 export const deleteMinhChung = (idMc, parentMaMc, token) => {
     return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -358,6 +385,7 @@ export const deleteMinhChung = (idMc, parentMaMc, token) => {
             throw error;
         });
 };
+// Upload Minh Chung
 export const uploadMinhChung = (formData, token) => {
     return api.post('/uploadToGoogleDrive', formData, {
         headers: {
@@ -371,6 +399,7 @@ export const uploadMinhChung = (formData, token) => {
             throw error;
         });
 };
+// Luu Minh Chung
 export const saveMinhChung = (minhChung, token) => {
     return api.post('/khominhchung', minhChung, {
         headers: {
@@ -383,30 +412,7 @@ export const saveMinhChung = (minhChung, token) => {
             throw error;
         });
 };
-export const insertNewChuanKdcl = (formData, token) => {
-    return api.post('/chuankdcl/insert', formData, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-    }).then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
-export const saveGoiY = (goiY, token) => {
-    return api.post('/goiy', goiY, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-    }).then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
+// Luu Minh Chung vao Kho Minh Chung
 export const saveFromKMCtoMinhChung = (minhChung, token) => {
     return api.post('/minhchung', minhChung, {
         headers: {
@@ -419,6 +425,7 @@ export const saveFromKMCtoMinhChung = (minhChung, token) => {
             throw error;
         });
 };
+// Luu Minh Chung dung cho ma Minh Chung
 export const saveMinhChungDungChung = (minhChung, token) => {
     return api.post('/minhchung/dungchung', minhChung, {
         headers: {
@@ -432,7 +439,7 @@ export const saveMinhChungDungChung = (minhChung, token) => {
         });
 };
 
-
+// Dang nhap
 export const login = (email, password) => {
     return api.post('http://localhost:1309/auth/login', { email, password }).then(response => response.data)
         .catch(error => {
