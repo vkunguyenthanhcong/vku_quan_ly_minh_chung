@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PdfViewer = ({ show, handleClose, link }) => {
+const PdfPreview = ({ show, handleClose, link }) => {
     if (!show) return null;
 
     return (
@@ -18,4 +18,4 @@ const PdfViewer = ({ show, handleClose, link }) => {
     );
 };
 
-export default PdfViewer;
+export default PdfPreview;
