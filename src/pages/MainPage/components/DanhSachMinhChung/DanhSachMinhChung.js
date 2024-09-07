@@ -8,6 +8,7 @@ import { getMinhChungKhongDungChung } from '../../../../services/apiServices';
 const DanhSachMinhChung = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [trichDan, setTrichDan] = useState("");
     const [minhChung, setMinhChung] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -48,22 +49,32 @@ const DanhSachMinhChung = () => {
       const buttonXemNhanh = (rowData) => {
         return (
           <div>
-            <button className='btn btn-secondary'>Xem Nhanh</button>
+            <button className="btn btn-secondary"onClick={() => handleClickViewPDF(rowData.linkLuuTru)}>Xem Nhanh</button>
           </div>
         );
       };
-
+      
     return (
+      
         <div
             className="content"
             style={{ background: "white", margin: "20px", padding: "20px" }}
         >
+          <div Col md={6}>
+          <input
+              className="form-control"
+              type="text"
+              value={trichDan}
+              onChange={(e) => setTrichDan(e.target.value)}
+          />
+          </div>
             <DataTable value={minhChung} paginator rows={30} globalFilter={globalFilter} emptyMessage="Không có dữ liệu">
                 <Column header="STT" body={indexTemplate} />
                 <Column header="Mã Minh Chứng" body={nameAndEmailTemplate} />
                 <Column field="tenMinhChung" header="Tên Minh Chứng" sortable />
-                <Column header="Xem Nhanh" body={buttonXemNhanh} />
+                <Column header="Xem Nhanh"body={buttonXemNhanh} />
             </DataTable>
+            <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </div>
     );
 }
