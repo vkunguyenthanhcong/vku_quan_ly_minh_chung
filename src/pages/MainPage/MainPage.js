@@ -34,7 +34,6 @@ const App = () => {
   const handleClick = () => {
     navigate("/quan-ly/chuong-trinh-dao-tao");
   };
-  console.log('b');
   return (
     <Container fluid style={{color:'#73879C'}}>
       <Row>

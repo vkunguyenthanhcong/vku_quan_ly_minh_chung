@@ -25,6 +25,7 @@
     "jwt-decode": "^4.0.0",
     "oidc-client": "^1.11.5",
     "pdfjs-dist": "^3.11.174",
+    "primereact": "^10.8.2",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.3.1",
