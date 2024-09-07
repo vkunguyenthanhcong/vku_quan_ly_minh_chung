@@ -438,7 +438,18 @@ export const saveMinhChungDungChung = (minhChung, token) => {
             throw error;
         });
 };
-
+export const getMinhChungKhongDungChung = (token) => {
+    return api.get(`/minhchung/MinhChungKhongDungChung`, { 
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
 // Dang nhap
 export const login = (email, password) => {
     return api.post('http://localhost:1309/auth/login', { email, password }).then(response => response.data)

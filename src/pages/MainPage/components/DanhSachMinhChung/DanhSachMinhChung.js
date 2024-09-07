@@ -1,69 +1,81 @@
-import React, {useState, useEffect} from 'react';
-import { useLocation } from 'react-router-dom';
-import { getCtdtData, getCtdtDataByMaKDCL, getMinhChungByMaCtdt, getThongTinCTDT } from '../../../../services/apiServices';
-import { Table } from 'react-bootstrap';
-import { TableBody, TableCell, TableHead, TableRow } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import PdfPreview from '../../../../services/PdfPreview';
+import { getMinhChungKhongDungChung } from '../../../../services/apiServices';
 
 const DanhSachMinhChung = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const token = localStorage.getItem('token');
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
-    
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
+    const [trichDan, setTrichDan] = useState("");
     const [minhChung, setMinhChung] = useState([]);
-
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const [
-                minhChungData,
-                chuongTrinhDaoTaoData
-            ] = await Promise.all([
-                getMinhChungByMaCtdt(KhungCTDT_ID, token),
-                getThongTinCTDT(KhungCTDT_ID, token)
-            ]);
-            setMinhChung(minhChungData);
-            setChuongTrinhDaoTao(chuongTrinhDaoTaoData);
-
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+    const [link, setLink] = useState("");
+    const [globalFilter, setGlobalFilter] = useState('');
+    const handleClickViewPDF = (link) => {
+        setLink(link);
+        openModal();
     };
-    console.log(chuongTrinhDaoTao);
+
+
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await getMinhChungKhongDungChung();
+                setMinhChung(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchData();
     }, []);
 
-    return(
+    const indexTemplate = (rowData, { rowIndex }) => {
+        return rowIndex + 1;
+      };
+
+    const nameAndEmailTemplate = (rowData) => {
+        return (
+          <div>
+            <p>{rowData.parentMaMc}{rowData.childMaMc}</p>
+          </div>
+        );
+      };
+      const buttonXemNhanh = (rowData) => {
+        return (
+          <div>
+            <button className="btn btn-secondary"onClick={() => handleClickViewPDF(rowData.linkLuuTru)}>Xem Nhanh</button>
+          </div>
+        );
+      };
+      
+    return (
+      
         <div
             className="content"
             style={{ background: "white", margin: "20px", padding: "20px" }}
         >
-            <p>Chuong Trinh Dao Tao {KhungCTDT_ID}</p>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>STT</TableCell>
-                        <TableCell>Mã</TableCell>
-                        <TableCell>Trích dẫn</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {minhChung.map((item, index) => (
-                        <TableRow>
-                            <TableCell>{index+1}</TableCell>
-                            <TableCell>{item.parentMaMc}{item.childMaMc}</TableCell>
-                            <TableCell>{item.tenMinhChung}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+          <div Col md={6}>
+          <input
+              className="form-control"
+              type="text"
+              value={trichDan}
+              onChange={(e) => setTrichDan(e.target.value)}
+          />
+          </div>
+            <DataTable value={minhChung} paginator rows={30} globalFilter={globalFilter} emptyMessage="Không có dữ liệu">
+                <Column header="STT" body={indexTemplate} />
+                <Column header="Mã Minh Chứng" body={nameAndEmailTemplate} />
+                <Column field="tenMinhChung" header="Tên Minh Chứng" sortable />
+                <Column header="Xem Nhanh"body={buttonXemNhanh} />
+            </DataTable>
+            <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </div>
-    )
+    );
 }
 export default DanhSachMinhChung;

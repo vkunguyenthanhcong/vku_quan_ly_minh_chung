@@ -28,7 +28,217 @@ const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
     color: 'white !important',
     border: '1px solid #ddd'
 }));;
+const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [minhChung, setMinhChung] = useState([]);
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+    const [link, setLink] = useState("");
+    const handleClickViewPDF = (link) => {
+        setLink(link);
+        openModal();
+    };
 
+
+    const navigate = useNavigate();
+    const handleClick = (idGoiY, idTieuChi) => {
+        navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}`);
+    };
+    const deleteMC = async (idMc, parentMaMc) => {
+        deleteMinhChung(idMc, parentMaMc);
+        fetchData();
+    }
+    const fetchData = async () => {
+        try {
+            const result = await getAllMinhChungWithIdGoiY(idGoiY);
+            setMinhChung(result);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchData();
+    }, [idGoiY]);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error.message}</div>;
+    return (
+        <>
+                <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHead >
+                        <TableRow style={{ maxWidth: '100%'}}>
+                            {minhChung.length > 0 ?
+                                <>
+                                <TableCell
+                                    style={{ 
+                                        width: '20%'
+                                    }}
+                                    className='bg-white p-1 border-top-1-solid-white border-1-solid-black'
+                                    >
+                                        <b>Mã</b>
+                                    </TableCell>
+                                    <TableCell
+                                        style={{ width: '20%' }}
+                                        className='bg-white p-1 border-top-1-solid-white border-1-solid-black'
+                                    >
+                                        <b>Số hiệu</b>
+                                    </TableCell>
+                                    <TableCell
+                                        style={{ width: '45%' }}
+                                        className='bg-white p-1 border-top-1-solid-white border-1-solid-black'
+                                    >
+                                        <b>Tên VB</b>
+                                    </TableCell>
+                                    <TableCell
+                                        style={{ width: '15%' }}
+                                        className='bg-white p-0 border-top-1-solid-white border-right-1-solid-white border-1-solid-black'
+                                    >
+                                        <button
+                                        style={{ width: '100%' }}
+                                        className='btn btn-success'
+                                        onClick={() => handleClick(idGoiY, idTieuChi)}
+                                        >
+                                        Bổ sung
+                                        </button>
+                                    </TableCell>
+                                    </> :
+                                <>
+                                    <TableCell style={{ width: '75%'}} colSpan={3} className='bg-white p-1 border-1-solid-white'>
+                                        <button className='btn btn-danger'>Thiếu</button>
+                                    </TableCell>
+                                    <TableCell style={{ width: '25%' }} className='bg-white p-1 border-1-solid-white'>
+                                        <button onClick={() => handleClick(idGoiY, idTieuChi)} className='btn btn-success' style={{ float: 'right' }}>Bổ sung</button>
+                                    </TableCell>
+                                </>
+                            }
+                        </TableRow>
+                    </TableHead>
+                    <TableBody >
+                        {minhChung.map((row, index) => (
+                            <TableRow key={index}>
+                                <TableCell className='p-1 border-1-solid-black'>{row.parentMaMc}{row.childMaMc}</TableCell>
+                                <TableCell className='p-1 border-1-solid-black'>{row.soHieu}</TableCell>
+                                <TableCell className='p-1 border-1-solid-black'>{row.tenMinhChung}</TableCell>
+                                <TableCell className='p-0 border-right-1-solid-white border-1-solid-black'>
+                                    <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary' onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem</button>
+                                    <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
+                                    <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+        </>
+
+    );
+});
+const Table_GoiY = React.memo(({ idMocChuan, idTieuChi }) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [goiY, setGoiY] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await getAllGoiYWithIdMocChuan(idMocChuan);
+                setGoiY(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [idMocChuan]);
+    return (
+        <>
+            {goiY.map((row, index) => (
+                <React.Fragment key={row.id}>
+                    <TableRow style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
+                        <CustomTableCell style={{ maxWidth: '100%', width: '25%', border: 'none' }}>
+                            <span>{row.tenGoiY}</span>
+                        </CustomTableCell>
+                        <CustomTableCellNoPadding style={{ padding: 0, width: '75%', maxWidth: '100%', border: 'none', height: '100%' }}>
+                            <Table_MinhChung idTieuChi={idTieuChi} idGoiY={row.idGoiY} />
+                        </CustomTableCellNoPadding>
+                    </TableRow>
+                    {index < goiY.length - 1 && <hr style={{ border: '1px solid black' }} />}
+                </React.Fragment>
+            ))}
+        </>
+
+    );
+});
+const Table_MocChuan = React.memo(({ idTieuChi }) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [mocChuan, setMocChuan] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await getAllMocChuanWithIdTieuChi(idTieuChi);
+                setMocChuan(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [idTieuChi]);
+    return (
+        <>
+            {mocChuan.map((row, index) => (
+                <TableBody>
+                    <TableRow key={row.id} >
+                        <CustomTableCell style={{ width: '20%' }} className='border-1'>{index + 1}. {row.tenMocChuan}</CustomTableCell>
+                        <CustomTableCell className='border-1 p-0' style={{ width: '80%' }}>
+                            <Table_GoiY idMocChuan={row.idMocChuan} idTieuChi={idTieuChi} />
+                        </CustomTableCell>
+                    </TableRow>
+                </TableBody>
+            ))}
+        </>
+    );
+});
+
+const TotalTieuChi = ({ idTieuChi }) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const [total, setTotal] = useState([]);
+    useEffect(() => {
+        setLoading(true);
+        const fetchDataFromAPI = async () => {
+            try {
+                const result = await getTotalMinhChungWithTieuChi(idTieuChi);
+                setTotal(result);
+            } catch (error) {
+                setError(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDataFromAPI();
+    }, [idTieuChi]);
+    return (
+        <>
+            {total.length > 0 ? (
+
+                total.map((item) => (
+                    <p>{item.total}</p>
+                ))
+
+            ) : (null)}
+        </>
+    )
+}
 
 const TieuChi = () => {
     const [loading, setLoading] = useState(true);
@@ -41,6 +251,7 @@ const TieuChi = () => {
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+
     const handleClickViewPDF = (link) => {
         setLink(link);
         openModal();
@@ -241,6 +452,7 @@ const TieuChi = () => {
         )
     }
 
+ main
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
@@ -249,7 +461,7 @@ const TieuChi = () => {
                 const result_2 = await getThongTinCTDT(KhungCTDT_ID);
                 setTieuChi(result);
                 setTieuChuan(result_1);
-                setChuongTrinhDaoTao(result_2);
+                setChuongTrinhDaoTao(result_2); 
             } catch (error) {
                 setError(error);
             } finally {
