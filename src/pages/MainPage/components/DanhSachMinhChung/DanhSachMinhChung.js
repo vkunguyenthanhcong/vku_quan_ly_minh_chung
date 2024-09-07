@@ -5,6 +5,7 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import PdfPreview from '../../../../services/PdfPreview';
 import { getMinhChungKhongDungChung } from '../../../../services/apiServices';
+import "./DanhSachMinhChung.css";
 
 const DanhSachMinhChung = () => {
     const [loading, setLoading] = useState(true);
@@ -47,7 +48,7 @@ const DanhSachMinhChung = () => {
     const buttonXemNhanh = (rowData) => {
         return (
             <div>
-                <button className='btn btn-secondary'>Xem Nhanh</button>
+                <button className='btn btn-secondary' onClick={() => handleClickViewPDF(rowData.linkLuuTru)}>Xem Nhanh</button>
             </div>
         );
     };
@@ -69,9 +70,10 @@ const DanhSachMinhChung = () => {
             <DataTable value={updateMinhChung} paginator rows={30} globalFilter={globalFilter} globalFilterFields={['maMinhChung', 'tenMinhChung']} emptyMessage="Không có dữ liệu">
                 <Column header="STT" body={indexTemplate} />
                 <Column header="Mã Minh Chứng" field='maMinhChung' />
-                <Column field="tenMinhChung" header="Tên Minh Chứng" sortable />
+                <Column field="tenMinhChung" header="Tên Minh Chứng" />
                 <Column header="Xem Nhanh" body={buttonXemNhanh} />
             </DataTable>
+            <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </div>
     );
 }
