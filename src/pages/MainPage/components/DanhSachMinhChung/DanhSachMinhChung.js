@@ -60,14 +60,6 @@ const DanhSachMinhChung = () => {
             className="content"
             style={{ background: "white", margin: "20px", padding: "20px" }}
         >
-          <div Col md={6}>
-          <input
-              className="form-control"
-              type="text"
-              value={trichDan}
-              onChange={(e) => setTrichDan(e.target.value)}
-          />
-          </div>
             <DataTable value={minhChung} paginator rows={30} globalFilter={globalFilter} emptyMessage="Không có dữ liệu">
                 <Column header="STT" body={indexTemplate} />
                 <Column header="Mã Minh Chứng" body={nameAndEmailTemplate} />
