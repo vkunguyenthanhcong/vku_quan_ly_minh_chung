@@ -362,8 +362,9 @@ const MinhChung = () => {
                                 .filter(item => item.idGoiY == GoiY_ID) // Add your filter condition here
                                 .map((item, index) => {
                                     const filteredItem = minhChung.filter(i => i.idMc === item.maDungChung);
-                                    const modifiedString = item.maDungChung == 0 ? (item.maMinhChung.slice(0, -3) + '.') : (0);
+                                    
                                     const maMinhChungDisplay = item.maDungChung == 0 ? item.maMinhChung : (filteredItem[0].maMinhChung);
+                                    const modifiedString = item.maDungChung == 0 ? (item.maMinhChung.slice(0, -3) + '.') : (0);
                                     return (<TableRow key={index}>
                                     <TableCell>{maMinhChungDisplay}</TableCell>
                                     <TableCell>{item.tenMinhChung}</TableCell>
