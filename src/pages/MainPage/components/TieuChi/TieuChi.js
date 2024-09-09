@@ -7,7 +7,7 @@ import {
     getAllTieuChiWithIdTieuChuan,
     getTieuChuanById,
     getThongTinCTDT,
-    getAllMocChuanWithIdTieuChi, getAllGoiYWithIdMocChuan, getAllMinhChungWithIdGoiY, deleteMinhChung,
+    getAllMocChuanWithIdTieuChi, getAllGoiYWithIdMocChuan, deleteMinhChung,
     getTotalMinhChungWithTieuChi
 } from '../../../../services/apiServices';
 import './TieuChi.css';
@@ -35,6 +35,7 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
@@ -47,7 +48,7 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
 
     const navigate = useNavigate();
     const handleClick = (idGoiY, idTieuChi) => {
-        navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}`);
+        navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}&TieuChuan_ID=${TieuChuan_ID}`);
     };
     const deleteMC = async (idMc, parentMaMc) => {
         deleteMinhChung(idMc, parentMaMc);
@@ -55,8 +56,8 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
     }
     const fetchData = async () => {
         try {
-            const result = await getAllMinhChungWithIdGoiY(idGoiY);
-            setMinhChung(result);
+            // const result = await getAllMinhChungWithIdGoiY(idGoiY);
+            // setMinhChung(result);
         } catch (err) {
             setError(err);
         } finally {

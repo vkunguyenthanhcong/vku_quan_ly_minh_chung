@@ -5,7 +5,6 @@ import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import PdfPreview from '../../../../services/PdfPreview';
 import { getMinhChungKhongDungChung } from '../../../../services/apiServices';
-import "./DanhSachMinhChung.css";
 
 const DanhSachMinhChung = () => {
     const [loading, setLoading] = useState(true);
@@ -60,6 +59,13 @@ const DanhSachMinhChung = () => {
             className="content"
             style={{ background: "white", margin: "20px", padding: "20px" }}
         >
+         <style>
+            {`
+            th {
+                color: white !important;
+            }
+            `}
+        </style>
             <InputText
             className='form-control'
                 type="search"

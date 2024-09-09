@@ -161,17 +161,7 @@ export const getMinhChungByMaCtdt = (maCtdt, token) => {
             throw error;
         });
 };
-//Lay tat ca data Minh Chung va Chuong Trinh Dao Tao 
-export const getAllMinhChungAndCtdt = (token) => {
-    return api.get(`/minhchung/MinhChungAndCtdt`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
+
 
 //Data thong tin cua Tieu Chuan
 export const getTieuChuanById = (TieuChuan_ID, token) => {
@@ -262,8 +252,8 @@ export const getAllGoiYWithIdMocChuan = (idMocChuan, token) => {
         });
 };
 // Lay data cua tat ca Minh Chung theo Goi Y
-export const getAllMinhChungWithIdGoiY = (idGoiY, token) => {
-    return api.get(`/minhchung/${idGoiY}`, {
+export const getAllMinhChungAndTieuChi = (token) => {
+    return api.get(`/minhchung/MinhChungAndIdTieuChi`, {
         headers: { Authorization: `Bearer ${token}` }
     })  
         .then(response => response.data)
