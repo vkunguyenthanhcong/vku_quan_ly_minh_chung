@@ -8,11 +8,11 @@ import { getThongTinDangNhap } from '../../services/apiServices';
 
 
 const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
-  const [user, setUser] = useState(null);
+  const token = localStorage.getItem('token');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const [user, setUser] = useState(null);
 
   const Logout = () => {
     localStorage.removeItem('token');

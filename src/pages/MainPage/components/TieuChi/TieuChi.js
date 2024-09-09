@@ -57,75 +57,77 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
     if (error) return <div>Error: {error.message}</div>;
     return (
         <>
-                <Table style={{ tableLayout: 'fixed', width: '100%'}}>
-                    <TableHead>
-                        <TableRow style={{ maxWidth: '100%'}}>
-                            {minhChung.filter(item => item.idGoiY === idGoiY).length > 0 ?
-                                <>
-                                <TableCell
-                                    style={{ 
-                                        width: '20%'
-                                    }}
-                                    className='bg-white p-1  border-1-solid-black'
-                                    >
-                                        <b>Mã</b>
-                                    </TableCell>
-                                    <TableCell
-                                        style={{ width: '20%' }}
-                                        className='bg-white p-1 border-1-solid-black'
-                                    >
-                                        <b>Số hiệu</b>
-                                    </TableCell>setMinhChung
-                                    <TableCell
-                                        style={{ width: '45%' }}
-                                        className='bg-white p-1 border-1-solid-black'
-                                    >
-                                        <b>Tên VB</b>
-                                    </TableCell>
-                                    <TableCell
-                                        style={{ width: '15%' }}
-                                        className='bg-white p-0  border-1-solid-black'
-                                    >
-                                        <button
-                                        style={{ width: '100%' }}
-                                        className='btn btn-success'
-                                        onClick={() => handleClick(idGoiY, idTieuChi)}
-                                        >
-                                        Bổ sung
-                                        </button>
-                                    </TableCell>
-                                    </> :
-                                <>
-                                    <TableCell style={{ width: '75%'}} colSpan={3} className='bg-white border-1-solid-white'>
-                                        <button className='btn btn-danger'>Thiếu</button>
-                                    </TableCell>
-                                    <TableCell style={{ width: '25%' }} className='bg-white border-1-solid-white'>
-                                        <button onClick={() => handleClick(idGoiY, idTieuChi)} className='btn btn-success' style={{ float: 'right' }}>Bổ sung</button>
-                                    </TableCell>
-                                </>
-                            }
+            <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                <TableHead className='bg-white'>
+
+                    {minhChung.filter(item => item.idGoiY === idGoiY).length > 0 ?
+                        <TableRow style={{ maxWidth: '100%' }} className='border-black'>
+                            <TableCell
+                                style={{
+                                    width: '20%'
+                                }}
+                                className='p-1'
+                            >
+                                <b>Mã</b>
+                            </TableCell>
+                            <TableCell
+                                style={{ width: '20%' }}
+                                className='p-1'
+                            >
+                                <b>Số hiệu</b>
+                            </TableCell>
+                            <TableCell
+                                style={{ width: '45%' }}
+                                className='p-1'
+                            >
+                                <b>Tên VB</b>
+                            </TableCell>
+                            <TableCell
+                                style={{ width: '15%' }}
+                                className='p-0'
+                            >
+                                <button
+                                    style={{ width: '100%' }}
+                                    className='btn btn-success'
+                                    onClick={() => handleClick(idGoiY, idTieuChi)}
+                                >
+                                    Bổ sung
+                                </button>
+                            </TableCell>
+                        </TableRow> :
+                        <TableRow style={{ maxWidth: '100%' }}>
+                            <TableCell style={{ width: '75%' }} colSpan={3} className='p-1 border-1-solid-white'>
+                                <button className='btn btn-danger'>Thiếu</button>
+                            </TableCell>
+                            <TableCell style={{ width: '25%' }} className='p-1 border-1-solid-white'>
+                                <button onClick={() => handleClick(idGoiY, idTieuChi)} className='btn btn-success' style={{ float: 'right' }}>Bổ sung</button>
+                            </TableCell>
                         </TableRow>
-                    </TableHead>
-                    <TableBody >
-                        {minhChung.filter(item => item.idGoiY === idGoiY).map((row, index) => {
-                            const filteredItem = minhChung.filter(i => i.idMc === row.maDungChung);
-                            const maMinhChungDisplay = row.maDungChung === 0 ? row.maMinhChung : (filteredItem[0].maMinhChung);
-                            const modifiedString = row.maDungChung === 0 ? (row.maMinhChung.slice(0, -3) + '.') : (0);
-                            return (<TableRow key={index}>
-                                <TableCell className='p-1 border-1-solid-black'>{maMinhChungDisplay}</TableCell>
-                                <TableCell className='p-1 border-1-solid-black'>{row.soHieu}</TableCell>
-                                <TableCell className='p-1 border-1-solid-black'>{row.tenMinhChung}</TableCell>
-                                <TableCell className='p-1 border-1-solid-black'></TableCell>
-                                <TableCell className='p-0 border-1-solid-black'>
-                                    <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary' onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem</button>
-                                    <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, modifiedString)}>Xóa</button>
+                    }
+                </TableHead>
+                <TableBody>
+                    {minhChung.filter(item => item.idGoiY === idGoiY).map((row, index) => {
+                        const filteredItem = minhChung.filter(i => i.idMc === row.maDungChung);
+                        const maMinhChungDisplay = row.maDungChung === 0 ? row.maMinhChung : (filteredItem[0].maMinhChung);
+                        const modifiedString = row.maDungChung === 0 ? (row.maMinhChung.slice(0, -3) + '.') : (0);
+
+                        return (
+                            <TableRow key={index} className='border-black'>
+                                <TableCell className='p-1' style={{ width: '25%' }}>{maMinhChungDisplay}</TableCell>
+                                <TableCell className='p-1' style={{ width: '25%' }}>{row.soHieu}</TableCell>
+                                <TableCell className='p-1' style={{ width: '30%' }}>{row.tenMinhChung}</TableCell>
+                                <TableCell className='p-0' style={{ width: '20%' }}>
+                                    <button style={{ width: '100%', marginTop: '5px' }} className='btn btn-secondary' onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem</button>
+                                    <button style={{ width: '100%', marginTop: '5px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, modifiedString)}>Xóa</button>
                                 </TableCell>
-                            </TableRow>)
-                        })}
-                    </TableBody>
-                    
-                </Table>
-                <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+
+
+            </Table>
+            <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </>
 
     );
@@ -151,11 +153,11 @@ const Table_GoiY = React.memo(({ idMocChuan, idTieuChi }) => {
         <>
             {goiY.map((row, index) => (
                 <>
-                    <TableRow style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0}}>
+                    <TableRow style={{ maxWidth: '100%', border: 'none', borderCollapse: 'collapse', borderSpacing: 0 }}>
                         <TableCell style={{ maxWidth: '100%', width: '25%', border: 'none' }}>
                             <span>{row.tenGoiY}</span>
                         </TableCell>
-                        <TableCell style={{width: '75%', maxWidth: '100%', border: 'none', height: '100%'}}>
+                        <TableCell style={{ width: '75%', maxWidth: '100%', border: 'none', height: '100%' }}>
                             <Table_MinhChung idTieuChi={idTieuChi} idGoiY={row.idGoiY} />
                         </TableCell>
                     </TableRow>
@@ -242,7 +244,7 @@ const TieuChi = () => {
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
-    
+
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
@@ -251,7 +253,7 @@ const TieuChi = () => {
                 const result_2 = await getThongTinCTDT(KhungCTDT_ID);
                 setTieuChi(result);
                 setTieuChuan(result_1);
-                setChuongTrinhDaoTao(result_2); 
+                setChuongTrinhDaoTao(result_2);
             } catch (error) {
                 setError(error);
             } finally {
@@ -262,6 +264,15 @@ const TieuChi = () => {
     }, [TieuChuan_ID, KhungCTDT_ID]);
     return (
         <div className="content" style={{ background: "white", margin: '20px', padding: '20px' }}>
+            <style>
+                {`
+                .border-gray > td{
+                    border : 1px solid #ccc !important;
+                }
+                .border-black > td, .border-black > th {
+                    border : 1px solid black !important}
+                `}
+            </style>
             <div>
                 {chuongTrinhDaoTao.map((row, index) => (
                     <p style={{ fontSize: '20px', textAlign: 'center' }}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH </b><b
@@ -285,15 +296,15 @@ const TieuChi = () => {
                             <TableCell colSpan={6}><b>Tiêu chuẩn {tieuChuan.stt}. {tieuChuan.tenTieuChuan}</b></TableCell>
                         </TableRow>
                         {tieuChi.map((row, index) => (
-                            <TableRow key={row.id}>
-                                <TableCell style={{verticalAlign: 'top'}}><b>{tieuChuan.stt}.{index + 1}</b> {row.tenTieuChi}</TableCell>
-                                <TableCell style={{verticalAlign: 'top'}}>{row.yeuCau.split(/(?=\d+\.\s)/).map((item, index) => (
+                            <TableRow key={row.id} className="border-gray">
+                                <TableCell style={{ verticalAlign: 'top' }}><b>{tieuChuan.stt}.{index + 1}</b> {row.tenTieuChi}</TableCell>
+                                <TableCell style={{ verticalAlign: 'top' }}>{row.yeuCau.split(/(?=\d+\.\s)/).map((item, index) => (
                                     <p key={index}>{item.trim()}</p>
                                 ))}</TableCell>
                                 <TableCell colSpan={3} className='p-0'>
                                     <Table_MocChuan idTieuChi={row.idTieuChi} />
                                 </TableCell>
-                                <TableCell style={{verticalAlign: 'top'}}><TotalTieuChi idTieuChi={row.idTieuChi} /></TableCell>
+                                <TableCell style={{ verticalAlign: 'top' }}><TotalTieuChi idTieuChi={row.idTieuChi} /></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
