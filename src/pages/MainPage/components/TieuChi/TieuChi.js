@@ -8,7 +8,8 @@ import {
     getTieuChuanById,
     getThongTinCTDT,
     getAllMocChuanWithIdTieuChi, getAllGoiYWithIdMocChuan, deleteMinhChung,
-    getTotalMinhChungWithTieuChi
+    getTotalMinhChungWithTieuChi,
+    getAllMinhChungAndTieuChi
 } from '../../../../services/apiServices';
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
@@ -56,8 +57,8 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
     }
     const fetchData = async () => {
         try {
-            // const result = await getAllMinhChungWithIdGoiY(idGoiY);
-            // setMinhChung(result);
+            const result = await getAllMinhChungAndTieuChi();
+            setMinhChung(result);
         } catch (err) {
             setError(err);
         } finally {
@@ -75,7 +76,7 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
                 <Table style={{ tableLayout: 'fixed', width: '100%' }}>
                     <TableHead >
                         <TableRow style={{ maxWidth: '100%'}}>
-                            {minhChung.length > 0 ?
+                            {minhChung.filter(item => item.idGoiY === idGoiY).length > 0 ?
                                 <>
                                 <TableCell
                                     style={{ 
@@ -90,7 +91,7 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
                                         className='bg-white p-1 border-top-1-solid-white border-1-solid-black'
                                     >
                                         <b>Số hiệu</b>
-                                    </TableCell>
+                                    </TableCell>setMinhChung
                                     <TableCell
                                         style={{ width: '45%' }}
                                         className='bg-white p-1 border-top-1-solid-white border-1-solid-black'
@@ -122,20 +123,24 @@ const Table_MinhChung = React.memo(({ idTieuChi, idGoiY }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody >
-                        {minhChung.map((row, index) => (
-                            <TableRow key={index}>
-                                <TableCell className='p-1 border-1-solid-black'>{row.parentMaMc}{row.childMaMc}</TableCell>
+                        {minhChung.filter(item => item.idGoiY === idGoiY).map((row, index) => {
+                            const filteredItem = minhChung.filter(i => i.idMc === row.maDungChung);
+                            const maMinhChungDisplay = row.maDungChung == 0 ? row.maMinhChung : (filteredItem[0].maMinhChung);
+                            return (<TableRow key={index}>
+                                <TableCell className='p-1 border-1-solid-black'>{maMinhChungDisplay}</TableCell>
                                 <TableCell className='p-1 border-1-solid-black'>{row.soHieu}</TableCell>
                                 <TableCell className='p-1 border-1-solid-black'>{row.tenMinhChung}</TableCell>
+                                <TableCell className='p-1 border-1-solid-black'></TableCell>
                                 <TableCell className='p-0 border-right-1-solid-white border-1-solid-black'>
                                     <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-secondary' onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem</button>
                                     <button style={{ width: '100%', marginTop: '10px' }} className='btn btn-danger' onClick={() => deleteMC(row.idMc, row.parentMaMc)}>Xóa</button>
-                                    <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
                                 </TableCell>
-                            </TableRow>
-                        ))}
+                            </TableRow>)
+                        })}
                     </TableBody>
+                    
                 </Table>
+                <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </>
 
     );
