@@ -9,6 +9,7 @@ import { getThongTinDangNhap } from '../../services/apiServices';
 
 const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -51,10 +52,12 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
   );
   
   const menuItems = [
+    ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản lý', isLink: true }] : []), // Nếu role là "ADMIN", thêm mục vào mảng
     { to: '/quan-ly', label: 'Quản lý tiêu chuẩn', isLink: true },
     { to: '/quan-ly/dinh-nghia-tieu-chuan', label: 'Định nghĩa tiêu chuẩn', isLink: true },
     { to: '', label: 'Báo cáo tự đánh giá', isLink: false }
   ];
+  
   return (
     <div className={`menu-scroll no-padding ${isScreenSmall ? 'text-center' : ''}`}>
       <i
@@ -105,7 +108,7 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
           </p>
           <br />
           {menuItems.map((item, index) => (
-            <MenuItem key={index} to={item.to} label={item.label} isLink={item.isLink} />
+            <MenuItem key={index} to={item.to} label={item.label} isLink={item.isLink}  />
           ))}
         </ul>
       </div>

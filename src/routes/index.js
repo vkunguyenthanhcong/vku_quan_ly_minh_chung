@@ -24,16 +24,16 @@ import ChiTietChuongTrinhDaoTao from '../pages/Admin/components/ChiTietiChuongTr
 const routes = [
   {
     path: "/quan-ly/",
-    element: <ProtectedRoute element={<MainPage />} requiredRole="USER" />, // Example role check for non-admin sections
+    element: <ProtectedRoute element={<MainPage />} requiredRoles={["USER", "ADMIN"]} />, // Example role check for non-admin sections
     children: [
-      { path: "", element: <ProtectedRoute element={<TrangChu />} requiredRole="USER" /> },
-      { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChuongTrinhDaoTao />} requiredRole="USER" /> },
-      { path: "tieu-chi", element: <ProtectedRoute element={<TieuChi />} requiredRole="USER" /> },
-      { path: "minh-chung", element: <ProtectedRoute element={<MinhChung />} requiredRole="USER" /> },
-      { path: "quan-ly-minh-chung", element: <ProtectedRoute element={<QuanLyMinhChung />} requiredRole="USER" /> },
-      { path: "dinh-nghia-tieu-chuan", element: <ProtectedRoute element={<DinhNghiaTieuChuan />} requiredRole="USER" /> },//them goi
-      { path: "tieu-chuan", element: <ProtectedRoute element={<DanhSachTieuChuan />} requiredRole="USER" /> },
-      { path: "danh-sach-minh-chung", element: <ProtectedRoute element={<DanhSachMinhChung />} requiredRole="USER" /> },
+      { path: "", element: <ProtectedRoute element={<TrangChu />} requiredRoles={["USER", "ADMIN"]} /> },
+      { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChuongTrinhDaoTao />} requiredRoles={["USER", "ADMIN"]} /> },
+        
+      { path: "minh-chung", element: <ProtectedRoute element={<MinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
+      { path: "quan-ly-minh-chung", element: <ProtectedRoute element={<QuanLyMinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
+      { path: "dinh-nghia-tieu-chuan", element: <ProtectedRoute element={<DinhNghiaTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> },//them goi
+      { path: "tieu-chuan", element: <ProtectedRoute element={<DanhSachTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> },
+      { path: "danh-sach-minh-chung", element: <ProtectedRoute element={<DanhSachMinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
     ],
   },
   {
@@ -46,12 +46,12 @@ const routes = [
   },
   {
     path: "/admin/",
-    element: <ProtectedRoute element={<Admin />} requiredRole="ADMIN" />, // Protect admin routes with ADMIN role
+    element: <ProtectedRoute element={<Admin />} requiredRoles={["ADMIN"]} />, // Protect admin routes with ADMIN role
     children: [
-      { path: "", element: <ProtectedRoute element={<TrangChuAdmin />} requiredRole="ADMIN" /> },
-      { path: "chuan-kiem-dinh", element: <ProtectedRoute element={<ChuanKiemDinh />} requiredRole="ADMIN" /> },
-      { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<AdminChuongTrinhDaoTao />} requiredRole="ADMIN" /> },
-      { path: "chi-tiet-chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChiTietChuongTrinhDaoTao />} requiredRole="ADMIN" /> },
+      { path: "", element: <ProtectedRoute element={<TrangChuAdmin />} requiredRoles={["ADMIN"]} /> },
+      { path: "chuan-kiem-dinh", element: <ProtectedRoute element={<ChuanKiemDinh />} requiredRoles={["ADMIN"]} /> },
+      { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<AdminChuongTrinhDaoTao />} requiredRoles={["ADMIN"]} /> },
+      { path: "chi-tiet-chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChiTietChuongTrinhDaoTao />} requiredRoles={["ADMIN"]} /> },
     ],
   }
 ];
