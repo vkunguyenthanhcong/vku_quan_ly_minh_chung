@@ -9,7 +9,6 @@ import { getMinhChungKhongDungChung } from '../../../../services/apiServices';
 const DanhSachMinhChung = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [trichDan, setTrichDan] = useState("");
     const [minhChung, setMinhChung] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -54,14 +53,15 @@ const DanhSachMinhChung = () => {
     };
     const buttonDungChung = (rowData) => {
         return (
-          <div>
-            <button className='btn btn-secondary'>Xem Nhanh</button>
-          </div>
+            <div>
+                <button className='btn btn-success'>Dùng Chung</button>
+            </div>
         );
-      };
+    };
+
+
 
     return (
-      
         <div
             className="content"
             style={{ background: "white", margin: "20px", padding: "20px" }}
@@ -82,9 +82,10 @@ const DanhSachMinhChung = () => {
             <br/>
             <DataTable value={updateMinhChung} paginator rows={30} globalFilter={globalFilter} globalFilterFields={['maMinhChung', 'tenMinhChung']} emptyMessage="Không có dữ liệu">
                 <Column header="STT" body={indexTemplate} />
-                <Column header="Mã Minh Chứng" body={nameAndEmailTemplate} />
-                <Column field="tenMinhChung" header="Tên Minh Chứng" sortable />
+                <Column header="Mã Minh Chứng" field='maMinhChung' />
+                <Column field="tenMinhChung" header="Tên Minh Chứng" />
                 <Column header="Xem Nhanh" body={buttonXemNhanh} />
+                <Column header="Dùng Chung" body={buttonDungChung} />
             </DataTable>
             <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </div>
