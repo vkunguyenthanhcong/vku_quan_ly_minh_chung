@@ -17,21 +17,20 @@ const isTokenExpired = (token) => {
 };
 
 // Function to check if the user is authenticated and has the required role
-const checkAuthAndRole = (requiredRole) => {
+const checkAuthAndRole = (requiredRoles) => {
     const token = localStorage.getItem('token');
     if (!token || isTokenExpired(token)) {
         console.log('Token is missing or expired');
         return false; // Token is either missing or expired
     }
-
     const userRole = localStorage.getItem('role');
-    return userRole === requiredRole;
+    return requiredRoles.includes(userRole);
 };
 
-const ProtectedRoute = ({ element, requiredRole, ...rest }) => {
+const ProtectedRoute = ({ element, requiredRoles, ...rest }) => {
     const location = useLocation();
 
-    return checkAuthAndRole(requiredRole) ? (
+    return checkAuthAndRole(requiredRoles) ? (
         React.cloneElement(element, rest) // Render the protected component
     ) : (
         <Navigate to="/" state={{ from: location }} replace /> // Redirect to login if not authenticated or role does not match
