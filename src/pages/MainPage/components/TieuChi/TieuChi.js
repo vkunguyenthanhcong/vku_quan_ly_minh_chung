@@ -244,7 +244,7 @@ const TieuChi = () => {
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
-
+    
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
