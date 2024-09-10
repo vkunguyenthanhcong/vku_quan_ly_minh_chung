@@ -1,9 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import './DanhSachTieuChuan.css'
-import { styled } from '@mui/material/styles';
 import colors from '../../../../components/color';
-import font from '../../../../components/font'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import {
@@ -13,17 +10,8 @@ import {
     getTieuChuanWithMaCtdt
 } from "../../../../services/apiServices";
 import PopupForm from "./PopupForm/PopupForm";
-const CustomTableCell = styled(TableCell)(({ theme }) => ({
-    fontSize: '16px',
-    fontFamily : font.inter
-}));
 
-const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
-    fontSize: '16px',
-    color : 'white !important',
-    fontFamily : font.inter
-}));;
-const ListGoiY = ({ idMocChuan , token}) => {
+const ListGoiY = ({ idMocChuan }) => {
     const [isPopupVisible, setIsPopupVisible] = useState(false);
 
     const showPopup = () => setIsPopupVisible(true);
@@ -34,7 +22,7 @@ const ListGoiY = ({ idMocChuan , token}) => {
     const [error, setError] = useState(null);
     const fetchGoiY = async () => {
         try {
-            const result = await getAllGoiYWithIdMocChuan(idMocChuan, token);
+            const result = await getAllGoiYWithIdMocChuan(idMocChuan);
             setGoiY(result);
         } catch (error) {
             setError(error);
@@ -43,33 +31,36 @@ const ListGoiY = ({ idMocChuan , token}) => {
         }
     };
     useEffect(() => {
-        
+
         fetchGoiY();
     }, [idMocChuan]);
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
     return (
         <>
-            {goiY.map((row, index) => (
-                <TableRow>
+            {goiY.map((row) => (
+                <React.Fragment key={row.id}> {/* Sử dụng key để tránh cảnh báo từ React */}
+                    <TableRow className="no-border">
                     <TableCell>{row.tenGoiY}</TableCell>
-                </TableRow>
-            ))}
+                    </TableRow>
+                    <hr />
+                </React.Fragment>
+                ))}
             <div className='d-flex justify-content-center'>
-            <button onClick={showPopup} className='btn'><i className='fas fa-edit'> </i> <span>  Bổ sung thêm gợi ý minh chứng</span></button>
+                <button onClick={showPopup} className='btn'><i className='fas fa-edit'> </i> <span>  Bổ sung thêm gợi ý minh chứng</span></button>
             </div>
-            <PopupForm isVisible={isPopupVisible} onClose={hidePopup} idMocChuan={idMocChuan} fetchGoiY ={fetchGoiY} token={token} />
+            <PopupForm isVisible={isPopupVisible} onClose={hidePopup} idMocChuan={idMocChuan} fetchGoiY={fetchGoiY} />
         </>
     );
 };
-const ListMocChuan = ({ idTieuChi, token }) => {
+const ListMocChuan = ({ idTieuChi }) => {
     const [mocChuan, setMocChuan] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchTieuChi = async () => {
             try {
-                const result = await getAllMocChuanWithIdTieuChi(idTieuChi, token);
+                const result = await getAllMocChuanWithIdTieuChi(idTieuChi);
                 setMocChuan(result);
             } catch (error) {
                 setError(error);
@@ -84,22 +75,26 @@ const ListMocChuan = ({ idTieuChi, token }) => {
     return (
         <>
             {mocChuan.map((row, index) => (
-                <TableRow>
-                    <TableCell style={{width : '50%'}}>{row.tenMocChuan}</TableCell>
-                    <TableCell style={{width : '50%'}}><ListGoiY idMocChuan={row.idMocChuan} token={token}/></TableCell>
-                </TableRow>
+                <React.Fragment key={row.idMocChuan}>
+                    <TableRow >
+                        <TableCell style={{ width: '50%' }}>{index + 1}. {row.tenMocChuan}</TableCell>
+                        <TableCell style={{ width: '50%' }}><ListGoiY idMocChuan={row.idMocChuan} /></TableCell>
+                    </TableRow>
+                    
+                </React.Fragment>
             ))}
+
         </>
     );
 };
-const ListTieuChi = ({ idTieuChuan, stt, token }) => {
+const ListTieuChi = ({ idTieuChuan, stt }) => {
     const [tieuChi, setTieuChi] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
         const fetchTieuChi = async () => {
             try {
-                const result = await getAllTieuChiWithIdTieuChuan(idTieuChuan, token);
+                const result = await getAllTieuChiWithIdTieuChuan(idTieuChuan);
                 setTieuChi(result);
             } catch (error) {
                 setError(error);
@@ -114,10 +109,12 @@ const ListTieuChi = ({ idTieuChuan, stt, token }) => {
     return (
         <>
             {tieuChi.map((row, index) => (
-                <TableRow>
-                    <TableCell><b>{stt}.{index+1}</b> {row.tenTieuChi}</TableCell>
-                    <TableCell>{row.yeuCau}</TableCell>
-                    <TableCell colSpan={2}><ListMocChuan idTieuChi={row.idTieuChi} token ={token} /></TableCell>
+                <TableRow className='border-gray'>
+                    <TableCell><b>{stt}.{index + 1}</b> {row.tenTieuChi}</TableCell>
+                    <TableCell>{row.yeuCau.split(/(?=\d+\.\s)/).map((item, index) => (
+                                    <p key={index}>{item.trim()}</p>
+                                ))}</TableCell>
+                    <TableCell colSpan={2}><ListMocChuan idTieuChi={row.idTieuChi} /></TableCell>
                 </TableRow>
             ))}
         </>
@@ -125,10 +122,9 @@ const ListTieuChi = ({ idTieuChuan, stt, token }) => {
 };
 
 const DanhSachTieuChuan = () => {
-    const token = localStorage.getItem('token');
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const KhungChuongTrinhID = queryParams.get('KhungChuongTrinhID');
+    const KhungChuongTrinhID = queryParams.get('KhungChuongTrinh_ID');
 
     const [tieuChuan, setTieuChuan] = useState([]);
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
@@ -137,8 +133,8 @@ const DanhSachTieuChuan = () => {
     const [error, setError] = useState(null);
     const fetchData = async () => {
         try {
-            const result = await getTieuChuanWithMaCtdt(KhungChuongTrinhID, token);
-            const result_1 = await getThongTinCTDT(KhungChuongTrinhID, token);
+            const result = await getTieuChuanWithMaCtdt(KhungChuongTrinhID);
+            const result_1 = await getThongTinCTDT(KhungChuongTrinhID);
             setTieuChuan(result);
             setChuongTrinhDaoTao(result_1);
         } catch (error) {
@@ -153,25 +149,39 @@ const DanhSachTieuChuan = () => {
     }, []);
     return (
         <div className="content" style={{ background: "white", margin: '20px' }}>
-            {chuongTrinhDaoTao.map((row, index)=> (
-                <p className='text-center' style={{fontSize: '20px'}}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH <span
-                    style={{color: colors.secondary}}>{row.tenCtdt}</span></b></p>
+            <style>
+                {`
+                th{
+                    color:white !important;
+                }
+                .border-gray > td{
+                    border : 1px solid #ccc !important;
+                }
+
+                .no-border > td{
+                    border : 1px solid white !important;
+                }
+                `}
+            </style>
+            {chuongTrinhDaoTao.map((row, index) => (
+                <p className='text-center' style={{ fontSize: '20px' }}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH <span
+                    style={{ color: colors.secondary }}>{row.tenCtdt}</span></b></p>
             ))}
             <TableContainer component={Paper}>
                 <Table className='font-Inter'>
                     <TableHead>
-                        <CustomTableHeadCell style={{width : '15%'}}>Tiêu chuẩn/ <br/>Tiêu chí</CustomTableHeadCell>
-                        <CustomTableHeadCell style={{width : '15%'}}>Yêu cầu của tiêu chí</CustomTableHeadCell>
-                        <CustomTableHeadCell style={{width : '35%'}}>Mốc chuẩn để tham chiếu để đánh giá tiêu chí đạt mức 4</CustomTableHeadCell>
-                        <CustomTableHeadCell style={{width : '35%'}}>Các gợi ý bắt buộc</CustomTableHeadCell>
+                        <TableCell style={{ width: '15%' }}>Tiêu chuẩn/ <br />Tiêu chí</TableCell>
+                        <TableCell style={{ width: '15%' }}>Yêu cầu của tiêu chí</TableCell>
+                        <TableCell style={{ width: '35%' }}>Mốc chuẩn để tham chiếu để đánh giá tiêu chí đạt mức 4</TableCell>
+                        <TableCell style={{ width: '35%' }}>Các gợi ý bắt buộc</TableCell>
                     </TableHead>
                     {tieuChuan.map((row, index) => (
-                    <TableBody>
+                        <TableBody>
                             <TableRow>
-                                <TableCell style={{backgroundColor : colors.grayColorLess, fontSize : '16px'}} colSpan={4}><b>Tiêu chuẩn {index + 1}. {row.tenTieuChuan}</b></TableCell>
+                                <TableCell style={{ backgroundColor: colors.grayColorLess, fontSize: '16px' }} colSpan={4}><b>Tiêu chuẩn {index + 1}. {row.tenTieuChuan}</b></TableCell>
                             </TableRow>
-                            <ListTieuChi idTieuChuan={row.idTieuChuan} stt = {index + 1} token = {token}/>
-                    </TableBody>
+                            <ListTieuChi idTieuChuan={row.idTieuChuan} stt={index + 1} />
+                        </TableBody>
                     ))}
                 </Table>
             </TableContainer>

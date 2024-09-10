@@ -15,9 +15,7 @@ import { Col, Row } from "react-bootstrap";
 import {
     deleteMinhChung,
     getAllKhoMinhChung,
-    getAllLoaiMinhChung, getAllMinhChung,
-    getAllMinhChungAndCtdt,
-    getAllMinhChungWithIdGoiY, getGoiYById, getTieuChiById, getTieuChuanById,
+    getAllLoaiMinhChung, getAllMinhChungAndTieuChi, getGoiYById, getTieuChiById, getTieuChuanById,
     saveFromKMCtoMinhChung,
     saveMinhChungDungChung,
     searchLoaiVanBanByDate,
@@ -40,7 +38,6 @@ const MinhChung = () => {
     const [loaiVanBan, setLoaiVanBan] = useState([]);
     const [khoMinhChung, setKhoMinhChung] = useState([]);
     const [minhChung, setMinhChung] = useState([]);
-    const [allMinhChung, setAllMinhChung] = useState([]);
 
     const [goiY, setGoiY] = useState([]);
     const [tieuChi, setTieuChi] = useState([]);
@@ -53,27 +50,16 @@ const MinhChung = () => {
     const GoiY_ID = queryParams.get('GoiY_ID');
     const TieuChi_ID = queryParams.get('TieuChi_ID');
     const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [
-                allMinhChungData,
-                minhChungData,
-                loaiVanBanData,
-                khoMinhChungData,
-                goiYData,
-                tieuChiData,
-            ] = await Promise.all([
-                getAllMinhChungAndCtdt(),
-                getAllMinhChungWithIdGoiY(GoiY_ID),
-                getAllLoaiMinhChung(),
-                getAllKhoMinhChung(),
-                getGoiYById(GoiY_ID),
-                getTieuChiById(TieuChi_ID),
-            ]);
-            
-            setAllMinhChung(allMinhChungData);
+            const minhChungData = await getAllMinhChungAndTieuChi();
+            const loaiVanBanData = await getAllLoaiMinhChung();
+            const khoMinhChungData = await getAllKhoMinhChung();
+            const goiYData = await getGoiYById(GoiY_ID);
+            const tieuChiData = await getTieuChiById(TieuChi_ID);
             setMinhChung(minhChungData);
             setLoaiVanBan(loaiVanBanData);
             setKhoMinhChung(khoMinhChungData);
@@ -133,7 +119,6 @@ const MinhChung = () => {
     };
 
     const saveFromKMCtoMC = async (idKmc) => {
-
         if (tieuChi !== "") {
             try {
                 const response = await getTieuChuanById(tieuChi.idTieuChuan);
@@ -150,7 +135,7 @@ const MinhChung = () => {
                     dataMinhChung.append("idTieuChuan", response.idTieuChuan);
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("parentMaMc", parentMaMc);
-                    const filter = minhChung.filter(item => item.maDungChung === 0);
+                    const filter = minhChung.filter(item => item.maDungChung === 0 && item.idTieuChi == TieuChi_ID);
                     dataMinhChung.append("childMaMc", format2Number(filter.length + 1));
 
                     await saveFromKMCtoMinhChung(dataMinhChung);
@@ -163,34 +148,28 @@ const MinhChung = () => {
 
     };
     const saveDungChung = async (idKmc, idMc) => {
-        if (tieuChi !== "") {
-            try {
-                const response = await getTieuChuanById(tieuChi.idTieuChuan);
+        try {
+            const dataMinhChung = new FormData();
 
-                if (response) {
-                    const dataMinhChung = new FormData();
+            dataMinhChung.append("idKmc", idKmc);
+            dataMinhChung.append("idTieuChuan", TieuChuan_ID);
+            dataMinhChung.append("idGoiY", goiY.idGoiY);
+            dataMinhChung.append("maDungChung", idMc);
 
-                    dataMinhChung.append("idKmc", idKmc);
-                    dataMinhChung.append("idTieuChuan", response.idTieuChuan);
-                    dataMinhChung.append("idGoiY", goiY.idGoiY);
-                    dataMinhChung.append("maDungChung", idMc);
-
-                    await saveMinhChungDungChung(dataMinhChung);
-                    fetchData();
-                }
-            } catch (err) {
-                setError(err);
-            }
+            await saveMinhChungDungChung(dataMinhChung);
+            fetchData();
+        } catch (err) {
+            setError(err);
         }
 
     };
     const deleteMC = async (idMc, parentMaMc) => {
         try {
             const response = await deleteMinhChung(idMc, parentMaMc);
-            if (response) { 
-                fetchData(); 
+            if (response) {
+                fetchData();
             } else {
-                setError('Failed to delete Minh Chung.'); 
+                setError('Failed to delete Minh Chung.');
             }
         } catch (err) {
             setError(err.message || 'An error occurred while deleting Minh Chung.');
@@ -200,35 +179,21 @@ const MinhChung = () => {
         navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}&GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     }
     const Button_Them = ({ idKMC }) => {
-        const daCo = minhChung.filter(item => item.idKmc === idKMC);
-        const dungChung = allMinhChung.filter(item => item.idKmc === idKMC && item.idGoiY !== GoiY_ID && item.maCtdt === KhungCTDT_ID)
-        console.log(dungChung);
-   
-        if (loading) return <div>Loading...</div>;
-        if (error) return <div>Error: {error.message}</div>;
+        const response = minhChung.filter(item => item.idKmc == idKMC);
 
+        const renderDungChungButton = () => {
+
+            const dungChung = minhChung.filter(item => item.idKmc === idKMC && item.idTieuChi == TieuChi_ID);
+
+            return (
+                <>
+                    {dungChung.length > 0 ? (null) : (<button style={{ marginTop: '5px' }} onClick={() => saveDungChung(idKMC, response[0].idMc)} className="btn btn-success">Dùng Chung</button>)}
+                </>
+            );
+        };
         return (
             <>
-                {daCo.length > 0 ? null : (
-                    dungChung.length > 0 ? (
-                        <button
-                            onClick={() => saveDungChung(idKMC, dungChung[0].idMc)}  // Use the first item in `dungChung`
-                            className="btn btn-success"
-                            style={{ marginTop: '5px' }}
-                        >
-                            Dùng Chung
-                        </button>
-                    ) : (
-                        <button
-                            style={{ marginTop: '5px' }}
-                            className="btn btn-success"
-                            onClick={() => saveFromKMCtoMC(idKMC)}
-                        >
-                            Thêm
-                        </button>
-                    )
-                )}
-
+                {response.length > 0 ? renderDungChungButton() : (<button onClick={() => saveFromKMCtoMC(idKMC)} style={{ marginTop: '5px' }} className="btn btn-success">Thêm</button>)}
             </>
         );
     };
@@ -241,7 +206,7 @@ const MinhChung = () => {
                 Tìm kiếm minh chứng cho Tiêu Chuẩn Mục tiêu và chuẩn đầu ra của chương
                 trình đào tạo
             </p>
-            <button className="btn btn-success">Quản lý minh chứng</button>
+            <a className="btn btn-success" href="danh-sach-minh-chung">Quản lý minh chứng</a>
             <button
                 onClick={handleClick}
                 className="btn btn-success"
@@ -374,13 +339,12 @@ const MinhChung = () => {
                     </TableContainer>
                 </Col>
                 <Col xs={12} md={6}>
-                    <p>Minh chứng đang có</p>
                     <p>
-                        <b>- Tên tiêu chí: </b>
+                        <b>- Tiêu chí: </b>
                         {tieuChi.tenTieuChi}
                     </p>
                     <p>
-                        <b>- Nguồn minh chứng: </b>
+                        <b>- Gợi ý minh chứng: </b>
                         {goiY.tenGoiY}
                     </p>
                     <br />
@@ -394,54 +358,24 @@ const MinhChung = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {minhChung.map((row) => {
-                                    // Function to determine what to display in the first TableCell
-                                    const getCellContent = () => {
-                                        if (row.maDungChung === 0) {
-                                            return (
-                                                <>
-                                                    {row.parentMaMc}
-                                                    {row.childMaMc}
-                                                </>
-                                            );
-                                        } else {
-                                            const matchedItem = allMinhChung.find(item => item.idMc === row.maDungChung); // Debugging output
+                                {minhChung
+                                    .filter(item => item.idGoiY == GoiY_ID) // Add your filter condition here
+                                    .map((item, index) => {
+                                        const filteredItem = minhChung.filter(i => i.idMc === item.maDungChung);
 
-                                            return matchedItem ? (
-                                                <>
-                                                    {matchedItem.parentMaMc}
-                                                    {matchedItem.childMaMc}
-                                                </>
-                                            ) : (
-                                                <span>No match found</span> // Fallback if no match is found
-                                            );
-                                        }
-                                    };
-
-                                    return (
-                                        <TableRow key={row.idMc}> {/* Ensure each row has a unique key */}
-                                            <TableCell width={150}>
-                                                {getCellContent()}
+                                        const maMinhChungDisplay = item.maDungChung == 0 ? item.maMinhChung : (filteredItem[0].maMinhChung);
+                                        const modifiedString = item.maDungChung == 0 ? (item.maMinhChung.slice(0, -3) + '.') : (0);
+                                        return (<TableRow key={index}>
+                                            <TableCell>{maMinhChungDisplay}</TableCell>
+                                            <TableCell>{item.tenMinhChung}</TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <button className="btn btn-secondary">Xem Nhanh</button><br/>
+                                                    <button className="btn btn-danger" style={{marginTop : '5px'}} onClick={() => deleteMC(item.idMc, modifiedString)}>Xóa</button>
+                                                </div>
                                             </TableCell>
-                                            <TableCell>{row.tenMinhChung}</TableCell>
-                                            <TableCell width={150}>
-                                                <button
-                                                    className="btn btn-secondary"
-                                                    onClick={() => handleClickViewPDF(row.linkLuuTru)}
-                                                >
-                                                    Xem nhanh
-                                                </button>
-                                                <br />
-                                                <button
-                                                    onClick={() => deleteMC(row.idMc, row.parentMaMc)}
-                                                    className="btn btn-danger space-5"
-                                                >
-                                                    Xoá
-                                                </button>
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })}
+                                        </TableRow>);
+                                    })}
                             </TableBody>
 
 

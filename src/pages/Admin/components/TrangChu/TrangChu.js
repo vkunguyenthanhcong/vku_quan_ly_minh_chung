@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom";
 
-const TrangChu = () => {
+const TrangChuAdmin = () => {
     const navigate = useNavigate();
     const goToChuanKiemDinh = () => {
         navigate('chuan-kiem-dinh');
@@ -26,4 +26,4 @@ const TrangChu = () => {
         </div>
     )
 }
-export default TrangChu;
+export default TrangChuAdmin;

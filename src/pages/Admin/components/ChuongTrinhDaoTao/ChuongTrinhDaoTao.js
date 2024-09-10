@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import "./ChuongTrinhDaoTao.css";
 import {
     getCtdtDataByMaKDCL,
     getKdclData, getMinhChungByMaCtdt,
     getTieuChiByMaCtdt,
     getTieuChuanWithMaCtdt
 } from "../../../../services/apiServices";
+import { useNavigate } from "react-router-dom";
+import ChuongTrinhDaoTao from "../../../MainPage/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao";
+
 
 const Total = ({maCtdt}) => {
     const [loading, setLoading] = useState(true);
@@ -42,9 +44,12 @@ const Total = ({maCtdt}) => {
 
 const ListChuongTrinhDaoTao = ({maKdcl}) => {
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const  goToChuongTrinhDaoTao = (ChuongTrinh_ID) => {
+        navigate(`../chi-tiet-chuong-trinh-dao-tao?ChuongTrinh_ID=${ChuongTrinh_ID}`);
+    }
 
     const fetchData = async () => {
         try {
@@ -64,9 +69,11 @@ const ListChuongTrinhDaoTao = ({maKdcl}) => {
     return (
         <div style={{marginLeft : '10px'}}>
             {chuongTrinhDaoTao.map((item, index) => (
-                <div>
+                <div style={{marginBottom : '10px'}}>
                     <p><b>{index+1}. {item.tenCtdt}</b></p>
                     <Total maCtdt={item.maCtdt} />
+                    <button className="btn btn-primary" onClick={() => goToChuongTrinhDaoTao(item.maCtdt)}>Chi tiết</button>
+                    
                 </div>
             ))}
         </div>
@@ -80,18 +87,19 @@ const AdminChuongTrinhDaoTao = () => {
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
 
 
-    const getChuanKDCL = async () => {
-        try {
-            const result = await getKdclData();
-            setChuanKDCL(result);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    }
+    
 
     useEffect(() => {
+        const getChuanKDCL = async () => {
+            try {
+                const result = await getKdclData();
+                setChuanKDCL(result);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        }
         getChuanKDCL();
     }, []);
 
@@ -103,6 +111,7 @@ const AdminChuongTrinhDaoTao = () => {
                         <div>
                             <p>{index + 1}. {item.tenKdcl}</p>
                             <ListChuongTrinhDaoTao maKdcl={item.maKdcl}/>
+                            
                         </div>
                     )) :
                     (

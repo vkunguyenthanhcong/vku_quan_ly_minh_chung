@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './PopupForm.css';
 import {saveGoiY, saveMinhChung} from "../../../../../services/apiServices"; // Optional: for styling
 
-const PopupForm = ({ isVisible, onClose, idMocChuan , fetchGoiY , token}) => {
+const PopupForm = ({ isVisible, onClose, idMocChuan , fetchGoiY }) => {
     
     const [inputValue, setInputValue] = useState('');
     const [isChecked, setIsChecked] = useState(true);
@@ -18,7 +18,7 @@ const PopupForm = ({ isVisible, onClose, idMocChuan , fetchGoiY , token}) => {
         goiY.append('idMocChuan', idMocChuan);
 
         try {
-            const response = await saveGoiY(goiY, token);
+            const response = await saveGoiY(goiY);
             fetchGoiY();
             setInputValue('');
         }catch (e) {

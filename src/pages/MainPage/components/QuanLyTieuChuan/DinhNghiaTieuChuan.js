@@ -1,35 +1,26 @@
 
 import React, { useEffect, useState } from 'react';
-import './QuanLyTieuChuan.css'
+import './DinhNghiaTieuChuan.css'
 import { styled } from '@mui/material/styles';
 import colors from '../../../../components/color';
 import font from '../../../../components/font'
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { getKdclData, getCtdtDataByMaKDCL } from '../../../../services/apiServices'
 import { useNavigate } from 'react-router-dom';
-const CustomTableCell = styled(TableCell)(({ theme }) => ({
-    fontSize: '16px',
-    fontFamily : font.inter
-}));
 
-const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
-    fontSize: '16px',
-    color : 'white !important',
-    fontFamily : font.inter
-}));;
-const GenericList = ({ maKdcl , token}) => {
+const GenericList = ({ maKdcl }) => {
     
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const handleButtonClick = (maCtdt, tenCtdt) => {
-        navigate(`../tieu-chuan?KhungChuongTrinhID=${maCtdt}`);
+    const handleButtonClick = (maCtdt) => {
+        navigate(`../tieu-chuan?KhungChuongTrinh_ID=${maCtdt}`);
     };
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await getCtdtDataByMaKDCL(maKdcl, token);
+                const result = await getCtdtDataByMaKDCL(maKdcl);
                 setData(result);
             } catch (err) {
                 setError(err);
@@ -46,13 +37,12 @@ const GenericList = ({ maKdcl , token}) => {
     return (
         <ul>
             {data.map((item, index) => (
-                <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btnViewCTDT'>{item.tenCtdt}</button></li>
+                <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btn-success'>{item.tenCtdt}</button></li>
             ))}
         </ul>
     );
 };
-const QuanLyTieuChuan = () => {
-    const token = localStorage.getItem('token');
+const DinhNghiaTieuChuan = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -60,7 +50,7 @@ const QuanLyTieuChuan = () => {
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
-                const result = await getKdclData(token);
+                const result = await getKdclData();
                 setData(result);
             } catch (error) {
                 setError(error);
@@ -70,29 +60,35 @@ const QuanLyTieuChuan = () => {
         };
         fetchDataFromAPI();
     }, []);
-
-
     return (
         <div className="content" style={{ background: "white", margin: '20px' }}>
+            <style>
+                {`
+                th{
+                    color:white !important;
+                }
+                `}
+            </style>
             <p style={{ fontSize: '20px' }}>DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</p>
             <hr />
+            
             <TableContainer  component={Paper}>
                 <Table className='font-Inter'>
                     <TableHead>
                         <TableRow >
-                            <CustomTableHeadCell >STT</CustomTableHeadCell>
-                            <CustomTableHeadCell>Tên Chuẩn đánh giá</CustomTableHeadCell>
-                            <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
-                            <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
+                            <TableCell >STT</TableCell>
+                            <TableCell>Tên Chuẩn đánh giá</TableCell>
+                            <TableCell>Năm áp dụng</TableCell>
+                            <TableCell>Tên Chương Trình Đào Tạo</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {data.map((row, index) => (
                             <TableRow key={row.id}>
-                                <CustomTableCell>{index + 1}</CustomTableCell>
-                                <CustomTableCell>{row.tenKdcl}</CustomTableCell>
-                                <CustomTableCell>{row.namBanHanh}</CustomTableCell>
-                                <CustomTableCell><GenericList maKdcl={row.maKdcl} token = {token}/></CustomTableCell>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>{row.tenKdcl}</TableCell>
+                                <TableCell>{row.namBanHanh}</TableCell>
+                                <TableCell><GenericList maKdcl={row.maKdcl}/></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -102,4 +98,4 @@ const QuanLyTieuChuan = () => {
     );
 };
 
-export default QuanLyTieuChuan;
+export default DinhNghiaTieuChuan;

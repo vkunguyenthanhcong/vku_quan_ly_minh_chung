@@ -8,11 +8,11 @@ import { getThongTinDangNhap } from '../../services/apiServices';
 
 
 const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
-  const [user, setUser] = useState(null);
+  const token = localStorage.getItem('token');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const [user, setUser] = useState(null);
 
   const Logout = () => {
     localStorage.removeItem('token');
@@ -35,6 +35,26 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
 
     fetchData();
   }, [token]);
+  const MenuItem = ({ to, label, isLink }) => (
+    <li className={`${isScreenSmall || !isMenuExpanded ? 'd-flex align-items-center justify-content-center' : ''}`}>
+      <i className="fas fa-graduation-cap" />
+      <span className="text-center">
+        {isLink ? (
+          <Link style={{ textDecoration: 'none', color: 'white' }} to={to}>
+            {label}
+          </Link>
+        ) : (
+          label
+        )}
+      </span>
+    </li>
+  );
+  
+  const menuItems = [
+    { to: '/quan-ly', label: 'Quản lý tiêu chuẩn', isLink: true },
+    { to: '/quan-ly/dinh-nghia-tieu-chuan', label: 'Định nghĩa tiêu chuẩn', isLink: true },
+    { to: '', label: 'Báo cáo tự đánh giá', isLink: false }
+  ];
   return (
     <div className={`menu-scroll no-padding ${isScreenSmall ? 'text-center' : ''}`}>
       <i
@@ -84,21 +104,9 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
             <b className='text-center' style={{ fontSize: '16px' }}> ĐẢM BẢO CHẤT LƯỢNG</b>
           </p>
           <br />
-          <li
-            className={`${isScreenSmall || !isMenuExpanded ? 'd-flex align-items-center justify-content-center' : ''}`}
-          >
-            <i className='fas fa-graduation-cap' />
-            <span className='text-center'>
-              <Link style={{ textDecoration: 'none', color: 'white' }} to={'/quan-ly'}>Quản lý tiêu chuẩn
-              </Link>
-            </span>
-          </li>
-          <li
-            className={`${isScreenSmall || !isMenuExpanded ? 'd-flex align-items-center justify-content-center' : ''}`}
-          >
-            <i className='fas fa-graduation-cap' />
-            <span className='text-center'> Báo cáo tự đánh giá</span>
-          </li>
+          {menuItems.map((item, index) => (
+            <MenuItem key={index} to={item.to} label={item.label} isLink={item.isLink} />
+          ))}
         </ul>
       </div>
     </div>
