@@ -84,11 +84,6 @@ const AdminChuongTrinhDaoTao = () => {
     const [chuanKDCL, setChuanKDCL] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
-
-
-    
-
     useEffect(() => {
         const getChuanKDCL = async () => {
             try {
