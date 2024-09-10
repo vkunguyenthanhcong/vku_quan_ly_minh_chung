@@ -44,3 +44,42 @@ body {
 .border-right-1-solid-white {
   border-right: 1px solid white !important;
 }
+.p-dialog-mask{
+  background-color: hsla(0, 0%, 50%, 0.5);
+  }
+  .p-confirm-dialog {
+      padding : 50px;
+      background-color: white;
+      border-radius : 10px
+  }
+  .p-confirm-dialog  .p-dialog-header {
+      color: black;
+      font-size : 20px;
+      font-weight : semibold;
+      margin-bottom : 20px;
+  }
+  .p-confirm-dialog .p-dialog-content {
+      color : black;
+      margin-bottom : 30px;
+  }
+  .p-confirm-dialog .p-dialog-footer{
+      position: relative;
+      margin-bottom : 30px;
+  }
+  .p-confirm-dialog .p-dialog-footer .p-confirm-dialog-reject{
+      background-color : white;
+      border : none;
+      color : var(--primary-color);
+      padding: 10px 20px 10px 20px;
+      position: absolute;
+      right: 80px;
+  }
+  .p-confirm-dialog .p-dialog-footer .p-confirm-dialog-accept{
+      background-color : var(--primary-color);
+      border : none;
+      color : white;
+      padding: 10px 20px 10px 20px;
+      position: absolute;
+      right: 0px;
+      border-radius : 15px
+  }

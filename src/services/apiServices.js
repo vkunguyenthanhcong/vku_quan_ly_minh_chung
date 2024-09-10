@@ -117,6 +117,30 @@ export const getCtdtDataByMaKDCL = (maKdcl, token) => {
         });
 };
 
+//update chuong trinh dao tao
+export const updateChuongTrinhDaoTao = (formData, token) => {
+    return api.put(`/ctdt/update`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//xoa chuong trinh dao tao
+export const deleteChuongTrinhDaoTao = (idCtdt, token) => {
+    return api.delete(`/ctdt/delete/${idCtdt}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //Data Tieu Chi Theo Ma Chuong Trinh Dao Tao
 export const getTieuChiByMaCtdt = (maCtdt, token) => {
     return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`, {
@@ -324,6 +348,7 @@ export const updateKhoMinhChung = (EvidenceID, minhChung, token) => {
     return api.put(`/khominhchung/edit/${EvidenceID}`, minhChung, {
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
         },
     }).then(response => response.data)
         .catch(error => {
