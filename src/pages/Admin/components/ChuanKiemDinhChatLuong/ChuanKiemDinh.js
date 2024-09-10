@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./ChuanKiemDinh.css";
-import { styled } from "@mui/material/styles";
 import { Modal, Button, Form } from 'react-bootstrap';
-import font from "../../../../components/font";
 import {
     Table,
     TableBody,
@@ -20,16 +18,6 @@ import {
     insertNewChuanKdcl,
 } from "../../../../services/apiServices";
 import { useNavigate } from "react-router-dom";
-const CustomTableCell = styled(TableCell)(({ theme }) => ({
-    fontSize: "16px",
-    fontFamily: font.inter,
-}));
-
-const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
-    fontSize: "16px",
-    color: "white !important",
-    fontFamily: font.inter,
-}));
 const PopupForm = ({ show, handleClose, fetchData }) => {
     const [formData, setFormData] = useState({
       tenKdcl: '',
@@ -235,20 +223,20 @@ const ChuanKiemDinh = () => {
             <TableContainer component={Paper}>
                 <Table className="font-Inter">
                     <TableHead>
-                        <TableRow>
-                            <CustomTableHeadCell>STT</CustomTableHeadCell>
-                            <CustomTableHeadCell>Tên Chuẩn đánh giá</CustomTableHeadCell>
-                            <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
-                            <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
-                            <CustomTableHeadCell>Tuỳ Chỉnh</CustomTableHeadCell>
-                            <CustomTableHeadCell><button className='btn btn-success' onClick={handleShow}>+</button></CustomTableHeadCell>
+                        <TableRow >
+                            <TableCell className="text-white">STT</TableCell>
+                            <TableCell className="text-white">Tên Chuẩn đánh giá</TableCell>
+                            <TableCell className="text-white">Năm áp dụng</TableCell>
+                            <TableCell className="text-white">Tên CTĐT</TableCell>
+                            <TableCell className="text-white">Tuỳ Chỉnh</TableCell>
+                            <TableCell><button className='btn btn-success' onClick={handleShow}>+</button></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {data.map((row, index) => (
                             <TableRow key={row.id}>
-                                <CustomTableCell>{index + 1}</CustomTableCell>
-                                <CustomTableCell>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>
                                     {row.isEditing ? (
                                         <input
                                             style={{width : '500px'}}
@@ -262,8 +250,8 @@ const ChuanKiemDinh = () => {
                                     ) : (
                                         row.tenKdcl
                                     )}
-                                </CustomTableCell>
-                                <CustomTableCell>
+                                </TableCell>
+                                <TableCell>
                                     {row.isEditing ? (
                                         <input
                                             type="text"
@@ -276,11 +264,11 @@ const ChuanKiemDinh = () => {
                                     ) : (
                                         row.namBanHanh
                                     )}
-                                </CustomTableCell>
-                                <CustomTableCell>
+                                </TableCell>
+                                <TableCell>
                                     <GenericList maKdcl={row.maKdcl} />
-                                </CustomTableCell>
-                                <CustomTableCell className="button-edit">
+                                </TableCell>
+                                <TableCell className="button-edit">
                                     <br />
                                     <button
                                         className="btn btn-primary"
@@ -292,7 +280,7 @@ const ChuanKiemDinh = () => {
                                     <button className="btn btn-danger"
                                     onClick={() => handleDeleteChuanKDCL(row.idKdcl)}
                                     >Xóa</button>
-                                </CustomTableCell>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

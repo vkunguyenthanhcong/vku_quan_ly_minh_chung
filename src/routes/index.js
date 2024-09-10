@@ -10,13 +10,16 @@ import MinhChung from "../pages/MainPage/components/MinhChung/minhChung";
 import DanhSachTieuChuan from "../pages/MainPage/components/DanhSachTieuChuan/DanhSachTieuChuan";
 import QuanLyMinhChung from "../pages/MainPage/components/QuanLyMinhChung/QuanLyMinhChung";
 import ListEvidence from "../pages/ListEvidence";
+import DanhSachMinhChung from '../pages/MainPage/components/DanhSachMinhChung/DanhSachMinhChung';
 
 import TrangChu from '../pages/MainPage/components/TrangChu/TrangChu';
 //admin
-import ChuanKiemDinh from "../pages/Admin/components/MainContent/ChuanKiemDinh";
+import ChuanKiemDinh from "../pages/Admin/components/ChuanKiemDinhChatLuong/ChuanKiemDinh";
 import AdminChuongTrinhDaoTao from "../pages/Admin/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao";
-import DanhSachMinhChung from '../pages/MainPage/components/DanhSachMinhChung/DanhSachMinhChung';
+
 import Admin from "../pages/Admin";
+import TrangChuAdmin from "../pages/Admin/components/TrangChu/TrangChu";
+import ChiTietChuongTrinhDaoTao from '../pages/Admin/components/ChiTietiChuongTrinhDaoTao/ChiTietChuongTrinhDaoTao';
 
 const routes = [
   {
@@ -45,9 +48,10 @@ const routes = [
     path: "/admin/",
     element: <ProtectedRoute element={<Admin />} requiredRole="ADMIN" />, // Protect admin routes with ADMIN role
     children: [
-      { path: "", element: <ProtectedRoute element={<TrangChu />} requiredRole="ADMIN" /> },
+      { path: "", element: <ProtectedRoute element={<TrangChuAdmin />} requiredRole="ADMIN" /> },
       { path: "chuan-kiem-dinh", element: <ProtectedRoute element={<ChuanKiemDinh />} requiredRole="ADMIN" /> },
       { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<AdminChuongTrinhDaoTao />} requiredRole="ADMIN" /> },
+      { path: "chi-tiet-chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChiTietChuongTrinhDaoTao />} requiredRole="ADMIN" /> },
     ],
   }
 ];

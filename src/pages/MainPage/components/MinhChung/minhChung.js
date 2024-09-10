@@ -166,10 +166,10 @@ const MinhChung = () => {
     const deleteMC = async (idMc, parentMaMc) => {
         try {
             const response = await deleteMinhChung(idMc, parentMaMc);
-            if (response) { 
-                fetchData(); 
+            if (response) {
+                fetchData();
             } else {
-                setError('Failed to delete Minh Chung.'); 
+                setError('Failed to delete Minh Chung.');
             }
         } catch (err) {
             setError(err.message || 'An error occurred while deleting Minh Chung.');
@@ -180,20 +180,20 @@ const MinhChung = () => {
     }
     const Button_Them = ({ idKMC }) => {
         const response = minhChung.filter(item => item.idKmc == idKMC);
-        
+
         const renderDungChungButton = () => {
-            
+
             const dungChung = minhChung.filter(item => item.idKmc === idKMC && item.idTieuChi == TieuChi_ID);
-            
+
             return (
                 <>
-                    {dungChung.length > 0 ? (null) : (<button style={{marginTop : '5px'}} onClick={() => saveDungChung(idKMC, response[0].idMc)} className="btn btn-success">Dùng Chung</button>)}
+                    {dungChung.length > 0 ? (null) : (<button style={{ marginTop: '5px' }} onClick={() => saveDungChung(idKMC, response[0].idMc)} className="btn btn-success">Dùng Chung</button>)}
                 </>
             );
         };
-        return(
+        return (
             <>
-                {response.length > 0 ? renderDungChungButton() : (<button onClick={() => saveFromKMCtoMC(idKMC)} style={{marginTop : '5px'}} className="btn btn-success">Thêm</button>)}
+                {response.length > 0 ? renderDungChungButton() : (<button onClick={() => saveFromKMCtoMC(idKMC)} style={{ marginTop: '5px' }} className="btn btn-success">Thêm</button>)}
             </>
         );
     };
@@ -358,24 +358,24 @@ const MinhChung = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {minhChung
-                                .filter(item => item.idGoiY == GoiY_ID) // Add your filter condition here
-                                .map((item, index) => {
-                                    const filteredItem = minhChung.filter(i => i.idMc === item.maDungChung);
-                                    
-                                    const maMinhChungDisplay = item.maDungChung == 0 ? item.maMinhChung : (filteredItem[0].maMinhChung);
-                                    const modifiedString = item.maDungChung == 0 ? (item.maMinhChung.slice(0, -3) + '.') : (0);
-                                    return (<TableRow key={index}>
-                                    <TableCell>{maMinhChungDisplay}</TableCell>
-                                    <TableCell>{item.tenMinhChung}</TableCell>
-                                    <TableCell>
-                                        <div>
-                                        <button className="btn btn-secondary">Xem Nhanh</button><br/><br/>
-                                        <button className="btn btn-danger" onClick={() => deleteMC(item.idMc, modifiedString)}>Xóa</button>
-                                        </div>
-                                    </TableCell>
-                                    </TableRow>);
-                            })}
+                                {minhChung
+                                    .filter(item => item.idGoiY == GoiY_ID) // Add your filter condition here
+                                    .map((item, index) => {
+                                        const filteredItem = minhChung.filter(i => i.idMc === item.maDungChung);
+
+                                        const maMinhChungDisplay = item.maDungChung == 0 ? item.maMinhChung : (filteredItem[0].maMinhChung);
+                                        const modifiedString = item.maDungChung == 0 ? (item.maMinhChung.slice(0, -3) + '.') : (0);
+                                        return (<TableRow key={index}>
+                                            <TableCell>{maMinhChungDisplay}</TableCell>
+                                            <TableCell>{item.tenMinhChung}</TableCell>
+                                            <TableCell>
+                                                <div>
+                                                    <button className="btn btn-secondary">Xem Nhanh</button><br/>
+                                                    <button className="btn btn-danger" style={{marginTop : '5px'}} onClick={() => deleteMC(item.idMc, modifiedString)}>Xóa</button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>);
+                                    })}
                             </TableBody>
 
 

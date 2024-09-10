@@ -448,4 +448,31 @@ export const login = (email, password) => {
             throw error;
         });
 };
+//khoa
+export const getKhoa = (token) => {
+    return api.get(`/khoa`, { 
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+
+//nganh
+export const getNganh = (token) => {
+    return api.get(`/nganh`, { 
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
 

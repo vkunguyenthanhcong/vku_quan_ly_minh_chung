@@ -60,8 +60,6 @@ const DinhNghiaTieuChuan = () => {
         };
         fetchDataFromAPI();
     }, []);
-
-
     return (
         <div className="content" style={{ background: "white", margin: '20px' }}>
             <style>

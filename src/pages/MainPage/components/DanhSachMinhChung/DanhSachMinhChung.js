@@ -51,6 +51,13 @@ const DanhSachMinhChung = () => {
             </div>
         );
     };
+    const buttonDungChung = (rowData) => {
+        return (
+            <div>
+                <button className='btn btn-success'>Dùng Chung</button>
+            </div>
+        );
+    };
 
 
 
@@ -78,6 +85,7 @@ const DanhSachMinhChung = () => {
                 <Column header="Mã Minh Chứng" field='maMinhChung' />
                 <Column field="tenMinhChung" header="Tên Minh Chứng" />
                 <Column header="Xem Nhanh" body={buttonXemNhanh} />
+                <Column header="Dùng Chung" body={buttonDungChung} />
             </DataTable>
             <PdfPreview show={isModalOpen} handleClose={closeModal} link={link} />
         </div>
