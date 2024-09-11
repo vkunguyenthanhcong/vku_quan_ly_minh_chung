@@ -38,7 +38,7 @@ const MinhChung = ({ criteriaID }) => {
                 <tr>
                     <td></td>
                     <td>{index + 1}</td>
-                    <td><Link to={row.linkLuuTru}>{row.parentMaMc}{row.childMaMc}</Link></td>
+                    <td><Link style={{textDecoration : 'none', color : 'black'}} to={row.linkLuuTru}>{row.parentMaMc}{row.childMaMc}</Link></td>
                     <td>{row.tenMinhChung}</td>
                     <td>{row.soHieu}<br/>{row.thoiGian}</td>
                     <td>{row.donViBanHanh}<br/>{row.caNhan}</td>
