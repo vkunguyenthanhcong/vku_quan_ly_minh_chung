@@ -282,7 +282,7 @@ const TieuChi = () => {
             <TableContainer component={Paper}>
                 <Table className='font-Inter'>
                     <TableHead>
-                        <TableRow>
+                        <TableRow id='table-row-color'>
                             <TableCell className='text-white' style={{ border: '0', width: '10%' }}>Tiêu Chuẩn/<br />Tiêu Chí</TableCell>
                             <TableCell className='text-white' style={{ border: '0', width: '10%' }}>Yêu cầu của tiêu chí</TableCell>
                             <TableCell className='text-white' style={{ border: '0', width: '10%' }}>Mốc chuẩn tham chiếu để đánh giá tiêu chí đạt mức 4</TableCell>

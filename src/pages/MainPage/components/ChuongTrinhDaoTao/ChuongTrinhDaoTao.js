@@ -85,7 +85,7 @@ const ChuongTrinhDaoTao = () => {
       <TableContainer>
         <Table className='font-Inter'>
           <TableHead>
-            <TableRow >
+            <TableRow id='table-row-color'>
               <CustomTableHeadCell>STT</CustomTableHeadCell>
               <CustomTableHeadCell>Tiêu Chuẩn</CustomTableHeadCell>
               <CustomTableHeadCell>Minh Chứng</CustomTableHeadCell>
