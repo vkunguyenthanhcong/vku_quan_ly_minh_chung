@@ -28,7 +28,7 @@ const routes = [
     children: [
       { path: "", element: <ProtectedRoute element={<TrangChu />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "chuong-trinh-dao-tao", element: <ProtectedRoute element={<ChuongTrinhDaoTao />} requiredRoles={["USER", "ADMIN"]} /> },
-        
+      { path: "tieu-chi", element: <ProtectedRoute element={<TieuChi />} requiredRoles={["USER", "ADMIN"]} /> }, 
       { path: "minh-chung", element: <ProtectedRoute element={<MinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "quan-ly-minh-chung", element: <ProtectedRoute element={<QuanLyMinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "dinh-nghia-tieu-chuan", element: <ProtectedRoute element={<DinhNghiaTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> },//them goi
