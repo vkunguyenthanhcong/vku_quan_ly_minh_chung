@@ -5,7 +5,6 @@ import MainPage from '../pages/MainPage';
 import ChuongTrinhDaoTao from '../pages/MainPage/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao';
 import HomePage from '../pages/HomePage';
 import TieuChi from '../pages/MainPage/components/TieuChi/TieuChi';
-import DinhNghiaTieuChuan from '../pages/MainPage/components/QuanLyTieuChuan/DinhNghiaTieuChuan';
 import MinhChung from "../pages/MainPage/components/MinhChung/minhChung";
 import DanhSachTieuChuan from "../pages/MainPage/components/DanhSachTieuChuan/DanhSachTieuChuan";
 import QuanLyMinhChung from "../pages/MainPage/components/QuanLyMinhChung/QuanLyMinhChung";
@@ -31,7 +30,6 @@ const routes = [
       { path: "tieu-chi", element: <ProtectedRoute element={<TieuChi />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "minh-chung", element: <ProtectedRoute element={<MinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "quan-ly-minh-chung", element: <ProtectedRoute element={<QuanLyMinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
-      { path: "dinh-nghia-tieu-chuan", element: <ProtectedRoute element={<DinhNghiaTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> },//them goi
       { path: "tieu-chuan", element: <ProtectedRoute element={<DanhSachTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "danh-sach-minh-chung", element: <ProtectedRoute element={<DanhSachMinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
     ],

@@ -3,18 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { getKdclData, getCtdtDataByMaKDCL } from '../../../../services/apiServices';
-import { useNavigate } from 'react-router-dom';
-const CustomTableCell = styled(TableCell)(({ theme }) => ({
-  fontSize: '16px'
-}));
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
-  fontSize: '16px',
-  color : 'white !important'
-}));;
 
 const TrangChu = () => {
-  const [data, setData] = useState([]);
+  const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const action = queryParams.get('action');
+    const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   //danh sach chuan kiem dinh chat luong
@@ -34,12 +30,19 @@ const TrangChu = () => {
   
 
   //danh sach chuong trinh dao tao
-  const GenericList = ({ maKdcl}) => {
+  const GenericList = ({ maKdcl }) => {
     const [data, setData] = useState([]);
     const navigate = useNavigate();
     const handleButtonClick = (maCtdt) => {
-      navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
+      if(action === "QuanLyTieuChuan"){
+        navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
+      }else if(action === "DinhNghiaTieuChuan"){
+        navigate(`tieu-chuan?KhungCTDT_ID=${maCtdt}`);
+      }else if(action === "BaoCaoTuDanhGia"){
+        navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
+      }
     };
+    
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -56,7 +59,7 @@ const TrangChu = () => {
     return (
       <ul>
         {data.map((item, index) => (
-          <li style={{marginBottom : '20px', marginTop : '20px'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btn-primary'>{item.tenCtdt}</button></li>
+          <li style={{marginBottom : '20px', marginTop : '20px', listStyleType : 'none'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btn-primary'>{item.tenCtdt}</button></li>
         ))}
       </ul>
     );
@@ -71,20 +74,20 @@ const TrangChu = () => {
       <TableContainer  component={Paper}>
         <Table className='font-Inter'>
           <TableHead>
-            <TableRow >
-              <CustomTableHeadCell>STT</CustomTableHeadCell>
-              <CustomTableHeadCell>Tên Chuẩn đánh giá</CustomTableHeadCell>
-              <CustomTableHeadCell>Năm áp dụng</CustomTableHeadCell>
-              <CustomTableHeadCell>Tên CTĐT</CustomTableHeadCell>
+            <TableRow id='table-row-color'>
+              <TableCell className='text-white'>STT</TableCell>
+              <TableCell className='text-white'>Tên Chuẩn đánh giá</TableCell>
+              <TableCell className='text-white'>Năm áp dụng</TableCell>
+              <TableCell className='text-white'>Tên CTĐT</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {data.map((row, index) => (
               <TableRow key={row.id}>
-                <CustomTableCell>{index + 1}</CustomTableCell>
-                <CustomTableCell>{row.tenKdcl}</CustomTableCell>
-                <CustomTableCell>{row.namBanHanh}</CustomTableCell>
-                <CustomTableCell><GenericList maKdcl={row.maKdcl}/></CustomTableCell>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{row.tenKdcl}</TableCell>
+                <TableCell>{row.namBanHanh}</TableCell>
+                <TableCell><GenericList maKdcl={row.maKdcl}/></TableCell>
               </TableRow>
             ))}
           </TableBody>

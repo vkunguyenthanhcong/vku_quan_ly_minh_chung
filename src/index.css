@@ -83,3 +83,6 @@ body {
       right: 0px;
       border-radius : 15px
   }
+  #table-row-color {
+    background-color: #2A3F54;
+  }

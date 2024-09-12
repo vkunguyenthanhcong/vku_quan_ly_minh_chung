@@ -70,7 +70,11 @@ const DanhSachMinhChung = () => {
             {`
             th {
                 color: white !important;
+                background-color: #2A3F54;
+                padding : 20px
             }
+            td{
+            padding : 20px}
             `}
         </style>
             <InputText
@@ -81,7 +85,7 @@ const DanhSachMinhChung = () => {
             />
             <br/>
             <DataTable value={updateMinhChung} paginator rows={30} globalFilter={globalFilter} globalFilterFields={['maMinhChung', 'tenMinhChung']} emptyMessage="Không có dữ liệu">
-                <Column header="STT" body={indexTemplate} />
+                <Column  header="STT" body={indexTemplate} />
                 <Column header="Mã Minh Chứng" field='maMinhChung' />
                 <Column field="tenMinhChung" header="Tên Minh Chứng" />
                 <Column header="Xem Nhanh" body={buttonXemNhanh} />

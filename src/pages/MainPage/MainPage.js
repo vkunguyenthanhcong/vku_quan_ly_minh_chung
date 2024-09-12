@@ -7,7 +7,6 @@ import Navbar from '../../components/Navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
 const App = () => {
-  const navigate = useNavigate();
   const [isMenuExpanded, setMenuExpanded] = useState(true);
   const [isSidebarVisible, setSidebarVisible] = useState(true);
   const [isScreenSmall, setIsScreenSmall] = useState(window.innerWidth < 576);
@@ -31,9 +30,6 @@ const App = () => {
       setSidebarVisible(true);
     }
   }, [isScreenSmall]);
-  const handleClick = () => {
-    navigate("/quan-ly/chuong-trinh-dao-tao");
-  };
   return (
     <Container fluid style={{color:'#73879C'}}>
       <Row>
