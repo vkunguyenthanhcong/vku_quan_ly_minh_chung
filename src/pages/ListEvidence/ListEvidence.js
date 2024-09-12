@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import ExcelJS from 'exceljs';
 import html2pdf from 'html2pdf.js';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import './ListEvidence.css';
 import {
@@ -38,7 +38,7 @@ const MinhChung = ({ criteriaID }) => {
                 <tr>
                     <td></td>
                     <td>{index + 1}</td>
-                    <td>{row.parentMaMc}{row.childMaMc}</td>
+                    <td><Link style={{textDecoration : 'none', color : 'black'}} to={row.linkLuuTru}>{row.parentMaMc}{row.childMaMc}</Link></td>
                     <td>{row.tenMinhChung}</td>
                     <td>{row.soHieu}<br/>{row.thoiGian}</td>
                     <td>{row.donViBanHanh}<br/>{row.caNhan}</td>

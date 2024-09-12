@@ -124,7 +124,7 @@ const ListTieuChi = ({ idTieuChuan, stt }) => {
 const DanhSachTieuChuan = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const KhungChuongTrinhID = queryParams.get('KhungChuongTrinh_ID');
+    const KhungChuongTrinhID = queryParams.get('KhungCTDT_ID');
 
     const [tieuChuan, setTieuChuan] = useState([]);
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
