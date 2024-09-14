@@ -1,8 +1,10 @@
 // src/Homepage.js
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import ExcelJS from 'exceljs';
-import html2pdf from 'html2pdf.js';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+import 'jspdf-autotable';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import './ListEvidence.css';
@@ -81,12 +83,15 @@ const TieuChi = ({standardID, numberNO}) => {
         </>
     );
 };
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const ListEvidence = () => {
+    
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const KhungDaoTao_ID = queryParams.get('KhungDaoTao_ID');
+    
     const exportToWord = () => {
         const table = document.getElementById('myTable');
     let html = table.outerHTML;
@@ -101,6 +106,7 @@ const ListEvidence = () => {
             th, td { border: 1px solid black; padding: 8px; text-align: left; }
             th { background-color: #f2f2f2; }
           </style>
+          
         </head>
         <body>
           ${html}
@@ -115,41 +121,78 @@ const ListEvidence = () => {
     a.download = 'table.docx';
     a.click();
       };
-    
-    const exportPDF = () => { 
+      const exportToPDF = () => {
         const table = document.getElementById('myTable');
-        const opt = {
-            margin: 0.2,
-            filename: 'table.pdf',
-            image: { type: 'jpeg', quality: 0.99 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: [11.7, 8.3], orientation: 'landscape' } // A4 landscape dimensions in inches
-          };
-
-    // Add CSS styles for "Times New Roman" font
-    const style = `
-      <style>
-        body { font-family: "Times New Roman", serif; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        tr { page-break-inside: avoid; }
-        thead { display: table-header-group; }
-        tfoot { display: table-footer-group; }
-      </style>
-    `;
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
     
-    // Combine the style and HTML content
-    const content = `
-      <html>
-        <head>${style}</head>
-        <body>${table.outerHTML}</body>
-      </html>
-    `;
+        const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+          return Array.from(row.querySelectorAll('td')).map(td => {
+            const colSpan = td.getAttribute('colspan') || 1;
+            return {
+              text: td.innerText.trim(),
+              colSpan: Number(colSpan),
+              rowSpan: 1
+            };
+          });
+        });
     
-    html2pdf().from(content).set(opt).save();
-
-    };
+        // Đảm bảo tất cả các hàng có số cột giống nhau với tiêu đề cột
+        const maxColumns = headers.length;
+        const formattedRows = rows.map(row => {
+          const rowLength = row.length;
+          return [...row, ...Array(maxColumns - rowLength).fill({ text: '', colSpan: 1, rowSpan: 1 })];
+        });
+    
+        // Thêm tiêu đề cột vào dữ liệu bảng
+        const body = [
+          headers.map(header => ({ text: header, colSpan: 1, rowSpan: 1 })),
+          ...formattedRows
+        ];
+    
+        const docDefinition = {
+          content: [
+            { text: 'DANH MỤC MINH CHỨNG', style: 'header' },
+            {
+              table: {
+                headerRows: 1,
+                widths: [70, 60, 70, 65, 70, 100, 50], // Thay đổi kích thước cột theo nhu cầu của bạn
+                body: body
+              },
+              layout: {
+                fillColor: function (rowIndex) {
+                  return rowIndex === 0 ? '#f2f2f2' : null; // Màu nền cho tiêu đề
+                },
+                hLineWidth: function (i) {
+                  return (i === 0 || i === body.length) ? 2 : 1; // Độ dày đường viền
+                },
+                vLineWidth: function () {
+                  return 1; // Độ dày đường viền dọc
+                },
+                hLineColor: function () {
+                  return '#000000'; // Màu đường viền ngang
+                },
+                vLineColor: function () {
+                  return '#000000'; // Màu đường viền dọc
+                }
+              }
+            }
+          ],
+          styles: {
+            header: {
+              fontSize: 16,
+              bold: true,
+              margin: [0, 0, 0, 10],
+              alignment: 'center'
+            }
+          },
+          pageMargins: [20, 40, 20, 20],
+          pageSize: 'A4'
+        };
+    
+        pdfMake.createPdf(docDefinition).download('table.pdf');
+      };
+    
+        
 
     const [tieuChuan, setTieuChuan] = useState([]);
 
@@ -327,6 +370,7 @@ const ListEvidence = () => {
               <TieuChi standardID={row.idTieuChuan} numberNO={index + 1} />
             </React.Fragment>
           ))}
+
         </tbody>
       </table>
             <footer style={{ 
@@ -337,7 +381,7 @@ const ListEvidence = () => {
                 width: '100%', 
                 padding: '10px 0' }}>
                 <button className="btn btn-primary me-2"  onClick={exportToWord}>Xuất File Word</button>
-                <button className="btn btn-danger me-2"  onClick={exportPDF}>Xuất File PDF</button>
+                <button className="btn btn-danger me-2"  onClick={exportToPDF}>Xuất File PDF</button>
                 <button className="btn btn-success" onClick={exportToExcel}>Xuất File Excel</button>
             </footer>
         </Container>
