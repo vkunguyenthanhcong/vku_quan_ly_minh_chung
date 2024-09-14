@@ -83,7 +83,9 @@ const TieuChi = ({standardID, numberNO}) => {
         </>
     );
 };
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.vfs = {
+    ...pdfFonts.pdfMake.vfs,
+  };
 
 const ListEvidence = () => {
     
@@ -122,75 +124,114 @@ const ListEvidence = () => {
     a.click();
       };
       const exportToPDF = () => {
-        const table = document.getElementById('myTable');
-        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
+        // Tải file pdfMakeVFS.json từ thư mục public
+        fetch('/pdfMakeVFS.json')  // Sử dụng đường dẫn tương đối đến tệp JSON
+          .then(response => response.json())
+          .then(vfs => {
+            // Cấu hình pdfMake với phông chữ tùy chỉnh
+            pdfMake.vfs = vfs;
     
-        const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
-          return Array.from(row.querySelectorAll('td')).map(td => {
-            const colSpan = td.getAttribute('colspan') || 1;
-            return {
-              text: td.innerText.trim(),
-              colSpan: Number(colSpan),
-              rowSpan: 1
-            };
-          });
-        });
-    
-        // Đảm bảo tất cả các hàng có số cột giống nhau với tiêu đề cột
-        const maxColumns = headers.length;
-        const formattedRows = rows.map(row => {
-          const rowLength = row.length;
-          return [...row, ...Array(maxColumns - rowLength).fill({ text: '', colSpan: 1, rowSpan: 1 })];
-        });
-    
-        // Thêm tiêu đề cột vào dữ liệu bảng
-        const body = [
-          headers.map(header => ({ text: header, colSpan: 1, rowSpan: 1 })),
-          ...formattedRows
-        ];
-    
-        const docDefinition = {
-          content: [
-            { text: 'DANH MỤC MINH CHỨNG', style: 'header' },
-            {
-              table: {
-                headerRows: 1,
-                widths: [70, 60, 70, 65, 70, 100, 50], // Thay đổi kích thước cột theo nhu cầu của bạn
-                body: body
-              },
-              layout: {
-                fillColor: function (rowIndex) {
-                  return rowIndex === 0 ? '#f2f2f2' : null; // Màu nền cho tiêu đề
-                },
-                hLineWidth: function (i) {
-                  return (i === 0 || i === body.length) ? 2 : 1; // Độ dày đường viền
-                },
-                vLineWidth: function () {
-                  return 1; // Độ dày đường viền dọc
-                },
-                hLineColor: function () {
-                  return '#000000'; // Màu đường viền ngang
-                },
-                vLineColor: function () {
-                  return '#000000'; // Màu đường viền dọc
-                }
+            // Định nghĩa font cho pdfMake
+            pdfMake.fonts = {
+              TimesNewRoman: {
+                normal: 'TimesNewRoman.ttf',
+                bold: 'TimesNewRomanBold.ttf',
+                italics: 'TimesNewRoman-Italic.ttf',
+                bolditalics: 'TimesNewRoman-BoldItalic.ttf'
               }
-            }
-          ],
-          styles: {
-            header: {
-              fontSize: 16,
-              bold: true,
-              margin: [0, 0, 0, 10],
-              alignment: 'center'
-            }
-          },
-          pageMargins: [20, 40, 20, 20],
-          pageSize: 'A4'
-        };
+            };
     
-        pdfMake.createPdf(docDefinition).download('table.pdf');
-      };
+            const table = document.getElementById('myTable');
+       
+            // Lấy tiêu đề cột
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
+       
+            // Lấy dữ liệu hàng và xử lý liên kết
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+              return Array.from(row.querySelectorAll('td, th')).map(cell => {
+                const anchorTag = cell.querySelector('a');
+                const colSpan = cell.colSpan || 1; // Kiểm tra colspan
+                const rowSpan = cell.rowSpan || 1; // Kiểm tra rowspan
+                if (anchorTag) {
+                  return {
+                    text: anchorTag.innerText.trim(),
+                    link: anchorTag.href,
+                    colSpan: colSpan,
+                    rowSpan: rowSpan
+                  };
+                } else {
+                  return { text: cell.innerText.trim(), colSpan: colSpan, rowSpan: rowSpan };
+                }
+              });
+            });
+       
+            // Đảm bảo tất cả các hàng có số cột giống nhau với tiêu đề cột
+            const maxColumns = headers.length;
+            const formattedRows = rows.map(row => {
+              const rowLength = row.length;
+              return [...row, ...Array(maxColumns - rowLength).fill({ text: '', colSpan: 1, rowSpan: 1 })];
+            });
+       
+            // Thêm tiêu đề cột vào dữ liệu bảng
+            const body = [
+              headers.map(header => ({ text: header, colSpan: 1, rowSpan: 1, bold: true })),
+              ...formattedRows
+            ];
+       
+            // Tạo định dạng PDF
+            const docDefinition = {
+              content: [
+                { text: 'DANH MỤC MINH CHỨNG', style: 'header' },
+                {
+                  table: {
+                    headerRows: 1,
+                    widths: [70, 60, 70, 65, 70, 100, 50], // Điều chỉnh kích thước cột cho phù hợp
+                    body: body
+                  },
+                  layout: {
+                    fillColor: function (rowIndex) {
+                      return rowIndex === 0 ? '#f2f2f2' : null; // Màu nền cho tiêu đề
+                    },
+                    hLineWidth: function (i) {
+                      return (i === 0 || i === body.length) ? 2 : 1; // Độ dày đường viền
+                    },
+                    vLineWidth: function () {
+                      return 1; // Độ dày đường viền dọc
+                    },
+                    hLineColor: function () {
+                      return '#000000'; // Màu đường viền ngang
+                    },
+                    vLineColor: function () {
+                      return '#000000'; // Màu đường viền dọc
+                    }
+                  }
+                }
+              ],
+              styles: {
+                header: {
+                  fontSize: 18,
+                  bold: true,
+                  margin: [0, 0, 0, 10],
+                  alignment: 'center',
+                  font: 'TimesNewRoman' // Sử dụng font TimesNewRoman
+                }
+              },
+              defaultStyle: {
+                font: 'TimesNewRoman' // Sử dụng font TimesNewRoman
+              },
+              pageMargins: [20, 40, 20, 20], // Lề trang
+              pageSize: 'A4' // Kích thước trang A4
+            };
+       
+            // Tạo PDF và tải xuống
+            pdfMake.createPdf(docDefinition).download('table_with_colspan.pdf');
+          })
+          .catch(error => console.error('Lỗi khi tải pdfMakeVFS.json:', error));
+    };
+    
+    
+    
+    
     
         
 
