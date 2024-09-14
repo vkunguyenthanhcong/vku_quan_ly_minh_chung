@@ -86,3 +86,6 @@ body {
   #table-row-color {
     background-color: #2A3F54;
   }
+  #myTable td, th {
+    padding : 10px;
+  }
