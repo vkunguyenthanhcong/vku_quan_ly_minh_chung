@@ -47,39 +47,39 @@ const ChuongTrinhDaoTao = () => {
       }
     };
     fetchDataFromAPI();
-  }, [KhungCTDT_ID]);
+  }, [KhungCTDT_ID]); 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
   return (
     <div className="content bg-white m-3 p-4">
-      {data.length > 0 ? (
-        data.map((item, index) => (
-          <div key={index}>
-            <p style={{ fontSize: '20px' }}>Giới thiệu khung chương trình <b>{item.tenCtdt}</b></p>
+      {data ? (
+        
+          <div>
+            <p style={{ fontSize: '20px' }}>Giới thiệu khung chương trình <b>{data.tenCtdt}</b></p>
             <p>
               - Chuẩn đánh giá ĐBCL:
               <button style={{ color: 'white', background: 'gray', border: 'none', borderRadius: '10px', padding: '5px 10px' }}>
-                <b>{item.tenKdcl}</b>
+                <b>{data.chuanKdcl.tenKdcl}</b>
               </button>
             </p>
             <p>
-              - Thuộc Khoa: <b>{item.tenKhoa}</b>
+              - Thuộc Khoa: <b>{data.khoa.tenKhoa}</b>
             </p>
             <p>
-              Web <b>{item.web}</b> - Email <b>{item.email}</b> - Điện thoại <b>{item.soDienThoai}</b>
+              Web <b>{data.khoa.web}</b> - Email <b>{data.khoa.email}</b> - Điện thoại <b>{data.khoa.sdt}</b>
             </p>
             <p>
-              - Thuộc Ngành: <b>{item.tenNganh}</b>
+              - Thuộc Ngành: <b>{data.nganh.tenNganh}</b>
             </p>
             <p>
-              - Thuộc Trình độ: <b>{item.trinhDo}</b>
+              - Thuộc Trình độ: <b>{data.nganh.trinhDo}</b>
             </p>
             <p>
-              - Số tín chỉ áp dụng: <b>{item.soTinChi}</b>
+              - Số tín chỉ áp dụng: <b>{data.soTinChi}</b>
             </p>
           </div>
-        ))
-      ) : (
+        )
+      : (
         <p>Trường Đại học Công nghệ Thông tin và Truyền thông Việt - Hàn</p>
       )}
       <TableContainer>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./ChuanKiemDinh.css";
 import { Modal, Button, Form } from 'react-bootstrap';
 import {
     Table,
@@ -18,6 +17,7 @@ import {
     insertNewChuanKdcl,
 } from "../../../../services/apiServices";
 import { useNavigate } from "react-router-dom";
+
 const PopupForm = ({ show, handleClose, fetchData }) => {
     const [formData, setFormData] = useState({
       tenKdcl: '',
@@ -82,8 +82,6 @@ const PopupForm = ({ show, handleClose, fetchData }) => {
     );
   };
 const GenericList = ({ maKdcl }) => {
-
-    const [edit, setEdit] = useState(false);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -116,10 +114,10 @@ const GenericList = ({ maKdcl }) => {
     return (
         <ul>
             {data.map((item, index) => (
-                <li style={{marginBottom: "20px", marginTop: "20px"}} key={index}>
+                <li  style={{marginBottom: "20px", marginTop: "20px", listStyleType : 'none'}} key={index}>
                     <button
                         onClick={() => handleButtonClick(item.maCtdt)}
-                        className="btn btnViewCTDT"
+                        className="btn btn-primary"
                     >
                         {item.tenCtdt}
                     </button>
@@ -129,6 +127,7 @@ const GenericList = ({ maKdcl }) => {
     );
 };
 const ChuanKiemDinh = () => {
+    const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -212,6 +211,9 @@ const ChuanKiemDinh = () => {
 
         }
     }
+    const goToPhanCong = () => {
+        navigate('../phan-cong');
+    }
 
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
@@ -223,7 +225,7 @@ const ChuanKiemDinh = () => {
             <TableContainer component={Paper}>
                 <Table className="font-Inter">
                     <TableHead>
-                        <TableRow >
+                        <TableRow id="table-row-color">
                             <TableCell className="text-white">STT</TableCell>
                             <TableCell className="text-white">Tên Chuẩn đánh giá</TableCell>
                             <TableCell className="text-white">Năm áp dụng</TableCell>
@@ -269,17 +271,18 @@ const ChuanKiemDinh = () => {
                                     <GenericList maKdcl={row.maKdcl} />
                                 </TableCell>
                                 <TableCell className="button-edit">
-                                    <br />
                                     <button
                                         className="btn btn-primary"
                                         onClick={() => handleEditClick(row.idKdcl)}
                                     >
                                         Chỉnh sửa
                                     </button>
-                                    <br />
-                                    <button className="btn btn-danger"
+                                    <br/>
+                                    <button className="btn btn-danger mt-2"
                                     onClick={() => handleDeleteChuanKDCL(row.idKdcl)}
                                     >Xóa</button>
+                                    <br/>
+                                    <button className="btn btn-success mt-2" onClick={() => goToPhanCong()}>Chia nhóm đánh giá</button>
                                 </TableCell>
                             </TableRow>
                         ))}

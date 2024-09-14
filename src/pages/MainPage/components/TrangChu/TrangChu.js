@@ -10,7 +10,7 @@ const TrangChu = () => {
   const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const action = queryParams.get('action');
-    const [data, setData] = useState([]);
+    const [chuanKdcl, setChuanKdcl] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   //danh sach chuan kiem dinh chat luong
@@ -18,7 +18,7 @@ const TrangChu = () => {
     const fetchDataFromAPI = async () => {
       try {
         const result = await getKdclData();
-        setData(result);
+        setChuanKdcl(result);
       } catch (error) {
         setError(error);
       } finally {
@@ -39,7 +39,7 @@ const TrangChu = () => {
       }else if(action === "DinhNghiaTieuChuan"){
         navigate(`tieu-chuan?KhungCTDT_ID=${maCtdt}`);
       }else if(action === "BaoCaoTuDanhGia"){
-        navigate(`chuong-trinh-dao-tao?KhungCTDT_ID=${maCtdt}`);
+        navigate(`bao-cao-tu-danh-gia?KhungCTDT_ID=${maCtdt}`);
       }
     };
     
@@ -82,14 +82,14 @@ const TrangChu = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row, index) => (
+            {chuanKdcl.map((row, index) => (
               <TableRow key={row.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{row.tenKdcl}</TableCell>
                 <TableCell>{row.namBanHanh}</TableCell>
                 <TableCell><GenericList maKdcl={row.maKdcl}/></TableCell>
               </TableRow>
-            ))}
+            ))}  
           </TableBody>
         </Table>
       </TableContainer>

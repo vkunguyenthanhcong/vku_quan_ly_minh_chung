@@ -12,7 +12,8 @@ const ChiTietChuongTrinhDaoTao = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
+    
+    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState();
     const [khoa, setKhoa] = useState([]);
     const [nganh, setNganh] = useState([]);
     const [selectedKhoa, setSelectedKhoa] = useState('');
@@ -23,17 +24,17 @@ const ChiTietChuongTrinhDaoTao = () => {
         const fetchData = async () => {
             try {
                 const result = await getThongTinCTDT(ChuongTrinh_ID);
-                setTenCTDT(result[0].tenCtdt);
                 setChuongTrinhDaoTao(result);
-                
-                if(result[0].tenKhoa != "" || result[0].tenNganh != ""){
+                setTenCTDT(result.tenCtdt);
+                console.log(chuongTrinhDaoTao)
+                if(result.khoa.tenKhoa != "" || result.nganh.tenNganh != ""){
                     const khoaData = await getKhoa();
                     const nganhData = await getNganh();
                     setNganh(nganhData);
                     setKhoa(khoaData);
-                    const maKhoa = khoaData.find(item => item.tenKhoa === result[0].tenKhoa).maKhoa;
+                    const maKhoa = khoaData.find(item => item.tenKhoa === result.khoa.tenKhoa).maKhoa;
                     setSelectedKhoa(maKhoa);
-                    const maNganh = nganhData.find(item => item.tenNganh === result[0].tenNganh && item.tenNganh).maNganh;
+                    const maNganh = nganhData.find(item => item.tenNganh === result.nganh.tenNganh && item.tenNganh).maNganh;
                     setSelectedNganh(maNganh);
                 }
                 
@@ -44,7 +45,6 @@ const ChiTietChuongTrinhDaoTao = () => {
             }
 
         };
-
         fetchData();
 
     }, [ChuongTrinh_ID]);
@@ -67,7 +67,7 @@ const ChiTietChuongTrinhDaoTao = () => {
                 formData.append('maNganh', selectedNganh);
                 formData.append('maKhoa', selectedKhoa);
                 formData.append('tenCtdt', tenCTDT);
-                formData.append('idCtdt', chuongTrinhDaoTao[0].idCtdt);
+                formData.append('maCtdt', chuongTrinhDaoTao.maCtdt);
 
                 const response = await updateChuongTrinhDaoTao(formData);
                 if(response === "OK"){
@@ -86,8 +86,8 @@ const ChiTietChuongTrinhDaoTao = () => {
             message: 'Bạn có chắc chắn muốn xóa?',
             header: 'Xác nhận',
             accept: async () => {
-                const idCtdt = parseInt(chuongTrinhDaoTao[0].idCtdt);
-                const response = await deleteChuongTrinhDaoTao(idCtdt);
+                const maCtdt = parseInt(chuongTrinhDaoTao.maCtdt);
+                const response = await deleteChuongTrinhDaoTao(maCtdt);
                 if(response === "OK"){
                     alert('Xóa thành công');
                 }else{
@@ -103,13 +103,13 @@ const ChiTietChuongTrinhDaoTao = () => {
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
             
-            {chuongTrinhDaoTao && chuongTrinhDaoTao.length > 0 ? (
+            {chuongTrinhDaoTao != null ? (
                 <>
-                    <h5><b>Giới thiệu Khung chương trình {chuongTrinhDaoTao[0].tenCtdt}</b></h5>
+                    <h5><b>Giới thiệu Khung chương trình {chuongTrinhDaoTao.tenCtdt}</b></h5>
                     <p>- Tên chương trình : </p>
                     <Input className="form-control" value={tenCTDT} onChange={(e) => handleChangeTenCtdt(e.target.value)}/>
                     <br/><br/>
-                    <p>- Chuẩn ánh giá ĐBCL : <button className="btn btn-secondary">{chuongTrinhDaoTao[0].tenKdcl}</button></p>
+                    <p>- Chuẩn ánh giá ĐBCL : <button className="btn btn-secondary">{chuongTrinhDaoTao.chuanKdcl.tenKdcl}</button></p>
                     <p>- Thuộc Khoa :
                         <select
                             className="form-select"
@@ -145,13 +145,12 @@ const ChiTietChuongTrinhDaoTao = () => {
                         </select>
                     </p>
                     <button className="btn btn-success" onClick={() => updateCtdt()}>Cập Nhật</button>
-                    <ConfirmDialog />
                     <button className="btn btn-danger ms-1" onClick={() => deleteCtdt()}>Xóa</button>
                 </>
             ) : (
                 <p>Loading...</p>
             )}
-
+            <ConfirmDialog />
         </div>
     );
 }
