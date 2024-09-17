@@ -63,13 +63,13 @@ const ChiTietChuongTrinhDaoTao = () => {
             message: 'Bạn có chắc chắn muốn cập nhật?',
             header: 'Xác nhận',
             accept: async () => {
-                const formData = new FormData();
-                formData.append('maNganh', selectedNganh);
-                formData.append('maKhoa', selectedKhoa);
-                formData.append('tenCtdt', tenCTDT);
-                formData.append('maCtdt', chuongTrinhDaoTao.maCtdt);
+                        const formData = new FormData();
+                        formData.append('maNganh', selectedNganh);
+                        formData.append('maKhoa', selectedKhoa);
+                        formData.append('tenCtdt', tenCTDT);
+                        formData.append('maCtdt', chuongTrinhDaoTao.maCtdt);
 
-                const response = await updateChuongTrinhDaoTao(formData);
+                    const response = await updateChuongTrinhDaoTao(formData);
                 if(response === "OK"){
                     alert('Cập nhật thành công');
                 }else{

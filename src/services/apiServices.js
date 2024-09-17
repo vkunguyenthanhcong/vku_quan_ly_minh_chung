@@ -62,8 +62,8 @@ export const getKdclData = (token) => {
         });
 };
 // Sua ten chuan kiem dinh chat luong
-export const updateTenKdcl = (tenKdcl, idKdcl, token) => {
-    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&idKdcl=${idKdcl}`, {
+export const updateTenKdcl = (tenKdcl, maKdcl, token) => {
+    return api.get(`/chuankdcl/updateTenKdcl?tenKdcl=${tenKdcl}&maKdcl=${maKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
     }).then(response => response.data)
         .catch(error => {
@@ -72,8 +72,8 @@ export const updateTenKdcl = (tenKdcl, idKdcl, token) => {
         });
 };
 // Sua nam ban hanh cua chuan kiem dinh chat luong
-export const updateNamBanHanh = (namBanHanh, idKdcl, token) => {
-    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&idKdcl=${idKdcl}`, {
+export const updateNamBanHanh = (namBanHanh, maKdcl, token) => {
+    return api.get(`/chuankdcl/updateNamBanHanh?namBanHanh=${namBanHanh}&maKdcl=${maKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
     }).then(response => response.data)
         .catch(error => {
@@ -82,8 +82,8 @@ export const updateNamBanHanh = (namBanHanh, idKdcl, token) => {
         });
 };
 // Xoa chuan kiem dinh chat luong
-export const deleteChuanKDCL = (idKdcl, token) => {
-    return api.delete(`/chuankdcl/deleteChuanKDCL?idKdcl=${idKdcl}`, {
+export const deleteChuanKDCL = (maKdcl, token) => {
+    return api.delete(`/chuankdcl/deleteChuanKDCL?maKdcl=${maKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
     }).then(response => response.data)
         .catch(error => {
@@ -516,6 +516,19 @@ export const getPhongBan = (token) => {
             throw error;
         });
 };
+//get phong ban by id
+export const getPhongBanById = (idPhongBan, token) => {
+    return api.get(`/phongban/${idPhongBan}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
 //save phong ban
 export const savePhongBan = (phongBan, token) => {
     return api.post('/phongban', phongBan, {
@@ -547,6 +560,113 @@ export const editPhongBan = (phongBan, token) => {
 //xoa phong ban
 export const deletePhongBan = (idPhongBan, token) => {
     return api.delete(`/phongban/delete/${idPhongBan}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+
+//get phan cong
+export const getAllPhanCong = (token) => {
+    return api.get(`/phancongdanhgia`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//get phan cong by idPhongBan
+export const getAllPhanCongByIdPhongBan = (idPhongBan, maKdcl, token) => {
+    return api.get(`/phancongdanhgia/findByIdPhongBan?idPhongBan=${idPhongBan}&maKdcl=${maKdcl}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+
+//get phan cong
+export const insertPhanCong = (token) => {
+    return api.get(`/phancongdanhgia`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//xoa phan cong
+export const deletePhanCong = (idPhanCong, token) => {
+    return api.delete(`/phancongdanhgia/${idPhanCong}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//cap nhat phan cong
+export const updatePhanCong = (phanCong, token) => {
+    return api.put('/phancongdanhgia', phanCong, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//them phan cong
+export const savePhanCong = (phanCong, token) => {
+    return api.post('/phancongdanhgia', phanCong, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+//phieu danh gia tieu chi
+export const savePhieuDanhGiaTieuChi = (formData, token) => {
+    return api.post('/phieudanhgiatieuchi', formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//get phieu danh gia by idTieuChuan va idTieuChi
+export const getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi = (idTieuChuan, idTieuChi, token) => {
+    return api.get(`/phieudanhgiatieuchi/findByTieuChuanAndTieuChi?idTieuChuan=${idTieuChuan}&idTieuChi=${idTieuChi}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
