@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import "./ChuanKiemDinh.css";
 import { Modal, Button, Form } from 'react-bootstrap';
 import {
     Table,
@@ -18,6 +17,7 @@ import {
     insertNewChuanKdcl,
 } from "../../../../services/apiServices";
 import { useNavigate } from "react-router-dom";
+
 const PopupForm = ({ show, handleClose, fetchData }) => {
     const [formData, setFormData] = useState({
       tenKdcl: '',
@@ -82,8 +82,6 @@ const PopupForm = ({ show, handleClose, fetchData }) => {
     );
   };
 const GenericList = ({ maKdcl }) => {
-
-    const [edit, setEdit] = useState(false);
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -116,10 +114,10 @@ const GenericList = ({ maKdcl }) => {
     return (
         <ul>
             {data.map((item, index) => (
-                <li style={{marginBottom: "20px", marginTop: "20px"}} key={index}>
+                <li  style={{marginBottom: "20px", marginTop: "20px", listStyleType : 'none'}} key={index}>
                     <button
                         onClick={() => handleButtonClick(item.maCtdt)}
-                        className="btn btnViewCTDT"
+                        className="btn btn-primary"
                     >
                         {item.tenCtdt}
                     </button>
@@ -129,6 +127,7 @@ const GenericList = ({ maKdcl }) => {
     );
 };
 const ChuanKiemDinh = () => {
+    const navigate = useNavigate();
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -158,7 +157,7 @@ const ChuanKiemDinh = () => {
     const handleEditClick = (id) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.idKdcl === id ? { ...item, isEditing: true } : item
+                item.maKdcl === id ? { ...item, isEditing: true } : item
             )
         );
     };
@@ -167,14 +166,14 @@ const ChuanKiemDinh = () => {
     const handleTenChange = (id, newText) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.idKdcl === id ? { ...item, tenKdcl: newText } : item
+                item.maKdcl === id ? { ...item, tenKdcl: newText } : item
             )
         );
     };
     const handleNamBanHanhChange = (id, newText) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.idKdcl === id ? { ...item, namBanHanh: newText } : item
+                item.maKdcl === id ? { ...item, namBanHanh: newText } : item
             )
         );
     };
@@ -184,11 +183,11 @@ const ChuanKiemDinh = () => {
         if (event.key === "Enter") {
             setData((prevList) =>
                 prevList.map((item) =>
-                    item.idKdcl === id ? { ...item, isEditing: false } : item
+                    item.maKdcl === id ? { ...item, isEditing: false } : item
                 )
             );
             try {
-                const response = await updateTenKdcl(event.target.value, id);
+                await updateTenKdcl(event.target.value, id);
             } catch (e) {}
         }
     };
@@ -196,21 +195,24 @@ const ChuanKiemDinh = () => {
         if (event.key === "Enter") {
             setData((prevList) =>
                 prevList.map((item) =>
-                    item.idKdcl === id ? { ...item, isEditing: false } : item
+                    item.maKdcl === id ? { ...item, isEditing: false } : item
                 )
             );
             try {
-                const response = await updateNamBanHanh(event.target.value, id);
+                await updateNamBanHanh(event.target.value, id);
             } catch (e) {}
         }
     };
-    const handleDeleteChuanKDCL = async (idKdcl) => {
+    const handleDeleteChuanKDCL = async (maKdcl) => {
         try {
-            const response = await deleteChuanKDCL(idKdcl);
+            const response = await deleteChuanKDCL(maKdcl);
             fetchDataFromAPI();
         }catch (e) {
 
         }
+    }
+    const goToPhanCong = (ChuanKiemDinh) => {
+        navigate(`../phan-cong?ChuanKiemDinh_ID=${ChuanKiemDinh}`);
     }
 
     return (
@@ -223,7 +225,7 @@ const ChuanKiemDinh = () => {
             <TableContainer component={Paper}>
                 <Table className="font-Inter">
                     <TableHead>
-                        <TableRow >
+                        <TableRow id="table-row-color">
                             <TableCell className="text-white">STT</TableCell>
                             <TableCell className="text-white">Tên Chuẩn đánh giá</TableCell>
                             <TableCell className="text-white">Năm áp dụng</TableCell>
@@ -243,9 +245,9 @@ const ChuanKiemDinh = () => {
                                             type="text"
                                             value={row.tenKdcl}
                                             onChange={(e) =>
-                                                handleTenChange(row.idKdcl, e.target.value)
+                                                handleTenChange(row.maKdcl, e.target.value)
                                             }
-                                            onKeyPress={(e) => handleTenPress(row.idKdcl, e)}
+                                            onKeyPress={(e) => handleTenPress(row.maKdcl, e)}
                                         />
                                     ) : (
                                         row.tenKdcl
@@ -257,9 +259,9 @@ const ChuanKiemDinh = () => {
                                             type="text"
                                             value={row.namBanHanh}
                                             onChange={(e) =>
-                                                handleNamBanHanhChange(row.idKdcl, e.target.value)
+                                                handleNamBanHanhChange(row.maKdcl, e.target.value)
                                             }
-                                            onKeyPress={(e) => handleNamBanHanhPress(row.idKdcl, e)}
+                                            onKeyPress={(e) => handleNamBanHanhPress(row.maKdcl, e)}
                                         />
                                     ) : (
                                         row.namBanHanh
@@ -269,17 +271,18 @@ const ChuanKiemDinh = () => {
                                     <GenericList maKdcl={row.maKdcl} />
                                 </TableCell>
                                 <TableCell className="button-edit">
-                                    <br />
                                     <button
                                         className="btn btn-primary"
-                                        onClick={() => handleEditClick(row.idKdcl)}
+                                        onClick={() => handleEditClick(row.maKdcl)}
                                     >
                                         Chỉnh sửa
                                     </button>
-                                    <br />
-                                    <button className="btn btn-danger"
-                                    onClick={() => handleDeleteChuanKDCL(row.idKdcl)}
+                                    <br/>
+                                    <button className="btn btn-danger mt-2"
+                                    onClick={() => handleDeleteChuanKDCL(row.maKdcl)}
                                     >Xóa</button>
+                                    <br/>
+                                    <button className="btn btn-success mt-2" onClick={() => goToPhanCong(row.maKdcl)}>Chia nhóm đánh giá</button>
                                 </TableCell>
                             </TableRow>
                         ))}

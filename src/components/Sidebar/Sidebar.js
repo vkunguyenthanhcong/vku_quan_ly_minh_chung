@@ -55,7 +55,7 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
     ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản lý', isLink: true }] : []), // Nếu role là "ADMIN", thêm mục vào mảng
     { to: '/quan-ly?action=QuanLyTieuChuan', label: 'Quản lý tiêu chuẩn', isLink: true },
     { to: '/quan-ly?action=DinhNghiaTieuChuan', label: 'Định nghĩa tiêu chuẩn', isLink: true },
-    { to: '/quan-ly??action=BaoCaoTuDanhGia', label: 'Báo cáo tự đánh giá', isLink: false }
+    { to: '/quan-ly?action=BaoCaoTuDanhGia', label: 'Báo cáo tự đánh giá', isLink: true }
   ];
   
   return (

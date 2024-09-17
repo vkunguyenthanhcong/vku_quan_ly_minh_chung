@@ -1,11 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
 :root {
-  --primary-color: #337ab7; 
-  --secondary-color: #26B99A; 
-  --third-color:#e29755;
-  --gray-color : #948F8F;
-  --text-color : #595959;
-  --globalFont : Inter, "Helvetica Neue", Roboto, Arial, sans-serif !important;
+  --primary-color: #337ab7;
+  --secondary-color: #26b99a;
+  --third-color: #e29755;
+  --gray-color: #948f8f;
+  --text-color: #595959;
+  --globalFont: Inter, "Helvetica Neue", Roboto, Arial, sans-serif !important;
 }
 
 body {
@@ -22,15 +22,15 @@ body {
 
 .btn-primary {
   background-color: var(--primary-color) !important;
-  border : var(--primary-color) !important;
+  border: var(--primary-color) !important;
 }
 .btn-success {
   background-color: var(--secondary-color) !important;
-  border : var(--secondary-color) !important;
+  border: var(--secondary-color) !important;
 }
-.btn-light{
+.btn-light {
   background-color: var(--third-color) !important;
-  border : var(--third-color) !important;
+  border: var(--third-color) !important;
 }
 .border-1-solid-black {
   border: 1px solid black !important;
@@ -44,45 +44,83 @@ body {
 .border-right-1-solid-white {
   border-right: 1px solid white !important;
 }
-.p-dialog-mask{
+.p-dialog-mask {
   background-color: hsla(0, 0%, 50%, 0.5);
-  }
-  .p-confirm-dialog {
-      padding : 50px;
-      background-color: white;
-      border-radius : 10px
-  }
-  .p-confirm-dialog  .p-dialog-header {
-      color: black;
-      font-size : 20px;
-      font-weight : semibold;
-      margin-bottom : 20px;
-  }
-  .p-confirm-dialog .p-dialog-content {
-      color : black;
-      margin-bottom : 30px;
-  }
-  .p-confirm-dialog .p-dialog-footer{
-      position: relative;
-      margin-bottom : 30px;
-  }
-  .p-confirm-dialog .p-dialog-footer .p-confirm-dialog-reject{
-      background-color : white;
-      border : none;
-      color : var(--primary-color);
-      padding: 10px 20px 10px 20px;
-      position: absolute;
-      right: 80px;
-  }
-  .p-confirm-dialog .p-dialog-footer .p-confirm-dialog-accept{
-      background-color : var(--primary-color);
-      border : none;
-      color : white;
-      padding: 10px 20px 10px 20px;
-      position: absolute;
-      right: 0px;
-      border-radius : 15px
-  }
-  #table-row-color {
-    background-color: #2A3F54;
-  }
+}
+.p-confirm-dialog {
+  padding: 50px;
+  background-color: white;
+  border-radius: 10px;
+}
+.a4-size {
+  width: 210mm;
+  border: 1px solid #000; /* Optional border */
+  box-sizing: border-box; /* Include padding and border in width and height */
+  margin: 20px auto; /* Center the div horizontally */
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 13px;
+}
+.a4-content{
+  margin-left: 3cm;
+  margin-top: 2cm;
+  margin-bottom: 2cm;
+  margin-right: 2cm;
+}
+.a4-content p {
+  margin-bottom: 1.5px; /* Space between paragraphs */
+}
+.a4-tab{
+  margin-left: 1.2cm;
+}
+.a4-mota div p{
+  text-indent: 1.2cm;
+}
+.a4-mota div ul li{
+  margin-left: 0.8cm;
+}
+
+.p-confirm-dialog .p-dialog-header {
+  color: black;
+  font-size: 20px;
+  font-weight: semibold;
+  margin-bottom: 20px;
+}
+.p-confirm-dialog .p-dialog-content {
+  color: black;
+  margin-bottom: 30px;
+}
+.p-confirm-dialog .p-dialog-footer {
+  position: relative;
+  margin-bottom: 30px;
+}
+.p-confirm-dialog .p-dialog-footer .p-confirm-dialog-reject {
+  background-color: white;
+  border: none;
+  color: var(--primary-color);
+  padding: 10px 20px 10px 20px;
+  position: absolute;
+  right: 80px;
+}
+.p-confirm-dialog .p-dialog-footer .p-confirm-dialog-accept {
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  padding: 10px 20px 10px 20px;
+  position: absolute;
+  right: 0px;
+  border-radius: 15px;
+}
+#table-row-color {
+  background-color: #2a3f54;
+}
+#myTable td,
+th {
+  padding: 10px;
+}
+.a4-size {
+  width: 210mm; /* Width of A4 paper */
+  height: 297mm; /* Height of A4 paper */
+  border: 1px solid #000; /* Optional border */
+  box-sizing: border-box; /* Include padding and border in width and height */
+  margin: 20px auto; /* Center the div horizontally */
+}

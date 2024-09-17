@@ -163,13 +163,11 @@ const DanhSachTieuChuan = () => {
                 }
                 `}
             </style>
-            {chuongTrinhDaoTao.map((row, index) => (
-                <p className='text-center' style={{ fontSize: '20px' }}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH <span
-                    style={{ color: colors.secondary }}>{row.tenCtdt}</span></b></p>
-            ))}
+            <p className='text-center' style={{ fontSize: '20px' }}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH <span
+                    style={{ color: colors.secondary }}>{chuongTrinhDaoTao.tenCtdt}</span></b></p>
             <TableContainer component={Paper}>
                 <Table className='font-Inter'>
-                    <TableHead>
+                    <TableHead id="table-row-color">
                         <TableCell style={{ width: '15%' }}>Tiêu chuẩn/ <br />Tiêu chí</TableCell>
                         <TableCell style={{ width: '15%' }}>Yêu cầu của tiêu chí</TableCell>
                         <TableCell style={{ width: '35%' }}>Mốc chuẩn để tham chiếu để đánh giá tiêu chí đạt mức 4</TableCell>
