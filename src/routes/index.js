@@ -22,6 +22,9 @@ import ChiTietChuongTrinhDaoTao from '../pages/Admin/components/ChiTietiChuongTr
 import BaoCaoTuDanhGia from '../pages/MainPage/components/BaoCaoTuDanhGia/BaoCaoTuDanhGia';
 import PhongBan from '../pages/Admin/components/QuanLyPhongBan/PhongBan';
 import PhanCongBaoCao from '../pages/Admin/components/PhanCongBaoCao/PhanCongBaoCao';
+import VietBaoCao from '../pages/MainPage/components/VietBaoCao/VietBaoCao';
+import VietBaoCaoTieuChi from '../pages/MainPage/components/VietBaoCaoTieuChi/VietBaoCaoTieuChi';
+import DanhGiaTieuChi from '../pages/DanhGiaTieuChi/DanhGiaTieuChi';
 
 const routes = [
   {
@@ -36,6 +39,8 @@ const routes = [
       { path: "tieu-chuan", element: <ProtectedRoute element={<DanhSachTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "danh-sach-minh-chung", element: <ProtectedRoute element={<DanhSachMinhChung />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "bao-cao-tu-danh-gia", element: <ProtectedRoute element={<BaoCaoTuDanhGia />} requiredRoles={["USER", "ADMIN"]} /> },
+      { path: "viet-bao-cao", element: <ProtectedRoute element={<VietBaoCao />} requiredRoles={["USER", "ADMIN"]} /> },
+      { path: "viet-bao-cao-tieu-chi", element: <ProtectedRoute element={<VietBaoCaoTieuChi />} requiredRoles={["USER", "ADMIN"]} /> }
     ],
   },
   {
@@ -45,6 +50,10 @@ const routes = [
   {
     path: "/danh-muc-minh-chung",
     element: <ListEvidence />,
+  },
+  {
+    path: "/danh-gia-tieu-chi",
+    element: <DanhGiaTieuChi />,
   },
   {
     path: "/admin/",

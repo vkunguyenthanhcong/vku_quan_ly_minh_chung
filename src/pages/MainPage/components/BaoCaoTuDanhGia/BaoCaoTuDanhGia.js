@@ -9,6 +9,7 @@ const BaoCaoTuDanhGia = () => {
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
     
     useEffect(() => {
         const fetchDataFromAPI = async () => {
@@ -26,9 +27,12 @@ const BaoCaoTuDanhGia = () => {
       if(loading === true){
         return (<p>Loading...</p>)
       }
+      const goToVietBaoCao = () => {
+        navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
+      }
     return (
         <div className="content bg-white m-3 p-4">
-            <p>BÁO CÁO TỰ ĐÁNH GIÁ <b>{chuongTrinhDaoTao[0].tenCtdt}</b></p>
+            <p>BÁO CÁO TỰ ĐÁNH GIÁ <b>{chuongTrinhDaoTao.tenCtdt}</b></p>
             <b>Kế hoạch</b>
             <div className="mt-2">
                 <Row>
@@ -41,7 +45,7 @@ const BaoCaoTuDanhGia = () => {
             <b>Viết báo cáo</b>
             <div className="mt-2">
                 <Row>
-                    <Col md={2} xs = {12}><button className="btn btn-success">Viết báo cáo tiêu chí</button></Col>
+                    <Col md={2} xs = {12}><button className="btn btn-success" onClick={() => goToVietBaoCao()}>Viết báo cáo tiêu chí</button></Col>
                 </Row>
             </div>
             <br/>
