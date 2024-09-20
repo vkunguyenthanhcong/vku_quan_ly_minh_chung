@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi } from "../../services/apiServices";
 import { useLocation } from "react-router-dom";
-import { saveAs } from 'file-saver';
-import { Document, Packer, Paragraph, TextRun, Hyperlink     } from 'docx';
 
 const DanhGiaTieuChi = () => {
     const location = useLocation();
@@ -51,73 +49,10 @@ const DanhGiaTieuChi = () => {
 
         return parts;
     };
-    const exportToWord = () => {
-        const doc = new Document({
-            sections: [
-                {
-                    properties: {},
-                    children: [
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: "PHIẾU ĐÁNH GIÁ TIÊU CHÍ",
-                                    bold: true,
-                                    size: 28, // kích thước phông chữ 14px
-                                }),
-                            ],
-                            alignment: 'center',
-                        }),
-                        new Paragraph({ text: "" }), // Thêm dòng trống
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: "Nhóm công tác: ",
-                                    bold: true,
-                                }),
-                            ],
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: "Tiêu chuẩn: ",
-                                    bold: true,
-                                }),
-                            ],
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: "Tiêu chí: ",
-                                    bold: true,
-                                }),
-                            ],
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: "1. Mô tả",
-                                    bold: true,
-                                }),
-                            ],
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: phieuDanhGia ? phieuDanhGia.moTa : 'Loading...',
-                                }),
-                            ],
-                        }),
-                    ],
-                },
-            ],
-        });
-
-        Packer.toBlob(doc).then((blob) => {
-            saveAs(blob, "PhieuDanhGia.docx");
-        });
-    };
     return (
-        <div className="a4-size" id="phieudanhgia">
+    <>
+    <div>
+        <div className="a4-size">
             <div className="a4-content">
                 <p className="text-center">
                     <b style={{ fontSize: '14px' }}>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b>
@@ -131,10 +66,14 @@ const DanhGiaTieuChi = () => {
                 ) : (
                     'Loading...'
                 )}</p>
-                <button onClick={exportToWord}>Xuất file Word</button>
             </div>
         </div>
-    );
+
+      </div>
+      <button onClick={handleExportToDocx}>Export to DOCX</button>
+    </>
+
+  );
 };
 
 export default DanhGiaTieuChi;

@@ -54,11 +54,9 @@ body {
 }
 .a4-size {
   width: 210mm;
-  border: 1px solid #000; /* Optional border */
-  box-sizing: border-box; /* Include padding and border in width and height */
   margin: 20px auto; /* Center the div horizontally */
   font-family: 'Times New Roman', Times, serif;
-  font-size: 13px;
+  font-size: 13pt;
 }
 .a4-content{
   margin-left: 3cm;
@@ -71,6 +69,9 @@ body {
 }
 .a4-tab{
   margin-left: 1.2cm;
+}
+.heading-1 {
+  text-align: center;
 }
 .a4-mota div p{
   text-indent: 1.2cm;
@@ -116,11 +117,4 @@ body {
 #myTable td,
 th {
   padding: 10px;
-}
-.a4-size {
-  width: 210mm; /* Width of A4 paper */
-  height: 297mm; /* Height of A4 paper */
-  border: 1px solid #000; /* Optional border */
-  box-sizing: border-box; /* Include padding and border in width and height */
-  margin: 20px auto; /* Center the div horizontally */
 }
