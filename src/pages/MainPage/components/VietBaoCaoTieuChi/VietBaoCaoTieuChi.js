@@ -49,13 +49,14 @@ import {
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
 import './VietBaoCao.css'
-import { getPhongBanById, getTieuChiById, getTieuChuanById, savePhieuDanhGiaTieuChi } from "../../../../services/apiServices";
+import { getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi, getPhongBanById, getTieuChiById, getTieuChuanById, savePhieuDanhGiaTieuChi } from "../../../../services/apiServices";
 const VietBaoCaoTieuChi = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
     const TieuChi_ID = queryParams.get('TieuChi_ID');
     const idPhongBan = queryParams.get('NhomCongTac');
+    const [phieuDanhGia, setPhieuDanhGia] = useState(null)
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -96,6 +97,28 @@ const VietBaoCaoTieuChi = () => {
 
             const response_3 = await getPhongBanById(idPhongBan);
             setNhomCongTac(response_3);
+
+            const response_4 = await getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi(TieuChuan_ID, TieuChi_ID)
+            console.log(response_4)
+            if(response_4){
+                setPhieuDanhGia(response_4)
+                setMoTa(response_4.moTa)
+                setDiemManh(response_4.diemManh)
+                setDiemYeu(response_4.diemTonTai)
+
+                setFormData({
+                    noiDungKhacPhuc: response_4.noiDungKhacPhuc,
+                    donViKhacPhuc: response_4.donViKhacPhuc,
+                    thoiGianKhacPhuc: response_4.thoiGianKhacPhuc,
+                    ghiChuKhacPhuc: response_4.ghiChuKhacPhuc,
+                    noiDungPhatHuy: response_4.noiDungPhatHuy,
+                    donViPhatHuy: response_4.donViPhatHuy,
+                    thoiGianPhatHuy: response_4.thoiGianPhatHuy,
+                    ghiChuPhatHuy: response_4.ghiChuPhatHuy,
+                    mucDanhGia: response_4.mucDanhGia
+                })
+                
+            }
         };
         fetchData();
     }, [TieuChuan_ID, TieuChi_ID, idPhongBan]);
@@ -397,18 +420,18 @@ const VietBaoCaoTieuChi = () => {
             data.append('ghiChuPhatHuy', formData.ghiChuPhatHuy);
             data.append('mucDanhGia', formData.mucDanhGia);
 
+            if(phieuDanhGia === null){
             const response = await savePhieuDanhGiaTieuChi(data);
             if(response === "OK"){
-                alert(response)
+                alert('Lưu thành công')
+            }}else{
+                data.append('idPhieuDanhGia', phieuDanhGia.idPhieuDanhGiaTieuChi)
             }
 
         } catch (error) {
 
         }
     }
-
-
-
     return (
         <div className="content bg-white m-3 p-4">
             <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b></p>
@@ -426,6 +449,7 @@ const VietBaoCaoTieuChi = () => {
                                     config={editorConfig}
                                     onReady={handleEditorReady}
                                     onChange={handleEditorChange}
+                                    data={moTa}
                                 />
                             )}
                         </div>
@@ -455,6 +479,7 @@ const VietBaoCaoTieuChi = () => {
                                     editor={ClassicEditor}
                                     config={editorConfig}
                                     onChange={handleSetDiemManh}
+                                    data={diemManh}
                                 />
                             )}
                         </div>
@@ -473,6 +498,7 @@ const VietBaoCaoTieuChi = () => {
                                     editor={ClassicEditor}
                                     config={editorConfig}
                                     onChange={handleSetDiemYeu}
+                                    data={diemYeu}
                                 />
                             )}
                         </div>
@@ -563,6 +589,7 @@ const VietBaoCaoTieuChi = () => {
                         value={option}
                         id={option.toString()}
                         onChange={handleSet}
+                        checked={formData.mucDanhGia == option}
                     />
                     <label htmlFor={option.toString()}>{option}</label>
                 </div>
