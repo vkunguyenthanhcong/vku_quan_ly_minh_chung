@@ -238,7 +238,7 @@ const TieuChi = () => {
     const [error, setError] = useState(null);
     const [tieuChi, setTieuChi] = useState([]);
     const [tieuChuan, setTieuChuan] = useState([]);
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
+    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState(null);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -274,10 +274,10 @@ const TieuChi = () => {
                 `}
             </style>
             <div>
-                {chuongTrinhDaoTao.map((row, index) => (
+                {chuongTrinhDaoTao ? 
                     <p style={{ fontSize: '20px', textAlign: 'center' }}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH </b><b
-                        style={{ color: 'green' }}>{row.tenCtdt}</b></p>
-                ))}
+                        style={{ color: 'green' }}>{chuongTrinhDaoTao.tenCtdt}</b></p>
+                : 'Loading...'}
             </div>
             <TableContainer component={Paper}>
                 <Table className='font-Inter'>
