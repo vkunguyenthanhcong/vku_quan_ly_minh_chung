@@ -7,7 +7,6 @@ import {
     getAllGoiYWithIdMocChuan,
     getAllMocChuanWithIdTieuChi,
     getAllTieuChiWithIdTieuChuan, getThongTinCTDT,
-    getTieuChuanWithMaCtdt
 } from "../../../../services/apiServices";
 import PopupForm from "./PopupForm/PopupForm";
 
@@ -126,27 +125,25 @@ const DanhSachTieuChuan = () => {
     const queryParams = new URLSearchParams(location.search);
     const KhungChuongTrinhID = queryParams.get('KhungCTDT_ID');
 
-    const [tieuChuan, setTieuChuan] = useState([]);
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
+    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState();
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const fetchData = async () => {
-        try {
-            const result = await getTieuChuanWithMaCtdt(KhungChuongTrinhID);
-            const result_1 = await getThongTinCTDT(KhungChuongTrinhID);
-            setTieuChuan(result);
-            setChuongTrinhDaoTao(result_1);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result_1 = await getThongTinCTDT(KhungChuongTrinhID);
+                setChuongTrinhDaoTao(result_1);
+            } catch (error) {
+                setError(error);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchData();
-    }, []);
+    }, [KhungChuongTrinhID]);
+    if(loading === true) {return (<p>Loading...</p>)}
     return (
         <div className="content" style={{ background: "white", margin: '20px' }}>
             <style>
@@ -164,7 +161,7 @@ const DanhSachTieuChuan = () => {
                 `}
             </style>
             <p className='text-center' style={{ fontSize: '20px' }}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH <span
-                    style={{ color: colors.secondary }}>{chuongTrinhDaoTao.tenCtdt}</span></b></p>
+                    style={{ color: colors.secondary }}>{chuongTrinhDaoTao ? chuongTrinhDaoTao.tenCtdt : 'Loading...'}</span></b></p>
             <TableContainer component={Paper}>
                 <Table className='font-Inter'>
                     <TableHead id="table-row-color">
@@ -173,14 +170,14 @@ const DanhSachTieuChuan = () => {
                         <TableCell style={{ width: '35%' }}>Mốc chuẩn để tham chiếu để đánh giá tiêu chí đạt mức 4</TableCell>
                         <TableCell style={{ width: '35%' }}>Các gợi ý bắt buộc</TableCell>
                     </TableHead>
-                    {tieuChuan.map((row, index) => (
+                    {chuongTrinhDaoTao ? chuongTrinhDaoTao.tieuChuan.map((row, index) => (
                         <TableBody>
                             <TableRow>
                                 <TableCell style={{ backgroundColor: colors.grayColorLess, fontSize: '16px' }} colSpan={4}><b>Tiêu chuẩn {index + 1}. {row.tenTieuChuan}</b></TableCell>
                             </TableRow>
                             <ListTieuChi idTieuChuan={row.idTieuChuan} stt={index + 1} />
                         </TableBody>
-                    ))}
+                    )) : 'Loading...'}
                 </Table>
             </TableContainer>
 

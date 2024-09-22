@@ -8,7 +8,9 @@ import {
     getThongTinCTDT,
     getAllMocChuanWithIdTieuChi, getAllGoiYWithIdMocChuan, deleteMinhChung,
     getTotalMinhChungWithTieuChi,
-    getAllMinhChungAndTieuChi
+    getAllMinhChungAndTieuChi,
+    getTieuChiByMaCtdt,
+    getTieuChuanWithMaCtdt
 } from '../../../../services/apiServices';
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
@@ -205,7 +207,7 @@ const TotalTieuChi = ({ idTieuChi }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [total, setTotal] = useState([]);
+    const [total, setTotal] = useState(0);
     useEffect(() => {
         setLoading(true);
         const fetchDataFromAPI = async () => {
@@ -222,13 +224,7 @@ const TotalTieuChi = ({ idTieuChi }) => {
     }, [idTieuChi]);
     return (
         <>
-            {total.length > 0 ? (
-
-                total.map((item) => (
-                    <p>{item.total}</p>
-                ))
-
-            ) : (null)}
+             <p>{total}</p>
         </>
     )
 }
@@ -236,9 +232,8 @@ const TotalTieuChi = ({ idTieuChi }) => {
 const TieuChi = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [tieuChi, setTieuChi] = useState([]);
-    const [tieuChuan, setTieuChuan] = useState([]);
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState(null);
+    const [tieuChuan, setTieuChuan] = useState(null);
+    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState(null)
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -248,12 +243,11 @@ const TieuChi = () => {
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
-                const result = await getAllTieuChiWithIdTieuChuan(TieuChuan_ID);
-                const result_1 = await getTieuChuanById(TieuChuan_ID);
-                const result_2 = await getThongTinCTDT(KhungCTDT_ID);
-                setTieuChi(result);
-                setTieuChuan(result_1);
-                setChuongTrinhDaoTao(result_2);
+                const response = await getThongTinCTDT(KhungCTDT_ID);
+                const response_2 = await getTieuChuanById(TieuChuan_ID);
+                setChuongTrinhDaoTao(response)
+                setTieuChuan(response_2);
+                
             } catch (error) {
                 setError(error);
             } finally {
@@ -293,9 +287,9 @@ const TieuChi = () => {
                     </TableHead>
                     <TableBody>
                         <TableRow>
-                            <TableCell colSpan={6}><b>Tiêu chuẩn {tieuChuan.stt}. {tieuChuan.tenTieuChuan}</b></TableCell>
+                            <TableCell colSpan={6}><b>Tiêu chuẩn {tieuChuan ? tieuChuan.stt : 'Loading...'}. {tieuChuan ? tieuChuan.tenTieuChuan : 'Loading...'}</b></TableCell>
                         </TableRow>
-                        {tieuChi.map((row, index) => (
+                        {tieuChuan ? tieuChuan.tieuChi.map((row, index) => (
                             <TableRow key={row.id} className="border-gray">
                                 <TableCell style={{ verticalAlign: 'top' }}><b>{tieuChuan.stt}.{index + 1}</b> {row.tenTieuChi}</TableCell>
                                 <TableCell style={{ verticalAlign: 'top' }}>{row.yeuCau.split(/(?=\d+\.\s)/).map((item, index) => (
@@ -306,7 +300,7 @@ const TieuChi = () => {
                                 </TableCell>
                                 <TableCell style={{ verticalAlign: 'top' }}><TotalTieuChi idTieuChi={row.idTieuChi} /></TableCell>
                             </TableRow>
-                        ))}
+                        )) : 'Loading...'}
                     </TableBody>
                 </Table>
             </TableContainer>

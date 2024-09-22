@@ -232,6 +232,17 @@ export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
             throw error;
         });
 };
+//Tong minh chung trong tieu chuan
+export const getTotalMinhChungWithTieuChuan = (idTieuChuan, token) => {
+    return api.get(`/minhchung/CountMinhChungByTieuChuan/${idTieuChuan}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error :', error);
+            throw error;
+        });
+};
 // Data Moc Chuan theo Tieu Chi
 export const getAllMocChuanWithIdTieuChi = (idTieuChi, token) => {
     return api.get(`/mocchuan/findByIdTieuChi/${idTieuChi}`, {
@@ -664,9 +675,35 @@ export const savePhieuDanhGiaTieuChi = (formData, token) => {
             throw error;
         });
 };
+//update phieu danh gia tieu chi
+export const updatePhieuDanhGiaTieuChi = (formData, token) => {
+    return api.put('/phieudanhgiatieuchi', formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //get phieu danh gia by idTieuChuan va idTieuChi
 export const getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi = (idTieuChuan, idTieuChi, token) => {
     return api.get(`/phieudanhgiatieuchi/findByTieuChuanAndTieuChi?idTieuChuan=${idTieuChuan}&idTieuChi=${idTieuChi}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//get phieu danh gia by maCtdt
+export const getPhieuDanhGiaTieuChiByMaCtdt = (maCtdt, token) => {
+    return api.get(`/phieudanhgiatieuchi/findByMaCtdt?maCtdt=${maCtdt}`, {
         headers: {
             Authorization: `Bearer ${token}`
         }

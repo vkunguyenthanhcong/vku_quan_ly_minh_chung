@@ -121,7 +121,7 @@ const MinhChung = () => {
     const saveFromKMCtoMC = async (idKmc) => {
         if (tieuChi !== "") {
             try {
-                const response = await getTieuChuanById(tieuChi.idTieuChuan);
+                const response = await getTieuChuanById(TieuChuan_ID);
 
                 if (response) {
                     const dataMinhChung = new FormData();

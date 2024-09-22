@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi } from "../../services/apiServices";
 import { useLocation } from "react-router-dom";
 import { saveAs } from 'file-saver';
-import { Document, Packer, Paragraph, TextRun, AlignmentType, Indent, ExternalHyperlink, LevelFormat, Table, TableCell, TableRow, WidthType, VerticalAlign, VerticalAlignElement, convertInchesToTwip } from 'docx';
+import { Document, Packer, Paragraph, TextRun, AlignmentType, ExternalHyperlink, LevelFormat, Table, TableCell, TableRow, WidthType, VerticalAlign, convertInchesToTwip } from 'docx';
 const DanhGiaTieuChi = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -183,7 +183,7 @@ const DanhGiaTieuChi = () => {
                 }),
               ],
               spacing: {
-                after : 360,
+                after: 360,
                 line: 360,
               },
               alignment: AlignmentType.CENTER,
@@ -215,7 +215,7 @@ const DanhGiaTieuChi = () => {
                 })
               ],
               spacing: {
-                
+
                 line: 360,
               },
               indent: {
@@ -233,7 +233,7 @@ const DanhGiaTieuChi = () => {
                 })
               ],
               spacing: {
-                
+
                 line: 360,
               },
               indent: {
@@ -426,7 +426,7 @@ const DanhGiaTieuChi = () => {
             spacing: {
               line: 360
             },
-            
+
           }),
         ],
         width: {
@@ -434,11 +434,11 @@ const DanhGiaTieuChi = () => {
           type: WidthType.DXA,
         },
         margins: {
-        top: convertInchesToTwip(0.1),
-        bottom: convertInchesToTwip(0.1),
-        right: convertInchesToTwip(0.1),
-        left: convertInchesToTwip(0.1),
-      },
+          top: convertInchesToTwip(0.1),
+          bottom: convertInchesToTwip(0.1),
+          right: convertInchesToTwip(0.1),
+          left: convertInchesToTwip(0.1),
+        },
       }));
 
       rows.push(new TableRow({
@@ -466,7 +466,6 @@ const DanhGiaTieuChi = () => {
       1300,
       1300,
     ];
-  
     // First row with colspan 7
     const headerCell = new TableCell({
       children: [
@@ -480,9 +479,9 @@ const DanhGiaTieuChi = () => {
             }),
           ],
           spacing: {
-            before : 100,
-          line: 360, // Adjust the margin as needed (in 1/20 pt)
-        },
+            before: 100,
+            line: 360, // Adjust the margin as needed (in 1/20 pt)
+          },
           alignment: AlignmentType.CENTER,
         }),
       ],
@@ -491,13 +490,13 @@ const DanhGiaTieuChi = () => {
         type: WidthType.DXA,
       },
       verticalAlignment: VerticalAlign.CENTER, // Center vertically
-      columnSpan: 7, 
+      columnSpan: 7,
     });
-  
+
     rows.push(new TableRow({
       children: [headerCell], // First row with colspan
     }));
-  
+
     // Data rows
     const numberCells = Array.from({ length: 7 }, (_, index) => new TableCell({
       children: [
@@ -510,9 +509,9 @@ const DanhGiaTieuChi = () => {
             }),
           ],
           spacing: {
-            before : 100,
-          line: 360, // Adjust the margin as needed (in 1/20 pt)
-        },
+            before: 100,
+            line: 360, // Adjust the margin as needed (in 1/20 pt)
+          },
           alignment: AlignmentType.CENTER,
         }),
       ],
@@ -522,12 +521,12 @@ const DanhGiaTieuChi = () => {
       },
       verticalAlignment: VerticalAlign.CENTER,
     }));
-  
+
     rows.push(new TableRow({
       children: numberCells,
     }));
     const checkCells = Array.from({ length: 7 }, (_, index) => {
-      const cellText = (index+1 == n) ? "X" : "";
+      const cellText = (index + 1 == n) ? "X" : "";
       return new TableCell({
         children: [
           new Paragraph({
@@ -540,9 +539,9 @@ const DanhGiaTieuChi = () => {
             ],
             alignment: AlignmentType.CENTER,
             spacing: {
-              before : 100,
-            line: 360, // Adjust the margin as needed (in 1/20 pt)
-          },
+              before: 100,
+              line: 360, // Adjust the margin as needed (in 1/20 pt)
+            },
           }),
         ],
         width: {
@@ -563,19 +562,26 @@ const DanhGiaTieuChi = () => {
       },
     });
   };
-  
+
 
 
   return (
     <>
       <div ref={contentRef} className="a4-size" id="phieudanhgia">
+      <style>
+                {`
+                td{
+                    color : black !important;
+                }
+                `}
+            </style>
         <div className="a4-content">
           <p className="heading-1">
             <b style={{ fontSize: '14pt' }}>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b>
           </p>
-          <p className="a4-tab"><b>Nhóm công tác: {phieuDanhGia ? phieuDanhGia.phongBan.tenPhongBan : 'Loading...'}</b></p>
-          <p className="a4-tab"><b>Tiêu chuẩn: {phieuDanhGia ? phieuDanhGia.tieuChuan.tenTieuChuan : 'Loading...'}</b></p>
-          <p className="a4-tab"><b>Tiêu chí: {phieuDanhGia ? phieuDanhGia.tieuChi.tenTieuChi : 'Loading...'}</b></p>
+          <p className="a4-tab mt-3" style={{ textAlign: "justify" }}><b>Nhóm công tác: {phieuDanhGia ? phieuDanhGia.phongBan.tenPhongBan : 'Loading...'}</b></p>
+          <p className="a4-tab" style={{ textAlign: "justify" }}><b>Tiêu chuẩn: {phieuDanhGia ? phieuDanhGia.tieuChuan.tenTieuChuan : 'Loading...'}</b></p>
+          <p className="a4-tab" style={{ textAlign: "justify" }}><b>Tiêu chí: {phieuDanhGia ? phieuDanhGia.tieuChi.tenTieuChi : 'Loading...'}</b></p>
           <p className="a4-tab"><b>1. Mô tả</b></p>
           <p className="a4-mota">{phieuDanhGia ? (
             <div dangerouslySetInnerHTML={{ __html: phieuDanhGia.moTa }} />
@@ -588,17 +594,150 @@ const DanhGiaTieuChi = () => {
           ) : (
             'Loading...'
           )}</p>
-          <p className="a4-tab"><b>3. Điểm tồn tai</b></p>
+          <p className="a4-tab"><b>3. Điểm tồn tại</b></p>
           <p className="a4-mota">{phieuDanhGia ? (
             <div dangerouslySetInnerHTML={{ __html: phieuDanhGia.diemTonTai }} />
           ) : (
             'Loading...'
           )}</p>
           <p className="a4-tab"><b>4. Kế hoạch hành động</b></p>
+          <tables style={{ borderCollapse: "collapse" }} className="mt-2">
+            <thead>
+              <tr>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}>TT</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}>Mục tiêu</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}>Nội dung</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}>Đơn vị/ cá nhân thực hiện</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}>Thời gian thực hiện hoặc hoàn thành</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}>Ghi chú</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "left"
+                }}>1</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "left"
+                }}>Khắc phục tồn tại</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.noiDungKhacPhuc : ''}</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px", textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.donViKhacPhuc : ''}</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px", textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.thoiGianKhacPhuc : ''}</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px", textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.ghiChuKhacPhuc : ''}</td>
+              </tr>
+              <tr>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "left"
+                }}>2</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "left"
+                }}>Phát huy điểm mạnh</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.noiDungPhatHuy : ''}</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.donViPhatHuy : ''}</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.thoiGianPhatHuy : ''}</td>
+                <td style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "justify"
+                }}>{phieuDanhGia ? phieuDanhGia.ghiChuPhatHuy : ''}</td>
+              </tr>
+            </tbody>
+          </tables>
+          <p className="a4-tab mt-2"><b>5. Mức đánh giá tiêu chí</b></p>
+          <table style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <td colSpan={7} style={{
+                  border: "1px solid black",
+                  padding: "8px",
+                  textAlign: "center"
+                }}><b>Thang đánh giá</b></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                  <td key={num} style={{
+                    border: "1px solid black",
+                    padding: "8px",
+                    textAlign: "center"
+                  }}>{num}</td>
+                ))}
+              </tr>
+              <tr>
+                {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                  <td key={num} style={{
+                    border: "1px solid black",
+                    padding: "8px",
+                    textAlign: "center"
+                  }}>
+                    {num === (phieuDanhGia ? phieuDanhGia.mucDanhGia : 1) ? "X" : ""}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
         </div>
 
       </div>
-      <button onClick={handleExportToDocx}>Export to DOCX</button>
+      <button onClick={handleExportToDocx} style={{position : "fixed", bottom : "20px", right : "20px",cursor : "pointer"}} className="btn btn-success">Xuất File Word</button>
     </>
 
   );
