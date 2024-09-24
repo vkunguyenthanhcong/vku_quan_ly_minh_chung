@@ -18,52 +18,6 @@ const BaoCaoTuDanhGia = () => {
     const doc = parser.parseFromString(html, 'text/html');
     const paragraphs = [];
 
-    const createTextRun = (node) => {
-      // Initialize text run properties
-      let textRunConfig = {
-        text: node.textContent || '',
-        size: 26,
-        font: "Times New Roman",
-      };
-
-      // Check if the node is bold or italic or both
-      if (node.nodeName === 'B' || node.nodeName === 'STRONG') {
-        textRunConfig.bold = true;
-      }
-      if (node.nodeName === 'I' || node.nodeName === 'EM') {
-        textRunConfig.italics = true;
-      }
-
-      // Return the configured TextRun
-      return new TextRun(textRunConfig);
-    };
-
-    const parseChildNodes = (nodes) => {
-      const textRuns = [];
-
-      nodes.forEach((child) => {
-        if (child.nodeType === Node.TEXT_NODE) {
-          // Add normal text
-          textRuns.push(new TextRun({
-            text: child.textContent || '',
-            size: 26,
-            font: "Times New Roman"
-          }));
-        } else if (child.nodeType === Node.ELEMENT_NODE) {
-          // Handle nested elements
-          if (child.nodeName === 'B' || child.nodeName === 'I' || child.nodeName === 'STRONG' || child.nodeName === 'EM') {
-            // Recursively process the child nodes inside <b>, <i>, <strong>, <em>
-            textRuns.push(...parseChildNodes(child.childNodes));
-          } else {
-            // Handle other types of elements if necessary
-            textRuns.push(createTextRun(child));
-          }
-        }
-      });
-
-      return textRuns;
-    };
-
     // Function to create TextRun for different node types
     const createTextRun = (node, isBold = false, isItalic = false, isUnderline = false) => {
       const text = node.textContent || '';
@@ -138,85 +92,31 @@ const BaoCaoTuDanhGia = () => {
     // Function to parse each node in the HTML and handle <p>, <ul>, <li>, and nested structures
     const parseNode = (node) => {
       if (node.nodeName === 'P') {
+        // Paragraph with possible nested <strong>, <i>, <u>, <a>
+        const textRuns = parseChildNodes(node.childNodes);
         paragraphs.push(new Paragraph({
-          children: [
-            new TextRun({
-              text: node.textContent || '',
-              size: 26,
-              font: "Times New Roman"
-            }),
-          ],
-          indent: {
-            firstLine: 720, // Indent for list items
-          },
-          spacing: {
-            line: 360, // 360 twips = 18pt line spacing (1.5 lines)
-          },
+          children: textRuns,
+          indent: { firstLine: 720 }, // Indent for paragraph
+          spacing: { line: 360 }, // 1.5 line spacing
           alignment: AlignmentType.JUSTIFIED,
         }));
       } else if (node.nodeName === 'UL') {
+        // Unordered list, handle <li> items
         node.childNodes.forEach((li) => {
           if (li.nodeName === 'LI') {
-            const textRuns = [];
-
-            li.childNodes.forEach((child) => {
-              if (child.nodeName === 'A') {
-                const linkUrl = child.getAttribute('href');
-                const linkText = child.textContent || '';
-
-                textRuns.push(new ExternalHyperlink({
-                  children: [
-                    new TextRun({
-                      text: linkText,
-                      color: '0000FF',
-                      size: 26,
-                      font: "Times New Roman",
-                    })
-                  ],
-                  link: linkUrl,
-                  spacing: {
-                    line: 360, // 360 twips = 18pt line spacing (1.5 lines)
-                  }
-                }));
-              } else {
-                textRuns.push(new TextRun({
-                  text: child.textContent || '',
-                  size: 26,
-                  font: "Times New Roman",
-                }));
-              }
-            });
-
+            const textRuns = parseChildNodes(li.childNodes);
             paragraphs.push(new Paragraph({
               children: textRuns,
-              numbering: {
-                reference: "my-unique-bullet-points",
-                level: 0,
-              },
+              numbering: { reference: "my-unique-bullet-points", level: 0 },
+              indent: { firstLine: 720 }, // Indent for list items
               spacing: { line: 360 },
-              indent: {
-                firstLine: 720, // Indent for list items
-              },
-              alignment: AlignmentType.JUSTIFIED,
             }));
           }
         });
-      } else if (node.nodeName === 'A') {
-        const linkUrl = node.getAttribute('href');
-        const linkText = node.textContent || '';
-
-        paragraphs.push(new Paragraph({
-          children: [
-            new TextRun({
-              text: linkText, // Simulate hyperlink style
-              color: '0000FF', // Blue color
-            }),
-          ],
-          hyperlink: linkUrl, // Link URL
-        }));
       }
     };
 
+    // Process the child nodes of the body (including <p>, <ul>, etc.)
     doc.body.childNodes.forEach((node) => {
       parseNode(node);
     });
@@ -265,7 +165,7 @@ const BaoCaoTuDanhGia = () => {
             new TextRun({
               text: header,
               size: 26,
-font: "Times New Roman",
+              font: "Times New Roman",
               bold: true
             }),
           ],
@@ -381,7 +281,7 @@ font: "Times New Roman",
     const rows = [new TableRow({ children: headerCells })];
     // Create the initial score row
     const initialCells = [
-`Tiêu chuẩn ${sttTieuChuan}`,
+      `Tiêu chuẩn ${sttTieuChuan}`,
       `${score / total}`
     ].map((text, cellIndex) => new TableCell({
       children: [
@@ -494,7 +394,8 @@ font: "Times New Roman",
             data.tieuChi.idTieuChi === tieuChiItem.idTieuChi
         )
         : [];
-return [
+
+      return [
         new Paragraph({
           children: [
             new TextRun({
@@ -605,7 +506,7 @@ return [
       new Paragraph({
         children: [],
         spacing: {
-line: 360, // Có thể điều chỉnh giá trị này để tạo khoảng cách lớn hơn nếu cần
+          line: 360, // Có thể điều chỉnh giá trị này để tạo khoảng cách lớn hơn nếu cần
         },
       }),
 
@@ -716,7 +617,7 @@ line: 360, // Có thể điều chỉnh giá trị này để tạo khoảng cá
   const goToVietBaoCao = () => {
     navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
   }
-return (
+  return (
     <div className="content bg-white m-3 p-4">
       <p>BÁO CÁO TỰ ĐÁNH GIÁ <b>{chuongTrinhDaoTao.tenCtdt}</b></p>
       <b>Kế hoạch</b>
