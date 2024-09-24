@@ -9,35 +9,18 @@ import {Link, useLocation, useNavigate} from 'react-router-dom';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import './ListEvidence.css';
 import {
-    getAllTieuChiWithIdTieuChuan,
+    getAllTieuChiWithIdTieuChuan, getMinhChungByMaCtdt,
     getMinhChungWithIdTieuChi,
     getTieuChuanWithMaCtdt
 } from "../../services/apiServices";
 import { saveAs } from 'file-saver';
 
-const MinhChung = ({ criteriaID }) => {
-    const [minhChung, setMinhChung] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    useEffect(() => {
-        const fetchMinhChung = async () => {
-            try {
-                const result = await getMinhChungWithIdTieuChi(criteriaID);
-                setMinhChung(result);
-            } catch (error) {
-                setError(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchMinhChung();
-    }, [criteriaID]);
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
+const MinhChung = ({ criteriaID, minhChung }) => {
+    const filter = minhChung.filter(item => item.idTieuChi === criteriaID);
     return (
         <>
-            {minhChung.map((row, index) => (
-                <tr>
+            {filter.map((row, index) => (
+                <tr key={row.idMc}>
                     <td></td>
                     <td>{index + 1}</td>
                     <td><Link style={{textDecoration : 'none', color : 'black'}} to={row.linkLuuTru}>{row.parentMaMc}{row.childMaMc}</Link></td>
@@ -50,7 +33,7 @@ const MinhChung = ({ criteriaID }) => {
         </>
     );
 };
-const TieuChi = ({standardID, numberNO}) => {
+const TieuChi = ({standardID, numberNO, minhChung}) => {
     const [tieuChi, setTieuChi] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -77,7 +60,7 @@ const TieuChi = ({standardID, numberNO}) => {
                         <td className='bold-italic'>Tiêu chí {numberNO}.{index + 1}</td>
                         <td className='bold' colSpan={6}>{row.tenTieuChi}</td>
                     </tr>
-                    <MinhChung criteriaID={row.idTieuChi} />
+                    <MinhChung criteriaID={row.idTieuChi} minhChung = {minhChung}/>
                 </React.Fragment>
             ))}
         </>
@@ -88,16 +71,32 @@ pdfMake.vfs = {
   };
 
 const ListEvidence = () => {
-    
-
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const KhungDaoTao_ID = queryParams.get('KhungDaoTao_ID');
-    
+    const [tieuChuan, setTieuChuan] = useState([]);
+    const [minhChung, setMinhChung] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchTieuChuan = async () => {
+            try {
+                const result = await getTieuChuanWithMaCtdt(KhungDaoTao_ID);
+                setTieuChuan(result);
+                const response = await getMinhChungByMaCtdt(KhungDaoTao_ID);
+                setMinhChung(response)
+            } catch (error) {
+                setError(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTieuChuan();
+    }, []);
     const exportToWord = () => {
         const table = document.getElementById('myTable');
     let html = table.outerHTML;
-
     // Add CSS styles to the HTML
     html = `
       <html>
@@ -123,7 +122,7 @@ const ListEvidence = () => {
     a.download = 'table.docx';
     a.click();
       };
-      const exportToPDF = () => {
+    const exportToPDF = () => {
         // Tải file pdfMakeVFS.json từ thư mục public
         fetch('/pdfMakeVFS.json')  // Sử dụng đường dẫn tương đối đến tệp JSON
           .then(response => response.json())
@@ -228,33 +227,6 @@ const ListEvidence = () => {
           })
           .catch(error => console.error('Lỗi khi tải pdfMakeVFS.json:', error));
     };
-    
-    
-    
-    
-    
-        
-
-    const [tieuChuan, setTieuChuan] = useState([]);
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    const fetchTieuChuan = async () => {
-        try {
-            const result = await getTieuChuanWithMaCtdt(KhungDaoTao_ID);
-            setTieuChuan(result);
-        } catch (error) {
-            setError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-    useEffect(() => {
-        fetchTieuChuan();
-    }, []); 
     const exportToExcel = async () => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Sheet1');
@@ -384,8 +356,6 @@ const ListEvidence = () => {
         const buffer = await workbook.xlsx.writeBuffer();
         saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'styled_table_with_borders.xlsx');
     };
-    
-    
     return (
         <Container fluid style={{ height: '100vh' }}>
             <h1 className='font'><b>DANH MỤC MINH CHỨNG</b></h1>
@@ -408,10 +378,9 @@ const ListEvidence = () => {
                 <td><b>Tiêu chuẩn {index + 1}</b></td>
                 <td colSpan={6}><b>{row.tenTieuChuan}</b></td>
               </tr>
-              <TieuChi standardID={row.idTieuChuan} numberNO={index + 1} />
+              <TieuChi standardID={row.idTieuChuan} numberNO={index + 1} minhChung = {minhChung}/>
             </React.Fragment>
           ))}
-
         </tbody>
       </table>
             <footer style={{ 
