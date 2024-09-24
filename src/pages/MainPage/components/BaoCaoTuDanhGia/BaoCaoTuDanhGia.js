@@ -18,93 +18,129 @@ const BaoCaoTuDanhGia = () => {
     const doc = parser.parseFromString(html, 'text/html');
     const paragraphs = [];
 
+    const createTextRun = (node) => {
+      // Initialize text run properties
+      let textRunConfig = {
+        text: node.textContent || '',
+        size: 26,
+        font: "Times New Roman",
+      };
+
+      // Check if the node is bold or italic or both
+      if (node.nodeName === 'B' || node.nodeName === 'STRONG') {
+        textRunConfig.bold = true;
+      }
+      if (node.nodeName === 'I' || node.nodeName === 'EM') {
+        textRunConfig.italics = true;
+      }
+
+      // Return the configured TextRun
+      return new TextRun(textRunConfig);
+    };
+
+    const parseChildNodes = (nodes) => {
+      const textRuns = [];
+
+      nodes.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          // Add normal text
+          textRuns.push(new TextRun({
+            text: child.textContent || '',
+            size: 26,
+            font: "Times New Roman"
+          }));
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          // Handle nested elements
+          if (child.nodeName === 'B' || child.nodeName === 'I' || child.nodeName === 'STRONG' || child.nodeName === 'EM') {
+            // Recursively process the child nodes inside <b>, <i>, <strong>, <em>
+            textRuns.push(...parseChildNodes(child.childNodes));
+          } else {
+            // Handle other types of elements if necessary
+            textRuns.push(createTextRun(child));
+          }
+        }
+      });
+
+      return textRuns;
+    };
+
     const parseNode = (node) => {
       if (node.nodeName === 'P') {
+        // Paragraph with possible nested elements
+        const textRuns = parseChildNodes(node.childNodes);
+
         paragraphs.push(new Paragraph({
-          children: [
-            new TextRun({
-              text: node.textContent || '',
-              size: 26,
-              font: "Times New Roman"
-            }),
-          ],
+          children: textRuns,
           indent: {
-            firstLine: 720, // Indent for list items
+            firstLine: 720, // Indent for paragraph
           },
           spacing: {
-            line: 360, // 360 twips = 18pt line spacing (1.5 lines)
+            line: 360, // 1.5 line spacing
           },
-          alignment: AlignmentType.JUSTIFIED,
+alignment: AlignmentType.JUSTIFIED,
         }));
-      } else if (node.nodeName === 'UL') {
+      } else if (node.nodeName === 'UL' || node.nodeName === 'OL') {
+        // Handle lists
         node.childNodes.forEach((li) => {
           if (li.nodeName === 'LI') {
-            const textRuns = [];
-
-            li.childNodes.forEach((child) => {
-              if (child.nodeName === 'A') {
-                const linkUrl = child.getAttribute('href');
-                const linkText = child.textContent || '';
-
-                textRuns.push(new ExternalHyperlink({
-                  children: [
-                    new TextRun({
-                      text: linkText,
-                      color: '0000FF',
-                      size: 26,
-                      font: "Times New Roman",
-                    })
-                  ],
-                  link: linkUrl,
-                  spacing: {
-                    line: 360, // 360 twips = 18pt line spacing (1.5 lines)
-                  }
-                }));
-              } else {
-                textRuns.push(new TextRun({
-                  text: child.textContent || '',
-                  size: 26,
-                  font: "Times New Roman",
-                }));
-              }
-            });
+            const textRuns = parseChildNodes(li.childNodes);
 
             paragraphs.push(new Paragraph({
               children: textRuns,
               numbering: {
-                reference: "my-unique-bullet-points",
-                level: 0,
+                reference: node.nodeName === 'UL' ? "my-unique-bullet-points" : "my-unique-numbering",
+                level: 0
               },
               spacing: { line: 360 },
               indent: {
-                firstLine: 720, // Indent for list items
+                firstLine: 720 // Indent for list items
               },
-              alignment: AlignmentType.JUSTIFIED,
+              alignment: AlignmentType.LEFT
             }));
           }
         });
       } else if (node.nodeName === 'A') {
+        // Handle hyperlinks
         const linkUrl = node.getAttribute('href');
         const linkText = node.textContent || '';
 
         paragraphs.push(new Paragraph({
           children: [
             new TextRun({
-              text: linkText, // Simulate hyperlink style
-              color: '0000FF', // Blue color
-            }),
+              text: linkText,
+              color: '0000FF', // Blue for hyperlink
+              size: 26,
+              font: "Times New Roman"
+            })
           ],
-          hyperlink: linkUrl, // Link URL
+          hyperlink: linkUrl // Link URL
         }));
+      } else {
+        // Handle other plain text nodes
+        if (node.textContent.trim()) {
+          paragraphs.push(new Paragraph({
+            children: [
+              new TextRun({
+                text: node.textContent.trim(),
+                size: 26,
+                font: "Times New Roman"
+              })
+            ],
+            spacing: { line: 360 },
+            alignment: AlignmentType.JUSTIFIED
+          }));
+        }
       }
     };
 
+    // Iterate through each child node in the body
     doc.body.childNodes.forEach((node) => {
       parseNode(node);
     });
 
     return paragraphs;
   };
+
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
@@ -146,7 +182,7 @@ const BaoCaoTuDanhGia = () => {
             new TextRun({
               text: header,
               size: 26,
-              font: "Times New Roman",
+font: "Times New Roman",
               bold: true
             }),
           ],
@@ -262,7 +298,7 @@ const BaoCaoTuDanhGia = () => {
     const rows = [new TableRow({ children: headerCells })];
     // Create the initial score row
     const initialCells = [
-      `Tiêu chuẩn ${sttTieuChuan}`,
+`Tiêu chuẩn ${sttTieuChuan}`,
       `${score / total}`
     ].map((text, cellIndex) => new TableCell({
       children: [
@@ -375,8 +411,7 @@ const BaoCaoTuDanhGia = () => {
             data.tieuChi.idTieuChi === tieuChiItem.idTieuChi
         )
         : [];
-
-      return [
+return [
         new Paragraph({
           children: [
             new TextRun({
@@ -487,7 +522,7 @@ const BaoCaoTuDanhGia = () => {
       new Paragraph({
         children: [],
         spacing: {
-          line: 360, // Có thể điều chỉnh giá trị này để tạo khoảng cách lớn hơn nếu cần
+line: 360, // Có thể điều chỉnh giá trị này để tạo khoảng cách lớn hơn nếu cần
         },
       }),
 
@@ -598,7 +633,7 @@ const BaoCaoTuDanhGia = () => {
   const goToVietBaoCao = () => {
     navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
   }
-  return (
+return (
     <div className="content bg-white m-3 p-4">
       <p>BÁO CÁO TỰ ĐÁNH GIÁ <b>{chuongTrinhDaoTao.tenCtdt}</b></p>
       <b>Kế hoạch</b>
