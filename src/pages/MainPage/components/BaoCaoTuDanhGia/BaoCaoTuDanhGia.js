@@ -223,21 +223,19 @@ const BaoCaoTuDanhGia = () => {
       }));
     };
 
-    filterDanhGiaTieuChuan.forEach((data, index) => {
+    filterDanhGiaTieuChuan.filter(item=>item.noiDungKhacPhuc != '').forEach((data, index) => {
       rows.push(new TableRow({
         children: createCells(data, 'KhacPhuc', index),
       }));
       stt++;
     });
 
-    filterDanhGiaTieuChuan.forEach((data, index) => {
+    filterDanhGiaTieuChuan.filter(item=>item.noiDungPhatHuy != '').forEach((data, index) => {
       rows.push(new TableRow({
         children: createCells(data, 'PhatHuy', index),
       }));
       stt++;
     });
-
-
     return new Table({
       rows: rows,
       width: {
