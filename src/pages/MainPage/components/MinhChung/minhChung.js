@@ -179,24 +179,32 @@ const MinhChung = () => {
         navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}&GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     }
     const Button_Them = ({ idKMC }) => {
-        const response = minhChung.filter(item => item.idKmc == idKMC);
+        // Lọc dữ liệu minhChung với idKMC và KhungCTDT_ID
+        const response = minhChung.filter(item => item.idKmc == idKMC && item.maCtdt == KhungCTDT_ID);
 
-        const renderDungChungButton = () => {
-
-            const dungChung = minhChung.filter(item => item.idKmc === idKMC && item.idTieuChi == TieuChi_ID);
-
+        // Component DungChung nhận props là data
+        const DungChung = ({ data }) => {
+            const filteredData = data.filter(item => item.idTieuChi == TieuChi_ID);
             return (
                 <>
-                    {dungChung.length > 0 ? (null) : (<button style={{ marginTop: '5px' }} onClick={() => saveDungChung(idKMC, response[0].idMc)} className="btn btn-success">Dùng Chung</button>)}
+                    {filteredData.length > 0 ? null : (<button onClick={() => saveDungChung(idKMC, data[0].idMc)} className="btn btn-success mt-2">Dùng chung</button>)}
                 </>
             );
         };
+
         return (
             <>
-                {response.length > 0 ? renderDungChungButton() : (<button onClick={() => saveFromKMCtoMC(idKMC)} style={{ marginTop: '5px' }} className="btn btn-success">Thêm</button>)}
+                {response.length > 0 ? (
+                    <DungChung data={response} />
+                ) : (
+                    <button onClick={() => saveFromKMCtoMC(idKMC)} style={{ marginTop: '5px' }} className="btn btn-success">
+                        Thêm
+                    </button>
+                )}
             </>
         );
     };
+
     return (
         <div
             className="content"

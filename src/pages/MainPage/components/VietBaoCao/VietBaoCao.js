@@ -121,29 +121,26 @@ const response_2 = await getTieuChuanWithMaCtdt(KhungCTDT_ID);
                                 ) : ''
                                 }
 
-                                <TableContainer component={Paper}>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow id='table-row-color'>
-                                                <TableCell className="text-white" style={{width: '10%'}}>STT</TableCell>
-                                                <TableCell className="text-white">Tiêu Chuẩn</TableCell>
-<TableCell className="text-white">Viết báo cáo</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {tieuChuan.map((item, index) => (
-                                                <React.Fragment key={index}>
-                                                    <TableRow>
-                                                        <TableCell className=""
-                                                                   style={{width: '10%'}}>{item.stt}</TableCell>
-                                                        <TableCell className=""><b>Tiêu
-                                                            chuẫn {item.stt}. {item.tenTieuChuan}</b></TableCell>
-                                                        <TableCell className=""></TableCell>
-                                                    </TableRow>
-                                                    <TieuChi idTieuChuan={item.idTieuChuan}
-                                                             phongBanUser={phongBanUser}/>
-                                                </React.Fragment>
-                                            ))}
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow id='table-row-color'>
+                                    <TableCell className="text-white" style={{ width: '10%' }}>STT</TableCell>
+                                    <TableCell className="text-white">Tiêu Chuẩn</TableCell>
+                                    <TableCell className="text-white">Viết báo cáo</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {tieuChuan.map((item, index) => (
+                                    <React.Fragment key={index}>
+                                        <TableRow>
+                                            <TableCell className="" style={{ width: '10%' }}>{item.stt}</TableCell>
+                                            <TableCell className=""><b>Tiêu chuẫn {item.stt}. {item.tenTieuChuan}</b></TableCell>
+                                            <TableCell className=""></TableCell>
+                                        </TableRow>
+                                        <TieuChi idTieuChuan={item.idTieuChuan} phongBanUser={phongBanUser} />
+                                    </React.Fragment>
+                                ))}
 
                                         </TableBody>
                                     </Table>

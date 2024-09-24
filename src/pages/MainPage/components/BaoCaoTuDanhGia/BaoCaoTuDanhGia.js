@@ -64,76 +64,159 @@ const BaoCaoTuDanhGia = () => {
       return textRuns;
     };
 
+    // Function to create TextRun for different node types
+    const createTextRun = (node, isBold = false, isItalic = false, isUnderline = false) => {
+      const text = node.textContent || '';
+
+      return new TextRun({
+        text: text,
+        bold: isBold,
+        italics: isItalic,
+        underline: isUnderline ? {} : undefined, // Underline support
+        size: 26,
+        font: "Times New Roman",
+      });
+    };
+
+    // Function to parse child nodes recursively and apply styles based on the tag
+    const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false) => {
+      const textRuns = [];
+
+      nodes.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          // Plain text
+          if (child.textContent.trim()) {
+            textRuns.push(createTextRun(child, isBold, isItalic, isUnderline));
+          }
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          switch (child.nodeName) {
+            case 'B':
+            case 'STRONG':
+              // Bold text, recursively process child nodes with bold style
+              textRuns.push(...parseChildNodes(child.childNodes, true, isItalic, isUnderline));
+              break;
+            case 'I':
+            case 'EM':
+              // Italic text, recursively process child nodes with italic style
+              textRuns.push(...parseChildNodes(child.childNodes, isBold, true, isUnderline));
+              break;
+            case 'U':
+              // Underline text, recursively process child nodes with underline style
+              textRuns.push(...parseChildNodes(child.childNodes, isBold, isItalic, true));
+              break;
+            case 'A':
+              // Hyperlink, create an ExternalHyperlink
+              const linkUrl = child.getAttribute('href');
+              const linkText = child.textContent || '';
+
+              const hyperlink = new ExternalHyperlink({
+                children: [
+                  new TextRun({
+                    text: linkText,
+                    color: '0000FF', // Blue color
+                    size: 26,
+                    font: "Times New Roman",
+                  }),
+                ],
+                link: linkUrl,
+                spacing: {
+                  line: 360, // 360 twips = 18pt line spacing (1.5 lines)
+                },
+              });
+              textRuns.push(hyperlink);
+              break;
+            default:
+              // Handle other elements recursively (e.g., <span>, <div>)
+              textRuns.push(...parseChildNodes(child.childNodes, isBold, isItalic, isUnderline));
+          }
+        }
+      });
+
+      return textRuns;
+    };
+
+    // Function to parse each node in the HTML and handle <p>, <ul>, <li>, and nested structures
     const parseNode = (node) => {
       if (node.nodeName === 'P') {
-        // Paragraph with possible nested elements
-        const textRuns = parseChildNodes(node.childNodes);
-
         paragraphs.push(new Paragraph({
-          children: textRuns,
+          children: [
+            new TextRun({
+              text: node.textContent || '',
+              size: 26,
+              font: "Times New Roman"
+            }),
+          ],
           indent: {
-            firstLine: 720, // Indent for paragraph
+            firstLine: 720, // Indent for list items
           },
           spacing: {
-            line: 360, // 1.5 line spacing
+            line: 360, // 360 twips = 18pt line spacing (1.5 lines)
           },
-alignment: AlignmentType.JUSTIFIED,
+          alignment: AlignmentType.JUSTIFIED,
         }));
-      } else if (node.nodeName === 'UL' || node.nodeName === 'OL') {
-        // Handle lists
+      } else if (node.nodeName === 'UL') {
         node.childNodes.forEach((li) => {
           if (li.nodeName === 'LI') {
-            const textRuns = parseChildNodes(li.childNodes);
+            const textRuns = [];
+
+            li.childNodes.forEach((child) => {
+              if (child.nodeName === 'A') {
+                const linkUrl = child.getAttribute('href');
+                const linkText = child.textContent || '';
+
+                textRuns.push(new ExternalHyperlink({
+                  children: [
+                    new TextRun({
+                      text: linkText,
+                      color: '0000FF',
+                      size: 26,
+                      font: "Times New Roman",
+                    })
+                  ],
+                  link: linkUrl,
+                  spacing: {
+                    line: 360, // 360 twips = 18pt line spacing (1.5 lines)
+                  }
+                }));
+              } else {
+                textRuns.push(new TextRun({
+                  text: child.textContent || '',
+                  size: 26,
+                  font: "Times New Roman",
+                }));
+              }
+            });
 
             paragraphs.push(new Paragraph({
               children: textRuns,
               numbering: {
-                reference: node.nodeName === 'UL' ? "my-unique-bullet-points" : "my-unique-numbering",
-                level: 0
+                reference: "my-unique-bullet-points",
+                level: 0,
               },
               spacing: { line: 360 },
               indent: {
-                firstLine: 720 // Indent for list items
+                firstLine: 720, // Indent for list items
               },
-              alignment: AlignmentType.LEFT
+              alignment: AlignmentType.JUSTIFIED,
             }));
           }
         });
       } else if (node.nodeName === 'A') {
-        // Handle hyperlinks
         const linkUrl = node.getAttribute('href');
         const linkText = node.textContent || '';
 
         paragraphs.push(new Paragraph({
           children: [
             new TextRun({
-              text: linkText,
-              color: '0000FF', // Blue for hyperlink
-              size: 26,
-              font: "Times New Roman"
-            })
+              text: linkText, // Simulate hyperlink style
+              color: '0000FF', // Blue color
+            }),
           ],
-          hyperlink: linkUrl // Link URL
+          hyperlink: linkUrl, // Link URL
         }));
-      } else {
-        // Handle other plain text nodes
-        if (node.textContent.trim()) {
-          paragraphs.push(new Paragraph({
-            children: [
-              new TextRun({
-                text: node.textContent.trim(),
-                size: 26,
-                font: "Times New Roman"
-              })
-            ],
-            spacing: { line: 360 },
-            alignment: AlignmentType.JUSTIFIED
-          }));
-        }
       }
     };
 
-    // Iterate through each child node in the body
     doc.body.childNodes.forEach((node) => {
       parseNode(node);
     });
