@@ -125,12 +125,8 @@ const VietBaoCaoTieuChi = () => {
                 };
             });
             setMinhChung(suggestions)
-            console.log(suggestions)
-
-            
             
             const response_4 = await getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi(TieuChuan_ID, TieuChi_ID)
-            console.log(response_4)
             if (response_4) {
                 setPhieuDanhGia(response_4)
                 setMoTa(response_4.moTa)

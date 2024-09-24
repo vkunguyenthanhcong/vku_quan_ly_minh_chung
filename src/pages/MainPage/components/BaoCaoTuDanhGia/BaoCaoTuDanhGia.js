@@ -18,93 +18,112 @@ const BaoCaoTuDanhGia = () => {
     const doc = parser.parseFromString(html, 'text/html');
     const paragraphs = [];
 
+    // Function to create TextRun for different node types
+    const createTextRun = (node, isBold = false, isItalic = false, isUnderline = false) => {
+      const text = node.textContent || '';
+
+      return new TextRun({
+        text: text,
+        bold: isBold,
+        italics: isItalic,
+        underline: isUnderline ? {} : undefined, // Underline support
+        size: 26,
+        font: "Times New Roman",
+      });
+    };
+
+    // Function to parse child nodes recursively and apply styles based on the tag
+    const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false) => {
+      const textRuns = [];
+
+      nodes.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          // Plain text
+          if (child.textContent.trim()) {
+            textRuns.push(createTextRun(child, isBold, isItalic, isUnderline));
+          }
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+          switch (child.nodeName) {
+            case 'B':
+            case 'STRONG':
+              // Bold text, recursively process child nodes with bold style
+              textRuns.push(...parseChildNodes(child.childNodes, true, isItalic, isUnderline));
+              break;
+            case 'I':
+            case 'EM':
+              // Italic text, recursively process child nodes with italic style
+              textRuns.push(...parseChildNodes(child.childNodes, isBold, true, isUnderline));
+              break;
+            case 'U':
+              // Underline text, recursively process child nodes with underline style
+              textRuns.push(...parseChildNodes(child.childNodes, isBold, isItalic, true));
+              break;
+            case 'A':
+              // Hyperlink, create an ExternalHyperlink
+              const linkUrl = child.getAttribute('href');
+              const linkText = child.textContent || '';
+
+              const hyperlink = new ExternalHyperlink({
+                children: [
+                  new TextRun({
+                    text: linkText,
+                    color: '0000FF', // Blue color
+                    size: 26,
+                    font: "Times New Roman",
+                  }),
+                ],
+                link: linkUrl,
+                spacing: {
+                  line: 360, // 360 twips = 18pt line spacing (1.5 lines)
+                },
+              });
+              textRuns.push(hyperlink);
+              break;
+            default:
+              // Handle other elements recursively (e.g., <span>, <div>)
+              textRuns.push(...parseChildNodes(child.childNodes, isBold, isItalic, isUnderline));
+          }
+        }
+      });
+
+      return textRuns;
+    };
+
+    // Function to parse each node in the HTML and handle <p>, <ul>, <li>, and nested structures
     const parseNode = (node) => {
       if (node.nodeName === 'P') {
+        // Paragraph with possible nested <strong>, <i>, <u>, <a>
+        const textRuns = parseChildNodes(node.childNodes);
         paragraphs.push(new Paragraph({
-          children: [
-            new TextRun({
-              text: node.textContent || '',
-              size: 26,
-              font: "Times New Roman"
-            }),
-          ],
-          indent: {
-            firstLine: 720, // Indent for list items
-          },
-          spacing: {
-            line: 360, // 360 twips = 18pt line spacing (1.5 lines)
-          },
+          children: textRuns,
+          indent: { firstLine: 720 }, // Indent for paragraph
+          spacing: { line: 360 }, // 1.5 line spacing
           alignment: AlignmentType.JUSTIFIED,
         }));
       } else if (node.nodeName === 'UL') {
+        // Unordered list, handle <li> items
         node.childNodes.forEach((li) => {
           if (li.nodeName === 'LI') {
-            const textRuns = [];
-
-            li.childNodes.forEach((child) => {
-              if (child.nodeName === 'A') {
-                const linkUrl = child.getAttribute('href');
-                const linkText = child.textContent || '';
-
-                textRuns.push(new ExternalHyperlink({
-                  children: [
-                    new TextRun({
-                      text: linkText,
-                      color: '0000FF',
-                      size: 26,
-                      font: "Times New Roman",
-                    })
-                  ],
-                  link: linkUrl,
-                  spacing: {
-                    line: 360, // 360 twips = 18pt line spacing (1.5 lines)
-                  }
-                }));
-              } else {
-                textRuns.push(new TextRun({
-                  text: child.textContent || '',
-                  size: 26,
-                  font: "Times New Roman",
-                }));
-              }
-            });
-
+            const textRuns = parseChildNodes(li.childNodes);
             paragraphs.push(new Paragraph({
               children: textRuns,
-              numbering: {
-                reference: "my-unique-bullet-points",
-                level: 0,
-              },
+              numbering: { reference: "my-unique-bullet-points", level: 0 },
+              indent: { firstLine: 720 }, // Indent for list items
               spacing: { line: 360 },
-              indent: {
-                firstLine: 720, // Indent for list items
-              },
-              alignment: AlignmentType.JUSTIFIED,
             }));
           }
         });
-      } else if (node.nodeName === 'A') {
-        const linkUrl = node.getAttribute('href');
-        const linkText = node.textContent || '';
-
-        paragraphs.push(new Paragraph({
-          children: [
-            new TextRun({
-              text: linkText, // Simulate hyperlink style
-              color: '0000FF', // Blue color
-            }),
-          ],
-          hyperlink: linkUrl, // Link URL
-        }));
       }
     };
 
+    // Process the child nodes of the body (including <p>, <ul>, etc.)
     doc.body.childNodes.forEach((node) => {
       parseNode(node);
     });
 
     return paragraphs;
   };
+
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
