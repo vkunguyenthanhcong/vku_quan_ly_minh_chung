@@ -49,7 +49,7 @@ import {
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
 import './VietBaoCao.css'
-import { getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi, getPhongBanById, getTieuChiById, getTieuChuanById, savePhieuDanhGiaTieuChi } from "../../../../services/apiServices";
+import { getAllMinhChung, getMinhChungWithIdTieuChi, getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi, getPhongBanById, getThongTinCTDT, getTieuChiById, getTieuChuanById, savePhieuDanhGiaTieuChi, updatePhieuDanhGiaTieuChi } from "../../../../services/apiServices";
 const VietBaoCaoTieuChi = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -67,6 +67,7 @@ const VietBaoCaoTieuChi = () => {
     const [editorInstance, setEditorInstance] = useState(null);
     const [tieuChuan, setTieuChuan] = useState([])
     const [tieuChi, setTieuChi] = useState([])
+    const [minhChung, setMinhChung] = useState([])
     const [nhomCongTac, setNhomCongTac] = useState(null)
 
     const [moTa, setMoTa] = useState('');
@@ -98,9 +99,39 @@ const VietBaoCaoTieuChi = () => {
             const response_3 = await getPhongBanById(idPhongBan);
             setNhomCongTac(response_3);
 
+            const allMinhChungData = await getAllMinhChung();
+            const response_5 = await getMinhChungWithIdTieuChi(TieuChi_ID);
+            const suggestions = response_5.map(itemB => {
+                let parentMaMc = itemB.parentMaMc;
+                let childMaMc = itemB.childMaMc;
+            
+                // Check if parentMaMc and childMaMc are "0"
+                if (parentMaMc == "0" && childMaMc == "0") {
+                    // Find the corresponding entry in arrayA using maDungChung
+                    const correspondingA = allMinhChungData.find(itemA => itemA.idMc == itemB.maDungChung);
+                    console.log(itemB.maDungChung)
+                    if (correspondingA) {
+                        parentMaMc = correspondingA.parentMaMc;
+                        childMaMc = correspondingA.childMaMc;
+                    }
+                }
+                // Combine parentMaMc and childMaMc to form maMinhChung
+                const maMinhChung = `${parentMaMc}${childMaMc}`;
+                // Return the required info
+                return {
+                    tenMinhChung: itemB.tenMinhChung,
+                    maMinhChung: maMinhChung,
+                    link: itemB.linkLuuTru
+                };
+            });
+            setMinhChung(suggestions)
+            console.log(suggestions)
+
+            
+            
             const response_4 = await getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi(TieuChuan_ID, TieuChi_ID)
             console.log(response_4)
-            if(response_4){
+            if (response_4) {
                 setPhieuDanhGia(response_4)
                 setMoTa(response_4.moTa)
                 setDiemManh(response_4.diemManh)
@@ -117,7 +148,7 @@ const VietBaoCaoTieuChi = () => {
                     ghiChuPhatHuy: response_4.ghiChuPhatHuy,
                     mucDanhGia: response_4.mucDanhGia
                 })
-                
+
             }
         };
         fetchData();
@@ -325,15 +356,10 @@ const VietBaoCaoTieuChi = () => {
                         setFilteredSuggestions([]);
                         return;
                     }
-                    // Sample suggestions
-                    const suggestions = [
-                        { tenTieuChuan: 'abc', maTieuChuan: 'H1.01.01.01', link: 'https://www.youtube.com/watch?v=IsYi0lD11Do' },
-                        { tenTieuChuan: 'def', maTieuChuan: 'H1.01.01.02', link: 'https://www.youtube.com/watch?v=IsYi0lD11Do' },
-                        // Add more data here
-                    ];
+                    
                     // Filter suggestions based on the query text
-                    const filtered = suggestions.filter(suggestion =>
-                        suggestion.maTieuChuan.startsWith(queryText)
+                    const filtered = minhChung.filter(suggestion =>
+                        suggestion.maMinhChung.startsWith(queryText)
                     );
                     setFilteredSuggestions(filtered);
                 } else {
@@ -358,10 +384,10 @@ const VietBaoCaoTieuChi = () => {
                     let newText;
                     if (endBracketIndex !== -1) {
                         // Replace existing bracketed text with hyperlink
-                        newText = `${textData.substring(0, bracketIndex + 1)}<a href="${suggestion.link}" target="_blank">${suggestion.maTieuChuan}</a>${textData.substring(endBracketIndex + 1)}`;
+                        newText = `${textData.substring(0, bracketIndex + 1)}<a href="${suggestion.link}" target="_blank">${suggestion.maMinhChung}</a>${textData.substring(endBracketIndex + 1)}`;
                     } else {
                         // Append suggestion with hyperlink within brackets
-                        newText = `${textData.substring(0, bracketIndex + 1)}<a href="${suggestion.link}" target="_blank">${suggestion.maTieuChuan}</a>]`;
+                        newText = `${textData.substring(0, bracketIndex + 1)}<a href="${suggestion.link}" target="_blank">${suggestion.maMinhChung}</a>]`;
                     }
                     editor.setData(newText);
                 } else {
@@ -371,7 +397,7 @@ const VietBaoCaoTieuChi = () => {
                         const position = editor.model.document.selection.getFirstPosition();
 
                         // Insert the hyperlink text
-                        writer.insertText(`[<a href="${suggestion.link}" target="_blank">[${suggestion.maTieuChuan}</a>]`, position);
+                        writer.insertText(`[<a href="${suggestion.link}" target="_blank">[${suggestion.maMinhChung}</a>]`, position);
                     });
                 }
                 // Clear filtered suggestions
@@ -420,12 +446,17 @@ const VietBaoCaoTieuChi = () => {
             data.append('ghiChuPhatHuy', formData.ghiChuPhatHuy);
             data.append('mucDanhGia', formData.mucDanhGia);
 
-            if(phieuDanhGia === null){
-            const response = await savePhieuDanhGiaTieuChi(data);
-            if(response === "OK"){
-                alert('Lưu thành công')
-            }}else{
+            if (phieuDanhGia === null) {
+                const response = await savePhieuDanhGiaTieuChi(data);
+                if (response === "OK") {
+                    alert('Lưu thành công')
+                }
+            } else {
                 data.append('idPhieuDanhGia', phieuDanhGia.idPhieuDanhGiaTieuChi)
+                const response = await updatePhieuDanhGiaTieuChi(data);
+                if (response === "OK") {
+                    alert('Lưu thành công')
+                }
             }
 
         } catch (error) {
@@ -463,7 +494,7 @@ const VietBaoCaoTieuChi = () => {
                             onClick={() => handleSuggestionClick(suggestion)}
                             style={{ cursor: 'pointer' }}
                         >
-                            {suggestion.maTieuChuan}: {suggestion.tenTieuChuan}
+                            {suggestion.maMinhChung}: {suggestion.tenMinhChung}
                         </li>
                     ))}
                 </ul>

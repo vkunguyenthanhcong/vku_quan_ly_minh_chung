@@ -22,7 +22,7 @@ const TieuChi = ({ idTieuChuan, phongBanUser}) => {
     const goToVietBaoCao = (idTieuChi) => {
         navigate(`../viet-bao-cao-tieu-chi?TieuChuan_ID=${idTieuChuan}&TieuChi_ID=${idTieuChi}&NhomCongTac=${phongBanUser}`)
     }
-    if (tieuChi.length === 0) { return (<p>Loading...</p>) }
+    
     return (
         <>
             {tieuChi.map((item, index) => (
@@ -94,7 +94,6 @@ const VietBaoCao = () => {
         };
         fetchData();
     }, [KhungCTDT_ID, phongBanUser]); 
-    console.log(tieuChuan)
     return (
         <div className="content bg-white m-3 p-4">
             {chuongTrinhDaoTao && chuongTrinhDaoTao.length > 0 ? (

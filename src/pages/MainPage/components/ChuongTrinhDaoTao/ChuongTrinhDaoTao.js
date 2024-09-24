@@ -1,8 +1,8 @@
 // src/components/ChuanKiemDinh.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getThongTinCTDT, getTieuChuanWithMaCtdt } from '../../../../services/apiServices';
-import {useLocation, useNavigate} from 'react-router-dom';
+import { getThongTinCTDT, getTotalMinhChungWithTieuChuan } from '../../../../services/apiServices';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
@@ -12,13 +12,40 @@ const CustomTableCell = styled(TableCell)(({ theme }) => ({
 
 const CustomTableHeadCell = styled(TableCell)(({ theme }) => ({
   fontSize: '16px',
-  color : 'white !important'
+  color: 'white !important'
 }));;
+const TotalMinhChung = memo(({ idTieuChuan }) => {
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getTotalMinhChungWithTieuChuan(idTieuChuan);
+        setTotal(response);
+      } catch (error) {
+        setError('Could not fetch total.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [idTieuChuan]);
+
+  if (loading) return <CustomTableCell>Loading...</CustomTableCell>;
+  if (error) return <CustomTableCell>{error}</CustomTableCell>;
+
+  return (
+    <CustomTableCell><b>{total}</b> minh chứng</CustomTableCell>
+  );
+});
 
 const ChuongTrinhDaoTao = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
-  const [tieuChuan, setTieuChuan] = useState([]);
+  const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -34,12 +61,8 @@ const ChuongTrinhDaoTao = () => {
     const fetchDataFromAPI = async () => {
       setLoading(true);
       try {
-        const [result, result_1] = await Promise.all([
-          getThongTinCTDT(KhungCTDT_ID),
-          getTieuChuanWithMaCtdt(KhungCTDT_ID)
-        ]);
-        setData(result);
-        setTieuChuan(result_1);
+        const response = await getThongTinCTDT(KhungCTDT_ID);
+        setChuongTrinhDaoTao(response);
       } catch (error) {
         setError(error);
       } finally {
@@ -47,41 +70,52 @@ const ChuongTrinhDaoTao = () => {
       }
     };
     fetchDataFromAPI();
-  }, [KhungCTDT_ID]); 
+  }, [KhungCTDT_ID]);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
   return (
     <div className="content bg-white m-3 p-4">
-      {data ? (
-        
-          <div>
-            <p style={{ fontSize: '20px' }}>Giới thiệu khung chương trình <b>{data.tenCtdt}</b></p>
-            <p>
-              - Chuẩn đánh giá ĐBCL:
-              <button style={{ color: 'white', background: 'gray', border: 'none', borderRadius: '10px', padding: '5px 10px' }}>
-                <b>{data.chuanKdcl.tenKdcl}</b>
-              </button>
-            </p>
-            <p>
-              - Thuộc Khoa: <b>{data.khoa.tenKhoa}</b>
-            </p>
-            <p>
-              Web <b>{data.khoa.web}</b> - Email <b>{data.khoa.email}</b> - Điện thoại <b>{data.khoa.sdt}</b>
-            </p>
-            <p>
-              - Thuộc Ngành: <b>{data.nganh.tenNganh}</b>
-            </p>
-            <p>
-              - Thuộc Trình độ: <b>{data.nganh.trinhDo}</b>
-            </p>
-            <p>
-              - Số tín chỉ áp dụng: <b>{data.soTinChi}</b>
-            </p>
-          </div>
-        )
-      : (
-        <p>Trường Đại học Công nghệ Thông tin và Truyền thông Việt - Hàn</p>
-      )}
+
+      <div>
+        <p style={{ fontSize: '20px' }}>Giới thiệu khung chương trình <b>{chuongTrinhDaoTao ? chuongTrinhDaoTao.tenCtdt : 'Loading...'}</b></p>
+        <p>
+          - Chuẩn đánh giá ĐBCL:
+          <button style={{ color: 'white', background: 'gray', border: 'none', borderRadius: '10px', padding: '5px 10px' }}>
+            <b>{chuongTrinhDaoTao.chuanKdcl.tenKdcl}</b>
+          </button>
+        </p>
+        {chuongTrinhDaoTao.khoa && chuongTrinhDaoTao.khoa.tenKhoa && (
+          <p>
+            - Thuộc Khoa: <b>{chuongTrinhDaoTao.khoa.tenKhoa}</b>
+          </p>
+        )}
+
+        {chuongTrinhDaoTao.khoa && (
+          <p>
+            Web <b>{chuongTrinhDaoTao.khoa.web || ''}</b> -
+            Email <b>{chuongTrinhDaoTao.khoa.email || ''}</b> -
+            Điện thoại <b>{chuongTrinhDaoTao.khoa.sdt || ''}</b>
+          </p>
+        )}
+
+        {chuongTrinhDaoTao.nganh && chuongTrinhDaoTao.nganh.tenNganh && (
+          <p>
+            - Thuộc Ngành: <b>{chuongTrinhDaoTao.nganh.tenNganh}</b>
+          </p>
+        )}
+
+        {chuongTrinhDaoTao.nganh && chuongTrinhDaoTao.nganh.trinhDo && (
+          <p>
+            - Thuộc Trình độ: <b>{chuongTrinhDaoTao.nganh.trinhDo}</b>
+          </p>
+        )}
+
+        {chuongTrinhDaoTao.soTinChi != null && chuongTrinhDaoTao.soTinChi != 0 && (
+          <p>
+            - Số tín chỉ áp dụng: <b>{chuongTrinhDaoTao.soTinChi}</b>
+          </p>
+        )}
+      </div>
       <TableContainer>
         <Table className='font-Inter'>
           <TableHead>
@@ -93,19 +127,19 @@ const ChuongTrinhDaoTao = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tieuChuan.map((row, index) => (
+            {chuongTrinhDaoTao ? (chuongTrinhDaoTao.tieuChuan.map((row, index) => (
               <TableRow key={row.id}>
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
                 <CustomTableCell><button onClick={() => handleClick(row.idTieuChuan)} className='btn btn-light text-white'>Quản lý minh chứng</button></CustomTableCell>
-                <CustomTableCell><b>{row.total}</b> minh chứng</CustomTableCell>
+                <TotalMinhChung idTieuChuan={row.idTieuChuan} />
               </TableRow>
-            ))}
+            ))) : 'Loading...'}
           </TableBody>
         </Table>
       </TableContainer>
     </div>
-    
+
   );
 };
 
