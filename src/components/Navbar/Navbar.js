@@ -42,7 +42,7 @@ const Navbar = ({ toggleMenuWidth }) => {
               borderRadius: '50%',
             }}
             alt={user ? `${user.fullName}` : 'User Avatar'}
-            src={'https://daotao.vku.udn.vn/uploads/sinhvien/20IT199.jpg'}
+            src={user.avatar}
           />
           {user && <span>{user.fullName}</span>}
         </li>

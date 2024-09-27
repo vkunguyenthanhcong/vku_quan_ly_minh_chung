@@ -13,7 +13,7 @@ const ChiTietChuongTrinhDaoTao = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     
-    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState();
+    const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState(null);
     const [khoa, setKhoa] = useState([]);
     const [nganh, setNganh] = useState([]);
     const [selectedKhoa, setSelectedKhoa] = useState('');
@@ -26,7 +26,6 @@ const ChiTietChuongTrinhDaoTao = () => {
                 const result = await getThongTinCTDT(ChuongTrinh_ID);
                 setChuongTrinhDaoTao(result);
                 setTenCTDT(result.tenCtdt);
-                console.log(chuongTrinhDaoTao)
                 if(result.khoa.tenKhoa != "" || result.nganh.tenNganh != ""){
                     const khoaData = await getKhoa();
                     const nganhData = await getNganh();
@@ -86,7 +85,7 @@ const ChiTietChuongTrinhDaoTao = () => {
             message: 'Bạn có chắc chắn muốn xóa?',
             header: 'Xác nhận',
             accept: async () => {
-                const maCtdt = parseInt(chuongTrinhDaoTao.maCtdt);
+                const maCtdt = chuongTrinhDaoTao.maCtdt;
                 const response = await deleteChuongTrinhDaoTao(maCtdt);
                 if(response === "OK"){
                     alert('Xóa thành công');
@@ -103,7 +102,7 @@ const ChiTietChuongTrinhDaoTao = () => {
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
             
-            {chuongTrinhDaoTao != null ? (
+            {chuongTrinhDaoTao ? (
                 <>
                     <h5><b>Giới thiệu Khung chương trình {chuongTrinhDaoTao.tenCtdt}</b></h5>
                     <p>- Tên chương trình : </p>

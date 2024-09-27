@@ -16,22 +16,22 @@ const Total = ({maCtdt}) => {
     const [totalTieuChi, setTotalTieuChi] = useState('');
     const [totalMinhChung, setTotalMinhChung] = useState('');
 
-    const fetchData = async () => {
-
-        try {
-            const tieuChuan = await getTieuChuanWithMaCtdt(maCtdt);
-            setTotalTieuChuan(tieuChuan.length);
-            const tieuChi = await getTieuChiByMaCtdt(maCtdt);
-            setTotalTieuChi(tieuChi.length);
-            const minhChung = await getMinhChungByMaCtdt(maCtdt);
-            setTotalMinhChung(minhChung.length);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    }
     useEffect(() => {
+        const fetchData = async () => {
+
+            try {
+                const tieuChuan = await getTieuChuanWithMaCtdt(maCtdt);
+                setTotalTieuChuan(tieuChuan.length);
+                const tieuChi = await getTieuChiByMaCtdt(maCtdt);
+                setTotalTieuChi(tieuChi.length);
+                const minhChung = await getMinhChungByMaCtdt(maCtdt);
+                setTotalMinhChung(minhChung.length);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        }
         fetchData();
     }, [maCtdt]);
 

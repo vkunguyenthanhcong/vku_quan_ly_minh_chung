@@ -14,11 +14,10 @@ const LogInForm = ({ isVisible, onClose }) => {
 
     try {
         const userData = await login(email, password)
-        console.log(userData)
         if (userData.token) {
             localStorage.setItem('token', userData.token)
             localStorage.setItem('role', userData.role)
-            localStorage.setItem('phongBan', userData.phongBan)
+            localStorage.setItem('phongBan', userData.phongBan.idPhongBan)
             if(userData.role === "ADMIN"){
                 navigate('/admin');
             }else if(userData.role === "USER"){

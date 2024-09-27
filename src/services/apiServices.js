@@ -116,7 +116,20 @@ export const getCtdtDataByMaKDCL = (maKdcl, token) => {
             throw error;
         });
 };
+//insert chuong trinh dao tao
+export const createChuongTrinhDaoTao = (formData, token) => {
+    return api.post(`/ctdt`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
 
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //update chuong trinh dao tao
     export const updateChuongTrinhDaoTao = (formData, token) => {
         return api.put(`/ctdt/update`, formData, {
@@ -414,7 +427,21 @@ export const deleteMinhChung = (idMc, parentMaMc, token) => {
 };
 // Upload Minh Chung
 export const uploadMinhChung = (formData, token) => {
-    return api.post('/uploadToGoogleDrive', formData, {
+    return api.post('/upload/uploadToGoogleDrive', formData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+// create folder CTDT
+export const createFolderCTDT = (tenCtdt, token) => {
+    return api.post('/upload/createFolderCtdt', tenCtdt, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -704,6 +731,19 @@ export const getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi = (idTieuChuan, idTieuC
 //get phieu danh gia by maCtdt
 export const getPhieuDanhGiaTieuChiByMaCtdt = (maCtdt, token) => {
     return api.get(`/phieudanhgiatieuchi/findByMaCtdt?maCtdt=${maCtdt}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//get all user
+export const getAllUser = (token) => {
+    return api.get(`../admin/get-all-users`, {
         headers: {
             Authorization: `Bearer ${token}`
         }

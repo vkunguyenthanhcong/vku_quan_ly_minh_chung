@@ -17,68 +17,87 @@ import {
     insertNewChuanKdcl,
 } from "../../../../services/apiServices";
 import { useNavigate } from "react-router-dom";
+import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
 const PopupForm = ({ show, handleClose, fetchData }) => {
+    const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
       tenKdcl: '',
       namBanHanh: '',
-      maKdcl: ''
+      soLuongTieuChuan : 0
     });
-  
     const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
+        const { name, value } = e.target;
+        const parsedValue = name === "soLuongTieuChuan" ? parseInt(value, 10) : value;
+        setFormData({ ...formData, [name]: parsedValue });
     };
-    
-      
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setOpen(true)
         try {
-          await insertNewChuanKdcl(formData); // Đợi insertNewChuanKdcl hoàn tất
-          handleClose(); // Đóng popup sau khi hoàn tất chèn dữ liệu
-          await fetchData(); // Đợi fetchData thực thi và cập nhật dữ liệu mới
+          const response = await insertNewChuanKdcl(formData);
+          if(response === "OK"){
+              await fetchData();
+              setOpen(false);
+              handleClose();
+          }
         } catch (error) {
           console.error('Error submitting form:', error);
           // Xử lý lỗi nếu cần
+        }finally {
+            setOpen(false);
+            handleClose();
         }
       };
-  
+
     return (
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Bổ sung Chuẩn kiểm định</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="tenKdcl">
-              <Form.Label>Tên Chuẩn đánh giá</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="" 
-                name="tenKdcl"
-                value={formData.tenKdcl}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-  
-            <Form.Group controlId="namBanHanh">
-              <Form.Label>Năm áp dụng</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder=""
-                name="namBanHanh"
-                value={formData.namBanHanh}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-            <Button variant="success" type="submit" className="mt-3">
-                Xác nhận
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+      open === false ? (<Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton>
+              <Modal.Title>Bổ sung Chuẩn kiểm định</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              <Form onSubmit={handleSubmit}>
+                  <Form.Group controlId="tenKdcl">
+                      <Form.Label>Tên Chuẩn đánh giá</Form.Label>
+                      <Form.Control
+                          type="text"
+                          placeholder=""
+                          name="tenKdcl"
+                          value={formData.tenKdcl}
+                          onChange={handleChange}
+                          required
+                      />
+                  </Form.Group>
+
+                  <Form.Group controlId="namBanHanh">
+                      <Form.Label>Năm áp dụng</Form.Label>
+                      <Form.Control
+                          type="text"
+                          placeholder=""
+                          name="namBanHanh"
+                          value={formData.namBanHanh}
+                          onChange={handleChange}
+                          required
+                      />
+                  </Form.Group>
+                  <Form.Group controlId="soLuongTieuChuan">
+                      <Form.Label>Số lượng tín chỉ</Form.Label>
+                      <Form.Control
+                          type="number"
+                          placeholder=""
+                          name="soLuongTieuChuan"
+                          value={formData.soLuongTieuChuan}
+                          onChange={handleChange}
+                          required
+                      />
+                  </Form.Group>
+                  <Button variant="success" type="submit" className="mt-3">
+                      Xác nhận
+                  </Button>
+              </Form>
+          </Modal.Body>
+      </Modal>) : (<LoadingProcess open={open}/>)
     );
   };
 const GenericList = ({ maKdcl }) => {
@@ -129,10 +148,10 @@ const GenericList = ({ maKdcl }) => {
 const ChuanKiemDinh = () => {
     const navigate = useNavigate();
     const [data, setData] = useState([]);
+    const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [show, setShow] = useState(false);
-
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const fetchDataFromAPI = async () => {
@@ -205,10 +224,14 @@ const ChuanKiemDinh = () => {
     };
     const handleDeleteChuanKDCL = async (maKdcl) => {
         try {
+            setOpen(true);
             const response = await deleteChuanKDCL(maKdcl);
-            fetchDataFromAPI();
+            if(response === "OK"){
+                setOpen(false)
+                fetchDataFromAPI();
+            }
         }catch (e) {
-
+            setOpen(false)
         }
     }
     const goToPhanCong = (ChuanKiemDinh) => {
@@ -217,6 +240,7 @@ const ChuanKiemDinh = () => {
 
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
+        <LoadingProcess open={open}/>
         <PopupForm show={show} handleClose={handleClose} fetchData={fetchDataFromAPI}/>
             <p style={{ fontSize: "20px" }}>
                 DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG
