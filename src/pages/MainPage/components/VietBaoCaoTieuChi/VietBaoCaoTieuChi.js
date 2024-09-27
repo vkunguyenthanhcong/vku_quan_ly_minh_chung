@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { useLocation } from "react-router-dom";
+import React, {useEffect, useState, useRef} from "react";
+import {CKEditor} from '@ckeditor/ckeditor5-react';
+import {useLocation} from "react-router-dom";
 import {
     ClassicEditor,
     Autoformat,
@@ -45,11 +45,23 @@ import {
     TextTransformation,
     TodoList,
     Underline,
-    Undo
+    Undo,
+    PasteFromOffice
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
 import './VietBaoCao.css'
-import { getAllMinhChung, getMinhChungWithIdTieuChi, getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi, getPhongBanById, getThongTinCTDT, getTieuChiById, getTieuChuanById, savePhieuDanhGiaTieuChi, updatePhieuDanhGiaTieuChi } from "../../../../services/apiServices";
+import {
+    getAllMinhChung,
+    getMinhChungWithIdTieuChi,
+    getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi,
+    getPhongBanById,
+    getThongTinCTDT,
+    getTieuChiById,
+    getTieuChuanById,
+    savePhieuDanhGiaTieuChi,
+    updatePhieuDanhGiaTieuChi
+} from "../../../../services/apiServices";
+
 const VietBaoCaoTieuChi = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -73,6 +85,8 @@ const VietBaoCaoTieuChi = () => {
     const [moTa, setMoTa] = useState('');
     const [diemManh, setDiemManh] = useState('');
     const [diemYeu, setDiemYeu] = useState('');
+
+    const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
 
     const [formData, setFormData] = useState({
         noiDungKhacPhuc: '',
@@ -104,7 +118,7 @@ const VietBaoCaoTieuChi = () => {
             const suggestions = response_5.map(itemB => {
                 let parentMaMc = itemB.parentMaMc;
                 let childMaMc = itemB.childMaMc;
-            
+
                 // Check if parentMaMc and childMaMc are "0"
                 if (parentMaMc == "0" && childMaMc == "0") {
                     // Find the corresponding entry in arrayA using maDungChung
@@ -125,7 +139,7 @@ const VietBaoCaoTieuChi = () => {
                 };
             });
             setMinhChung(suggestions)
-            
+
             const response_4 = await getPhieuDanhGiaTieuChiByTieuChuanAndTieuChi(TieuChuan_ID, TieuChi_ID)
             if (response_4) {
                 setPhieuDanhGia(response_4)
@@ -153,7 +167,6 @@ const VietBaoCaoTieuChi = () => {
 
     useEffect(() => {
         setIsLayoutReady(true);
-
         return () => setIsLayoutReady(false);
     }, []);
     const handleEditorReady = (editor) => {
@@ -232,7 +245,8 @@ const VietBaoCaoTieuChi = () => {
             TextTransformation,
             TodoList,
             Underline,
-            Undo
+            Undo,
+            PasteFromOffice
         ],
         balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
         blockToolbar: ['bold', 'italic', '|', 'link', 'insertTable', '|', 'bulletedList', 'numberedList', 'outdent', 'indent'],
@@ -332,19 +346,32 @@ const VietBaoCaoTieuChi = () => {
         }
     };
     const handleEditorChange = (event, editor) => {
-
         if (editor && editor.getData) {
             try {
-                // Get the editor's data as HTML
+                const view = editor.editing.view;
+                const selection = view.document.selection;
+                const domRange = view.domConverter.viewRangeToDom(selection.getFirstRange());
+
+                const clientRects = domRange.getClientRects();
+
+                if (clientRects.length > 0) {
+                    const rect = clientRects[0]; // Chỉ lấy vị trí đầu tiên
+                    const x = rect.left;
+                    const y = rect.top + window.scrollY; // Thêm window.scrollY để xử lý khi có cuộn trang
+                    setMousePosition({ x, y });
+                }
                 const data = editor.getData();
-                setMoTa(data)
+
+                setMoTa(data);
+
                 // Parse the HTML to extract plain text
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(data, 'text/html');
                 const inputText = doc.body.textContent || '';
-                // Find the position of the last `[`
+
+
                 const bracketIndex = inputText.lastIndexOf('[');
-                if (bracketIndex !== -1) {
+                if (bracketIndex != -1) {
                     // Extract the part after `[`
                     const queryText = inputText.substring(bracketIndex + 1).trim();
                     // If there's no additional text after `[`, don't filter suggestions
@@ -352,7 +379,6 @@ const VietBaoCaoTieuChi = () => {
                         setFilteredSuggestions([]);
                         return;
                     }
-                    
                     // Filter suggestions based on the query text
                     const filtered = minhChung.filter(suggestion =>
                         suggestion.maMinhChung.startsWith(queryText)
@@ -369,6 +395,7 @@ const VietBaoCaoTieuChi = () => {
             console.error('Editor or editor.getData is not available.');
         }
     };
+
     const handleSuggestionClick = (suggestion) => {
         if (editorInstance) {
             const editor = editorInstance;
@@ -416,7 +443,7 @@ const VietBaoCaoTieuChi = () => {
         setDiemYeu(data)
     }
     const handleSet = (event) => {
-        const { name, value } = event.target;
+        const {name, value} = event.target;
         setFormData({
             ...formData,
             [name]: value
@@ -462,14 +489,16 @@ const VietBaoCaoTieuChi = () => {
     return (
         <div className="content bg-white m-3 p-4">
             <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b></p>
-            <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (<span>'Loading...'</span>)}</p>
+            <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
+                <span>'Loading...'</span>)}</p>
             <p>Tiêu chuẩn : {tieuChuan.tenTieuChuan}</p>
             <p>Tiêu chí : {tieuChi.tenTieuChi}</p>
             <p>1. Mô tả</p>
             <div className="main-container">
-                <div className="editor-container editor-container_classic-editor editor-container_include-block-toolbar" ref={editorContainerRef}>
+                <div className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                     ref={editorContainerRef}>
                     <div className="editor-container__editor">
-                        <div ref={editorRef}>
+                        <div ref={editorRef} spellCheck={false}>
                             {isLayoutReady && (
                                 <CKEditor
                                     editor={ClassicEditor}
@@ -483,24 +512,37 @@ const VietBaoCaoTieuChi = () => {
                     </div>
                 </div>
 
-                <ul>
-                    {filteredSuggestions.map((suggestion, index) => (
-                        <li
-                            key={index}
-                            onClick={() => handleSuggestionClick(suggestion)}
-                            style={{ cursor: 'pointer' }}
-                        >
-                            {suggestion.maMinhChung}: {suggestion.tenMinhChung}
-                        </li>
-                    ))}
-                </ul>
+                {
+                    filteredSuggestions != "" ? (<ul
+                        style={{
+                            position: "absolute",
+                            zIndex: "1000",
+                            top: `${mousePosition.y}px`,
+                            left: `${mousePosition.x}px`,
+                            backgroundColor: "white",
+                            border: "1px solid #ccc",
+                            padding: "10px",
+                            listStyle: "none",
+                        }}
+                    >
+                        {filteredSuggestions.map((suggestion, index) => (
+                            <li
+                                key={index}
+                                onClick={() => handleSuggestionClick(suggestion)}
+                                style={{cursor: 'pointer'}}
+                            >
+                                {suggestion.maMinhChung}: {suggestion.tenMinhChung}
+                            </li>
+                        ))}
+                    </ul>) : ''}
 
             </div>
             <p>2. Điểm mạnh</p>
             <div className="main-container">
-                <div className="editor-container editor-container_classic-editor editor-container_include-block-toolbar" ref={editorContainerRef}>
+                <div className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                     ref={editorContainerRef}>
                     <div className="editor-container__editor">
-                        <div ref={editorRef}>
+                        <div ref={editorRef} spellCheck={false}>
                             {isLayoutReady && (
                                 <CKEditor
                                     editor={ClassicEditor}
@@ -517,9 +559,10 @@ const VietBaoCaoTieuChi = () => {
 
             <p className="mt-2">3. Điểm tồn tại</p>
             <div className="main-container">
-                <div className="editor-container editor-container_classic-editor editor-container_include-block-toolbar" ref={editorContainerRef}>
+                <div className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                     ref={editorContainerRef}>
                     <div className="editor-container__editor">
-                        <div ref={editorRef}>
+                        <div ref={editorRef} spellCheck={false}>
                             {isLayoutReady && (
                                 <CKEditor
                                     editor={ClassicEditor}
@@ -536,72 +579,72 @@ const VietBaoCaoTieuChi = () => {
             <p className="mt-2">4. Kế hoạch hành động</p>
             <table className="easy-table">
                 <thead>
-                    <tr>
-                        <td>TT</td>
-                        <td>Mục tiêu</td>
-                        <td>Nội dung</td>
-                        <td>Đơn vị/ cá nhân thực hiện</td>
-                        <td>Thời gian thực hiện hoặc hoàn thành</td>
-                        <td>Ghi chú</td>
-                    </tr>
+                <tr>
+                    <td>TT</td>
+                    <td>Mục tiêu</td>
+                    <td>Nội dung</td>
+                    <td>Đơn vị/ cá nhân thực hiện</td>
+                    <td>Thời gian thực hiện hoặc hoàn thành</td>
+                    <td>Ghi chú</td>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Khắc phục tồn tại</td>
-                        <td> <textarea
-                            name="noiDungKhacPhuc"
-                            value={formData.noiDungKhacPhuc}
-                            onChange={handleSet}
-                            placeholder="Nội dung khắc phục"
-                        /></td>
-                        <td><textarea
-                            name="donViKhacPhuc"
-                            value={formData.donViKhacPhuc}
-                            onChange={handleSet}
-                            placeholder="Đơn vị khắc phục"
-                        /></td>
-                        <td><textarea
-                            name="thoiGianKhacPhuc"
-                            value={formData.thoiGianKhacPhuc}
-                            onChange={handleSet}
-                            placeholder="Thời gian khắc phục"
-                        /></td>
-                        <td><textarea
-                            name="ghiChuKhacPhuc"
-                            value={formData.ghiChuKhacPhuc}
-                            onChange={handleSet}
-                            placeholder="Ghi chú khắc phục"
-                        /></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Phát huy điểm mạnh</td>
-                        <td><textarea
-                            name="noiDungPhatHuy"
-                            value={formData.noiDungPhatHuy}
-                            onChange={handleSet}
-                            placeholder="Nội dung phát huy"
-                        /></td>
-                        <td><textarea
-                            name="donViPhatHuy"
-                            value={formData.donViPhatHuy}
-                            onChange={handleSet}
-                            placeholder="Đơn vị phát huy"
-                        /></td>
-                        <td><textarea
-                            name="thoiGianPhatHuy"
-                            value={formData.thoiGianPhatHuy}
-                            onChange={handleSet}
-                            placeholder="Thời gian phát huy"
-                        /></td>
-                        <td><textarea
-                            name="ghiChuPhatHuy"
-                            value={formData.ghiChuPhatHuy}
-                            onChange={handleSet}
-                            placeholder="Ghi chú phát huy"
-                        /></td>
-                    </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Khắc phục tồn tại</td>
+                    <td> <textarea
+                        name="noiDungKhacPhuc"
+                        value={formData.noiDungKhacPhuc}
+                        onChange={handleSet}
+                        placeholder="Nội dung khắc phục"
+                    /></td>
+                    <td><textarea
+                        name="donViKhacPhuc"
+                        value={formData.donViKhacPhuc}
+                        onChange={handleSet}
+                        placeholder="Đơn vị khắc phục"
+                    /></td>
+                    <td><textarea
+                        name="thoiGianKhacPhuc"
+                        value={formData.thoiGianKhacPhuc}
+                        onChange={handleSet}
+                        placeholder="Thời gian khắc phục"
+                    /></td>
+                    <td><textarea
+                        name="ghiChuKhacPhuc"
+                        value={formData.ghiChuKhacPhuc}
+                        onChange={handleSet}
+                        placeholder="Ghi chú khắc phục"
+                    /></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Phát huy điểm mạnh</td>
+                    <td><textarea
+                        name="noiDungPhatHuy"
+                        value={formData.noiDungPhatHuy}
+                        onChange={handleSet}
+                        placeholder="Nội dung phát huy"
+                    /></td>
+                    <td><textarea
+                        name="donViPhatHuy"
+                        value={formData.donViPhatHuy}
+                        onChange={handleSet}
+                        placeholder="Đơn vị phát huy"
+                    /></td>
+                    <td><textarea
+                        name="thoiGianPhatHuy"
+                        value={formData.thoiGianPhatHuy}
+                        onChange={handleSet}
+                        placeholder="Thời gian phát huy"
+                    /></td>
+                    <td><textarea
+                        name="ghiChuPhatHuy"
+                        value={formData.ghiChuPhatHuy}
+                        onChange={handleSet}
+                        placeholder="Ghi chú phát huy"
+                    /></td>
+                </tr>
                 </tbody>
             </table>
 
@@ -621,10 +664,9 @@ const VietBaoCaoTieuChi = () => {
                     <label htmlFor={option.toString()}>{option}</label>
                 </div>
             ))}
-            <br />
+            <br/>
 
             <button className="btn btn-success" onClick={() => savePhieuDanhGia()}>Lưu</button>
-
 
 
         </div>

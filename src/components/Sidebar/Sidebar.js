@@ -79,7 +79,7 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
           <Col md={4}>
             <img
               className='avatar-circle'
-              src={'https://daotao.vku.udn.vn/uploads/sinhvien/20IT199.jpg'}
+              src={user ? user.avatar : ''}
               style={{ maxHeight: '100px', border: '5px solid white' }}
               alt={user ? `${user.fullName}` : 'User Avatar'}
             />

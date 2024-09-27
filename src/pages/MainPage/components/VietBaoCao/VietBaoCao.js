@@ -49,7 +49,6 @@ const VietBaoCao = () => {
     const [phanCong, setPhanCong] = useState([])
 
     const phongBanUser = localStorage.getItem('phongBan');
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -135,9 +134,9 @@ const VietBaoCao = () => {
                                                 <React.Fragment key={index}>
                                                     <TableRow>
                                                         <TableCell className=""
-                                                                   style={{width: '10%'}}>{item.stt}</TableCell>
+                                                                   style={{width: '10%'}}><b>{index+1}</b></TableCell>
                                                         <TableCell className=""><b>Tiêu
-                                                            chuẫn {item.stt}. {item.tenTieuChuan}</b></TableCell>
+                                                            chuẩn {item.stt}. {item.tenTieuChuan}</b></TableCell>
                                                         <TableCell className=""></TableCell>
                                                     </TableRow>
                                                     <TieuChi idTieuChuan={item.idTieuChuan}

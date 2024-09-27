@@ -15,18 +15,8 @@ import {
     uploadMinhChung
 } from "../../../../services/apiServices";
 import PdfPreview from "../../../../services/PdfPreview";
+import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
-function LoadingProcess(props) {
-    const { open } = props;
-    return (
-        <Dialog open={open}>
-            <DialogTitle>Hệ thống đang tiến hành thêm dữ liệu</DialogTitle>
-            <Box className='d-flex justify-content-center' sx={{ display: 'flex' }} md={{ display: 'flex' }}>
-                <CircularProgress />
-            </Box>
-        </Dialog>
-    );
-}
 
 
 const QuanLyMinhChung = () =>{
@@ -124,7 +114,8 @@ const QuanLyMinhChung = () =>{
             }else{
                 const formData = new FormData();
                 formData.append("file", file);
-                if(file.size > 2000000) {
+
+                if(file.size > 20000000) {
                     alert('Hệ thống chỉ chấp nhận file có dung lượng không quá 20 MB.');
                     return;
                 }else{
@@ -141,7 +132,7 @@ const QuanLyMinhChung = () =>{
                         minhChung.append('tenMinhChung', trichYeu);
 
                         minhChung.append('thoigian', ngayPhatHanh);
-                        
+
                         minhChung.append('linkLuuTru', response.url);
 
                         const response_1 = await updateKhoMinhChung(EvidenceID,minhChung, token);
@@ -161,7 +152,7 @@ const QuanLyMinhChung = () =>{
         }else{
             const formData = new FormData();
             formData.append("file", file);
-            if(file.size > 2000000) {
+            if(file.size > 20000000) {
                 alert('Hệ thống chỉ chấp nhận file có dung lượng không quá 20 MB.');
                 return;
             }else{
