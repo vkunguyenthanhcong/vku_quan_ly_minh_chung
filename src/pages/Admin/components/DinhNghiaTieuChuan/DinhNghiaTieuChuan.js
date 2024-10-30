@@ -42,7 +42,6 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
         setOpen(true)
         try {
             let response;
-
             if(formData.id == 0){
                 if (formData.title === 'Tiêu Chuẩn') {
                     response = await insertNewTieuChuan(formData);
@@ -248,12 +247,6 @@ const DinhNghiaTieuChuan = () => {
         });
     }
 
-    if (loading) {
-        return (<p>Loading...</p>)
-    }
-    if (error != '') {
-        return (<p>{error}</p>)
-    }
     return (
         <div className="content" style={{background: "white", margin: "20px"}}>
             <ConfirmDialog />
@@ -275,20 +268,34 @@ const DinhNghiaTieuChuan = () => {
                     <TableBody>
                         <TableRow>
                             <TableCell colSpan={3} className="text-center">
-                                {tieuChuan.length > 0 ? (tieuChuan.length === chuongTrinhDaoTao.chuanKdcl.soLuongTieuChuan ? (
-                                    <button className="btn btn-success disabled">Thêm tiêu chuẩn</button>
+                                {tieuChuan.length >= 0 ? (
+                                    chuongTrinhDaoTao?.chuanKdcl ? (
+                                        tieuChuan.length === chuongTrinhDaoTao.chuanKdcl.soLuongTieuChuan ? (
+                                            <button className="btn btn-success disabled">Thêm tiêu chuẩn</button>
+                                        ) : (
+                                            <button
+                                                className="btn btn-success"
+                                                onClick={() => {
+                                                    setFormData({
+                                                        title: 'Tiêu Chuẩn',
+                                                        ten: '',
+                                                        stt: findMissingSTT(tieuChuan),
+                                                        yeuCau: '',
+                                                        idParent: ChuongTrinh_ID
+                                                    });
+                                                    handleShow();
+                                                }}
+                                            >
+                                                Thêm tiêu chuẩn
+                                            </button>
+                                        )
+                                    ) : (
+                                        'chuanKdcl not available'
+                                    )
                                 ) : (
-                                    <button className="btn btn-success" onClick={() => {
-                                        setFormData({
-                                            title: 'Tiêu Chuẩn',
-                                            ten: '',
-                                            stt: findMissingSTT(tieuChuan),
-                                            yeuCau: '',
-                                            idParent: ChuongTrinh_ID
-                                        });
-                                        handleShow()
-                                    }}>Thêm tiêu chuẩn</button>
-                                )) : ('Loading...')}
+                                    'Loading...'
+                                )}
+
                             </TableCell>
                         </TableRow>
 
