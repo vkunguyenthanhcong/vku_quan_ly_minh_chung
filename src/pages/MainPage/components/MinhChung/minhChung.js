@@ -149,7 +149,7 @@ const MinhChung = () => {
         }
     };
 
-    const saveFromKMCtoMC = async (idKmc) => {
+    const saveFromKMCtoMC = async (idKmc, idParent) => {
 
         if (tieuChi !== "") {
             try {
@@ -166,6 +166,8 @@ const MinhChung = () => {
                     dataMinhChung.append("idTieuChuan", response.idTieuChuan);
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("parentMaMc", parentMaMc);
+                    dataMinhChung.append("linkLuuTru", idParent);
+                    dataMinhChung.append("folderIdParent", tieuChi.idGoogleDrive);
 
                     const filter = minhChung?.filter(item =>
                         item.maDungChung == 0 && item.idTieuChi == TieuChi_ID
@@ -213,7 +215,7 @@ const MinhChung = () => {
     const handleClickEdit = (EvidenceID) => {
         navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}&GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     }
-    const Button_Them = ({ idKMC }) => {
+    const Button_Them = ({ idKMC, idParent }) => {
 
         const response = minhChung.filter(item => item.khoMinhChung.idKhoMinhChung == idKMC);
 
@@ -233,7 +235,7 @@ const MinhChung = () => {
                 {response.length > 0 ? (
                     <DungChung data={response} />
                 ) : (
-                    <button onClick={() => saveFromKMCtoMC(idKMC)} style={{ marginTop: '5px' }} className="btn btn-success">
+                    <button onClick={() => saveFromKMCtoMC(idKMC, idParent)} style={{ marginTop: '5px' }} className="btn btn-success">
                         Thêm
                     </button>
                 )}
@@ -374,7 +376,7 @@ const MinhChung = () => {
                                                 <button className="btn btn-primary space-5" onClick={() => handleClickEdit(row.idKhoMinhChung)}>Sửa</button>
                                             </b>
                                             <br />
-                                            <Button_Them idKMC={row.idKhoMinhChung} minhChung={minhChung}/>
+                                            <Button_Them idKMC={row.idKhoMinhChung} idParent={row.linkLuuTru}/>
                                         </TableCell>
                                     </TableRow>
                                 ))}

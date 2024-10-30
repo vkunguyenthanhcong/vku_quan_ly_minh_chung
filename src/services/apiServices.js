@@ -525,7 +525,7 @@ export const deleteMinhChung = (idMc, parentMaMc, token) => {
 };
 // Upload Minh Chung
 export const uploadMinhChung = (formData, token) => {
-    return api.post('/upload/uploadToGoogleDrive', formData, {
+    return api.post('/upload', formData, {
         headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
