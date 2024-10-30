@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Button, Form } from 'react-bootstrap';
+import React, {useEffect, useState} from "react";
+import {Modal, Button, Form} from 'react-bootstrap';
 import {
     Table,
     TableBody,
@@ -14,93 +14,94 @@ import {
     getCtdtDataByMaKDCL,
     updateTenKdcl,
     updateNamBanHanh, deleteChuanKDCL,
-    insertNewChuanKdcl,
+    insertNewChuanKdcl, getAllChuongTrinhDaoTao,
 } from "../../../../services/apiServices";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
-const PopupForm = ({ show, handleClose, fetchData }) => {
+const PopupForm = ({show, handleClose, fetchData}) => {
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
-      tenKdcl: '',
-      namBanHanh: '',
-      soLuongTieuChuan : 0
+        tenKdcl: '',
+        namBanHanh: '',
+        soLuongTieuChuan: 0
     });
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         const parsedValue = name === "soLuongTieuChuan" ? parseInt(value, 10) : value;
-        setFormData({ ...formData, [name]: parsedValue });
+        setFormData({...formData, [name]: parsedValue});
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setOpen(true)
         try {
-          const response = await insertNewChuanKdcl(formData);
-          if(response === "OK"){
-              await fetchData();
-              setOpen(false);
-              handleClose();
-          }
+            const response = await insertNewChuanKdcl(formData);
+            if (response === "OK") {
+                await fetchData();
+                setOpen(false);
+                handleClose();
+            }
         } catch (error) {
-          console.error('Error submitting form:', error);
-          // Xử lý lỗi nếu cần
-        }finally {
+            console.error('Error submitting form:', error);
+            // Xử lý lỗi nếu cần
+        } finally {
             setOpen(false);
             handleClose();
         }
-      };
+    };
 
     return (
-      open === false ? (<Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-              <Modal.Title>Bổ sung Chuẩn kiểm định</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-              <Form onSubmit={handleSubmit}>
-                  <Form.Group controlId="tenKdcl">
-                      <Form.Label>Tên Chuẩn đánh giá</Form.Label>
-                      <Form.Control
-                          type="text"
-                          placeholder=""
-                          name="tenKdcl"
-                          value={formData.tenKdcl}
-                          onChange={handleChange}
-                          required
-                      />
-                  </Form.Group>
+        open === false ? (
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Bổ sung Chuẩn kiểm định</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={handleSubmit}>
+                        <Form.Group controlId="tenKdcl">
+                            <Form.Label>Tên Chuẩn đánh giá</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder=""
+                                name="tenKdcl"
+                                value={formData.tenKdcl}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
 
-                  <Form.Group controlId="namBanHanh">
-                      <Form.Label>Năm áp dụng</Form.Label>
-                      <Form.Control
-                          type="text"
-                          placeholder=""
-                          name="namBanHanh"
-                          value={formData.namBanHanh}
-                          onChange={handleChange}
-                          required
-                      />
-                  </Form.Group>
-                  <Form.Group controlId="soLuongTieuChuan">
-                      <Form.Label>Số lượng tín chỉ</Form.Label>
-                      <Form.Control
-                          type="number"
-                          placeholder=""
-                          name="soLuongTieuChuan"
-                          value={formData.soLuongTieuChuan}
-                          onChange={handleChange}
-                          required
-                      />
-                  </Form.Group>
-                  <Button variant="success" type="submit" className="mt-3">
-                      Xác nhận
-                  </Button>
-              </Form>
-          </Modal.Body>
-      </Modal>) : (<LoadingProcess open={open}/>)
+                        <Form.Group controlId="namBanHanh">
+                            <Form.Label>Năm áp dụng</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder=""
+                                name="namBanHanh"
+                                value={formData.namBanHanh}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="soLuongTieuChuan">
+                            <Form.Label>Số lượng tín chỉ</Form.Label>
+                            <Form.Control
+                                type="number"
+                                placeholder=""
+                                name="soLuongTieuChuan"
+                                value={formData.soLuongTieuChuan}
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+                        <Button variant="success" type="submit" className="mt-3">
+                            Xác nhận
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>) : (<LoadingProcess open={open}/>)
     );
-  };
-const GenericList = ({ maKdcl }) => {
+};
+const GenericList = ({maKdcl}) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -111,11 +112,13 @@ const GenericList = ({ maKdcl }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await getCtdtDataByMaKDCL(maKdcl);
-                const initializedData = result.map((item) => ({
-                    ...item,
-                    isEditing: false,
-                }));
+                const result = await getAllChuongTrinhDaoTao();
+                const initializedData = result
+                    .filter(item => item.chuanKdcl && item.chuanKdcl.maKdcl === maKdcl) // Ensure chuanKdcl exists
+                    .map(item => ({
+                        ...item,
+                        isEditing: false,
+                    }));
                 setData(initializedData);
             } catch (err) {
                 setError(err);
@@ -133,7 +136,7 @@ const GenericList = ({ maKdcl }) => {
     return (
         <ul>
             {data.map((item, index) => (
-                <li  style={{marginBottom: "20px", marginTop: "20px", listStyleType : 'none'}} key={index}>
+                <li style={{marginBottom: "20px", marginTop: "20px", listStyleType: 'none'}} key={index}>
                     <button
                         onClick={() => handleButtonClick(item.maCtdt)}
                         className="btn btn-primary"
@@ -148,14 +151,14 @@ const GenericList = ({ maKdcl }) => {
 const ChuanKiemDinh = () => {
     const navigate = useNavigate();
     const [data, setData] = useState([]);
-    const [open, setOpen] = useState(false);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [show, setShow] = useState(false);
+    const [open, setOpen] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const fetchDataFromAPI = async () => {
-        
         try {
             const result = await getKdclData();
             const initializedData = result.map((item) => ({
@@ -176,7 +179,7 @@ const ChuanKiemDinh = () => {
     const handleEditClick = (id) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.maKdcl === id ? { ...item, isEditing: true } : item
+                item.maKdcl === id ? {...item, isEditing: true} : item
             )
         );
     };
@@ -185,14 +188,14 @@ const ChuanKiemDinh = () => {
     const handleTenChange = (id, newText) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.maKdcl === id ? { ...item, tenKdcl: newText } : item
+                item.maKdcl === id ? {...item, tenKdcl: newText} : item
             )
         );
     };
     const handleNamBanHanhChange = (id, newText) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.maKdcl === id ? { ...item, namBanHanh: newText } : item
+                item.maKdcl === id ? {...item, namBanHanh: newText} : item
             )
         );
     };
@@ -202,35 +205,37 @@ const ChuanKiemDinh = () => {
         if (event.key === "Enter") {
             setData((prevList) =>
                 prevList.map((item) =>
-                    item.maKdcl === id ? { ...item, isEditing: false } : item
+                    item.maKdcl === id ? {...item, isEditing: false} : item
                 )
             );
             try {
                 await updateTenKdcl(event.target.value, id);
-            } catch (e) {}
+            } catch (e) {
+            }
         }
     };
     const handleNamBanHanhPress = async (id, event) => {
         if (event.key === "Enter") {
             setData((prevList) =>
                 prevList.map((item) =>
-                    item.maKdcl === id ? { ...item, isEditing: false } : item
+                    item.maKdcl === id ? {...item, isEditing: false} : item
                 )
             );
             try {
                 await updateNamBanHanh(event.target.value, id);
-            } catch (e) {}
+            } catch (e) {
+            }
         }
     };
     const handleDeleteChuanKDCL = async (maKdcl) => {
         try {
             setOpen(true);
             const response = await deleteChuanKDCL(maKdcl);
-            if(response === "OK"){
+            if (response === "OK") {
                 setOpen(false)
                 fetchDataFromAPI();
             }
-        }catch (e) {
+        } catch (e) {
             setOpen(false)
         }
     }
@@ -239,13 +244,13 @@ const ChuanKiemDinh = () => {
     }
 
     return (
-        <div className="content" style={{ background: "white", margin: "20px" }}>
-        <LoadingProcess open={open}/>
-        <PopupForm show={show} handleClose={handleClose} fetchData={fetchDataFromAPI}/>
-            <p style={{ fontSize: "20px" }}>
+        <div className="content" style={{background: "white", margin: "20px"}}>
+            <LoadingProcess open={open}/>
+            <PopupForm show={show} handleClose={handleClose} fetchData={fetchDataFromAPI}/>
+            <p style={{fontSize: "20px"}}>
                 DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG
             </p>
-            <hr />
+            <hr/>
             <TableContainer component={Paper}>
                 <Table className="font-Inter">
                     <TableHead>
@@ -255,7 +260,9 @@ const ChuanKiemDinh = () => {
                             <TableCell className="text-white">Năm áp dụng</TableCell>
                             <TableCell className="text-white">Tên CTĐT</TableCell>
                             <TableCell className="text-white">Tuỳ Chỉnh</TableCell>
-                            <TableCell><button className='btn btn-success' onClick={handleShow}>+</button></TableCell>
+                            <TableCell>
+                                <button className='btn btn-success' onClick={handleShow}>+</button>
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -265,7 +272,7 @@ const ChuanKiemDinh = () => {
                                 <TableCell>
                                     {row.isEditing ? (
                                         <input
-                                            style={{width : '500px'}}
+                                            style={{width: '500px'}}
                                             type="text"
                                             value={row.tenKdcl}
                                             onChange={(e) =>
@@ -292,7 +299,7 @@ const ChuanKiemDinh = () => {
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <GenericList maKdcl={row.maKdcl} />
+                                    <GenericList maKdcl={row.maKdcl}/>
                                 </TableCell>
                                 <TableCell className="button-edit">
                                     <button
@@ -303,10 +310,13 @@ const ChuanKiemDinh = () => {
                                     </button>
                                     <br/>
                                     <button className="btn btn-danger mt-2"
-                                    onClick={() => handleDeleteChuanKDCL(row.maKdcl)}
-                                    >Xóa</button>
+                                            onClick={() => handleDeleteChuanKDCL(row.maKdcl)}
+                                    >Xóa
+                                    </button>
                                     <br/>
-                                    <button className="btn btn-success mt-2" onClick={() => goToPhanCong(row.maKdcl)}>Chia nhóm đánh giá</button>
+                                    <button className="btn btn-success mt-2"
+                                            onClick={() => goToPhanCong(row.maKdcl)}>Chia nhóm đánh giá
+                                    </button>
                                 </TableCell>
                             </TableRow>
                         ))}

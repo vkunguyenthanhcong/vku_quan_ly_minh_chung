@@ -9,9 +9,8 @@ import {Link, useLocation, useNavigate} from 'react-router-dom';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import './ListEvidence.css';
 import {
-    getAllTieuChiWithIdTieuChuan, getMinhChungByMaCtdt,
-    getMinhChungWithIdTieuChi,
-    getTieuChuanWithMaCtdt
+    findTieuChuaByMaCtdt, getAllTieuChi,
+    getMinhChungByMaCtdt,
 } from "../../services/apiServices";
 import { saveAs } from 'file-saver';
 
@@ -40,8 +39,9 @@ const TieuChi = ({standardID, numberNO, minhChung}) => {
     useEffect(() => {
         const fetchTieuChi = async () => {
             try {
-                const result = await getAllTieuChiWithIdTieuChuan(standardID);
-                setTieuChi(result);
+                const result = await getAllTieuChi();
+                const filterResult = result.filter((item) => item.idTieuChuan === standardID);
+                setTieuChi(filterResult);
             } catch (error) {
                 setError(error);
             } finally {
@@ -82,7 +82,7 @@ const ListEvidence = () => {
     useEffect(() => {
         const fetchTieuChuan = async () => {
             try {
-                const result = await getTieuChuanWithMaCtdt(KhungDaoTao_ID);
+                const result = await findTieuChuaByMaCtdt(KhungDaoTao_ID);
                 setTieuChuan(result);
                 const response = await getMinhChungByMaCtdt(KhungDaoTao_ID);
                 setMinhChung(response)

@@ -13,9 +13,9 @@ import "./minhChung.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
 import {
-    deleteMinhChung,
+    deleteMinhChung, findTieuChuaByMaCtdt, getAllGoiY,
     getAllKhoMinhChung,
-    getAllLoaiMinhChung, getAllMinhChungAndTieuChi, getGoiYById, getTieuChiById, getTieuChuanById,
+    getAllLoaiMinhChung, getAllMinhChung, getAllMocChuan, getGoiYById, getTieuChiById, getTieuChuanById,
     saveFromKMCtoMinhChung,
     saveMinhChungDungChung,
     searchLoaiVanBanByDate,
@@ -23,6 +23,7 @@ import {
 } from "../../../../services/apiServices";
 import PdfPreview from "../../../../services/PdfPreview";
 import { createMaMinhChung, format2Number } from "../../../../services/formatNumber";
+
 
 const MinhChung = () => {
     const token = localStorage.getItem('token');
@@ -37,7 +38,7 @@ const MinhChung = () => {
     const [selectedId, setSelectedId] = useState("");
     const [loaiVanBan, setLoaiVanBan] = useState([]);
     const [khoMinhChung, setKhoMinhChung] = useState([]);
-    const [minhChung, setMinhChung] = useState([]);
+    const [minhChung, setMinhChung] = useState(null);
 
     const [goiY, setGoiY] = useState([]);
     const [tieuChi, setTieuChi] = useState([]);
@@ -55,12 +56,42 @@ const MinhChung = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const minhChungData = await getAllMinhChungAndTieuChi();
+            const tieuChuanData = await findTieuChuaByMaCtdt(KhungCTDT_ID);
+            const idTieuChuanArray = tieuChuanData.map(item => item.idTieuChuan);
+            const mocChuanData = await getAllMocChuan();
+            const minhChungData = await getAllMinhChung();
+            const goiYAll = await getAllGoiY();
+            const updatedMinhChung = minhChungData
+                .filter(item => idTieuChuanArray.includes(item.idTieuChuan))
+                .map(item => {
+                    const maMinhChung = `${item.parentMaMc || 'H1'}${item.childMaMc || ''}`;
+                    const idMocChuan = goiYAll.find((gy) => gy.idGoiY == item.idGoiY).idMocChuan;
+                    const idTieuChi = mocChuanData.find((mc) => mc.idMocChuan == idMocChuan).idTieuChi;
+                    if (item.maDungChung !== 0) {
+                        const matchingItem = minhChungData.find(mc => mc.idMc === item.maDungChung);
+
+                        if (matchingItem) {
+                            return {
+                                ...item,
+                                khoMinhChung : matchingItem.khoMinhChung,
+                                parentMaMc: matchingItem.parentMaMc,   // Copy parentMaMc from matching item
+                                childMaMc: matchingItem.childMaMc,     // Copy childMaMc from matching item
+                                maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`, // Copy maMinhChung from matching item
+                                idTieuChi: idTieuChi// Assign idTieuChi if found
+                            };
+                        }
+                    }
+                    return {
+                        ...item,
+                        maMinhChung,
+                        idTieuChi: idTieuChi
+                    };
+                });
+            const tieuChiData = await getTieuChiById(TieuChi_ID);
             const loaiVanBanData = await getAllLoaiMinhChung();
             const khoMinhChungData = await getAllKhoMinhChung();
             const goiYData = await getGoiYById(GoiY_ID);
-            const tieuChiData = await getTieuChiById(TieuChi_ID);
-            setMinhChung(minhChungData);
+            setMinhChung(updatedMinhChung);
             setLoaiVanBan(loaiVanBanData);
             setKhoMinhChung(khoMinhChungData);
             setGoiY(goiYData);
@@ -119,10 +150,10 @@ const MinhChung = () => {
     };
 
     const saveFromKMCtoMC = async (idKmc) => {
+
         if (tieuChi !== "") {
             try {
                 const response = await getTieuChuanById(TieuChuan_ID);
-
                 if (response) {
                     const dataMinhChung = new FormData();
                     const parentMaMc = createMaMinhChung({
@@ -135,7 +166,11 @@ const MinhChung = () => {
                     dataMinhChung.append("idTieuChuan", response.idTieuChuan);
                     dataMinhChung.append("idGoiY", goiY.idGoiY);
                     dataMinhChung.append("parentMaMc", parentMaMc);
-                    const filter = minhChung.filter(item => item.maDungChung === 0 && item.idTieuChi == TieuChi_ID);
+
+                    const filter = minhChung?.filter(item =>
+                        item.maDungChung == 0 && item.idTieuChi == TieuChi_ID
+                    );
+
                     dataMinhChung.append("childMaMc", format2Number(filter.length + 1));
 
                     await saveFromKMCtoMinhChung(dataMinhChung);
@@ -179,11 +214,12 @@ const MinhChung = () => {
         navigate(`/quan-ly/quan-ly-minh-chung?EvidenceID=${EvidenceID}&GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
     }
     const Button_Them = ({ idKMC }) => {
-        // Lọc dữ liệu minhChung với idKMC và KhungCTDT_ID
-        const response = minhChung.filter(item => item.idKmc == idKMC && item.maCtdt == KhungCTDT_ID);
+
+        const response = minhChung.filter(item => item.khoMinhChung.idKhoMinhChung == idKMC);
 
         // Component DungChung nhận props là data
         const DungChung = ({ data }) => {
+            console.log(data)
             const filteredData = data.filter(item => item.idTieuChi == TieuChi_ID);
             return (
                 <>
@@ -338,7 +374,7 @@ const MinhChung = () => {
                                                 <button className="btn btn-primary space-5" onClick={() => handleClickEdit(row.idKhoMinhChung)}>Sửa</button>
                                             </b>
                                             <br />
-                                            <Button_Them idKMC={row.idKhoMinhChung} />
+                                            <Button_Them idKMC={row.idKhoMinhChung} minhChung={minhChung}/>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -366,24 +402,45 @@ const MinhChung = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {minhChung
-                                    .filter(item => item.idGoiY == GoiY_ID) // Add your filter condition here
+                                {minhChung && minhChung
+                                    .filter(item => item.idGoiY == GoiY_ID) // Filter based on GoiY_ID
                                     .map((item, index) => {
-                                        const filteredItem = minhChung.filter(i => i.idMc === item.maDungChung);
+                                        // Find the matching item if maDungChung is not 0
+                                        const filteredItem = item.maDungChung !== 0
+                                            ? minhChung.find(i => i.idMc === item.maDungChung)
+                                            : null;
 
-                                        const maMinhChungDisplay = item.maDungChung == 0 ? item.maMinhChung : (filteredItem[0].maMinhChung);
-                                        const modifiedString = item.maDungChung == 0 ? (item.maMinhChung.slice(0, -3) + '.') : (0);
-                                        return (<TableRow key={index}>
-                                            <TableCell>{maMinhChungDisplay}</TableCell>
-                                            <TableCell>{item.tenMinhChung}</TableCell>
-                                            <TableCell>
-                                                <div>
-                                                    <button className="btn btn-secondary">Xem Nhanh</button><br/>
-                                                    <button className="btn btn-danger" style={{marginTop : '5px'}} onClick={() => deleteMC(item.idMc, modifiedString)}>Xóa</button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>);
-                                    })}
+                                        // Determine which maMinhChung to display
+                                        const maMinhChungDisplay = item.maDungChung === 0
+                                            ? item.maMinhChung
+                                            : (filteredItem ? filteredItem.maMinhChung : '');
+
+                                        // Prepare modifiedString only if maDungChung is 0
+                                        const modifiedString = item.maDungChung === 0
+                                            ? item.maMinhChung.slice(0, -3) + '.'
+                                            : null;
+
+                                        return (
+                                            <TableRow key={index}>
+                                                <TableCell>{maMinhChungDisplay}</TableCell>
+                                                <TableCell>{item.khoMinhChung.tenMinhChung}</TableCell>
+                                                <TableCell>
+                                                    <div>
+                                                        <button className="btn btn-secondary">Xem Nhanh</button><br/>
+                                                        <button
+                                                            className="btn btn-danger"
+                                                            style={{marginTop: '5px'}}
+                                                            onClick={() => deleteMC(item.idMc, modifiedString)}
+                                                        >
+                                                            Xóa
+                                                        </button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                }
+
                             </TableBody>
 
 

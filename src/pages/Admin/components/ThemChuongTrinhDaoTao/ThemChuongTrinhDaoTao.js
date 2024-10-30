@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {
     createChuongTrinhDaoTao,
-    getCtdtDataByMaKDCL,
     getKdclData,
     getKhoa,
     getNganh
 } from "../../../../services/apiServices";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 function ThemChuongTrinhDaoTao() {
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         tenCtdt: "",
         maCtdt: "",
         maKdcl: "",
@@ -16,7 +15,8 @@ function ThemChuongTrinhDaoTao() {
         trinhDo: "Đại học",
         soTinChi: 0,
         maNganh: ""
-    });
+    };
+    const [formData, setFormData] = useState(initialFormData);
     const [open, setOpen] = useState(false);
     const [ckdcl, setCkdcl] = useState([]);
     const [khoa, setKhoa] = useState([]);
@@ -71,6 +71,7 @@ function ThemChuongTrinhDaoTao() {
             if (response === "OK") {
                 setOpen(false);
                 alert('Thêm thành công');
+                setFormData(initialFormData);
             }
         } catch (e) {
             setOpen(false);
