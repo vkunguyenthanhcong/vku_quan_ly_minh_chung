@@ -107,7 +107,7 @@ const MinhChung = () => {
     }, []);
     const navigate = useNavigate();
     const handleClick = () => {
-        navigate(`/quan-ly/quan-ly-minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
+        navigate(`/quan-ly/quan-ly-minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan_ID=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
     };
     const handleClickViewPDF = (link) => {
         setLink(link);
@@ -366,7 +366,7 @@ const MinhChung = () => {
                                             <b>
                                                 <button
                                                     className="btn btn-secondary"
-                                                    onClick={() => handleClickViewPDF(row.linkLuuTru)}
+                                                    onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}
                                                 >
                                                     Xem nhanh
                                                 </button>
@@ -428,13 +428,19 @@ const MinhChung = () => {
                                                 <TableCell>{item.khoMinhChung.tenMinhChung}</TableCell>
                                                 <TableCell>
                                                     <div>
-                                                        <button className="btn btn-secondary">Xem Nhanh</button><br/>
+                                                        <button
+                                                            className="btn btn-secondary"
+                                                            onClick={() => handleClickViewPDF(item.linkLuuTru)}
+                                                        >
+                                                            Xem nhanh
+                                                        </button>
+                                                        <br/>
                                                         <button
                                                             className="btn btn-danger"
                                                             style={{marginTop: '5px'}}
                                                             onClick={() => deleteMC(item.idMc, modifiedString)}
                                                         >
-                                                            Xóa
+                                                        Xóa
                                                         </button>
                                                     </div>
                                                 </TableCell>

@@ -50,9 +50,6 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
                 } else if (formData.title === 'Mốc Chuẩn') {
                     response = await insertNewMocChuan(formData);
                 }else if (formData.title === 'Gợi Ý') {
-                    alert(formData.ten)
-                    alert(formData.batBuoc)
-                    alert(formData.idParent)
                     response  = await saveGoiY(formData);
                 }
             }else{
@@ -167,7 +164,8 @@ const DinhNghiaTieuChuan = () => {
         ten: '',
         stt: 0,
         yeuCau: '',
-        idParent: ''
+        idParent: '',
+        id : 0
     });
 
     const fetchData = async () => {
@@ -281,7 +279,8 @@ const DinhNghiaTieuChuan = () => {
                                                         ten: '',
                                                         stt: findMissingSTT(tieuChuan),
                                                         yeuCau: '',
-                                                        idParent: ChuongTrinh_ID
+                                                        idParent: ChuongTrinh_ID,
+                                                        id : 0
                                                     });
                                                     handleShow();
                                                 }}
@@ -331,7 +330,8 @@ const DinhNghiaTieuChuan = () => {
                                                     ten: '',
                                                     stt: findMissingSTT(item.tieuChi),
                                                     yeuCau: '',
-                                                    idParent: item.idTieuChuan
+                                                    idParent: item.idTieuChuan,
+                                                    id : 0
                                                 });
                                                 handleShow();
                                             }}
@@ -375,7 +375,8 @@ const DinhNghiaTieuChuan = () => {
                                                             ten: '',
                                                             stt: 0,
                                                             yeuCau: '',
-                                                            idParent: i.idTieuChi
+                                                            idParent: i.idTieuChi,
+                                                            id : 0
                                                         });
                                                         handleShow();
                                                     }}
