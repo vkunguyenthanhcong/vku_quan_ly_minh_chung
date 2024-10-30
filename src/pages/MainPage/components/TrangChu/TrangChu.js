@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { getKdclData, getCtdtDataByMaKDCL } from '../../../../services/apiServices';
+import {getKdclData, getCtdtDataByMaKDCL, getAllChuongTrinhDaoTao} from '../../../../services/apiServices';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+//danh sach chuong trinh dao tao
 
 const TrangChu = () => {
   const location = useLocation();
@@ -27,11 +28,8 @@ const TrangChu = () => {
     };
     fetchDataFromAPI();
   }, []);
-  
-
-  //danh sach chuong trinh dao tao
   const GenericList = ({ maKdcl }) => {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState(null);
     const navigate = useNavigate();
     const handleButtonClick = (maCtdt) => {
       if(action === "QuanLyTieuChuan"){
@@ -42,12 +40,13 @@ const TrangChu = () => {
         navigate(`bao-cao-tu-danh-gia?KhungCTDT_ID=${maCtdt}`);
       }
     };
-    
+
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const result = await getCtdtDataByMaKDCL(maKdcl);
-          setData(result);
+          const result = await getAllChuongTrinhDaoTao();
+          const filteredData = result.filter(item => item.chuanKdcl && item.chuanKdcl.maKdcl === maKdcl);
+          setData(filteredData)
         } catch (err) {
           setError(err);
         } finally {
@@ -55,15 +54,16 @@ const TrangChu = () => {
         }
       };
       fetchData();
-    }, [maKdcl]);
+    }, []);
     return (
-      <ul>
-        {data.map((item, index) => (
-          <li style={{marginBottom : '20px', marginTop : '20px', listStyleType : 'none'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btn-primary'>{item.tenCtdt}</button></li>
-        ))}
-      </ul>
+        <ul>
+          {data ? data.map((item, index) => (
+              <li style={{marginBottom : '20px', marginTop : '20px', listStyleType : 'none'}} key={index}><button onClick={() => handleButtonClick(item.maCtdt, item.tenCtdt)} className='btn btn-primary'>{item.tenCtdt}</button></li>
+          )) : ('')}
+        </ul>
     );
   };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 

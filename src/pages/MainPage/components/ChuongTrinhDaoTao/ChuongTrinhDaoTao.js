@@ -1,7 +1,11 @@
 // src/components/ChuanKiemDinh.js
 import React, { useEffect, useState, memo } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getThongTinCTDT, getTotalMinhChungWithTieuChuan } from '../../../../services/apiServices';
+import {
+  findTieuChuaByMaCtdt, getAllMinhChung,
+  getThongTinCTDT,
+  getTotalMinhChungWithTieuChuan
+} from '../../../../services/apiServices';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -24,8 +28,9 @@ const TotalMinhChung = memo(({ idTieuChuan }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = await getTotalMinhChungWithTieuChuan(idTieuChuan);
-        setTotal(response);
+        const response = await getAllMinhChung();
+        const filterResult = response.filter((item) => item.idTieuChuan == idTieuChuan);
+        setTotal(filterResult.length);
       } catch (error) {
         setError('Could not fetch total.');
       } finally {
@@ -45,7 +50,8 @@ const TotalMinhChung = memo(({ idTieuChuan }) => {
 
 const ChuongTrinhDaoTao = () => {
   const navigate = useNavigate();
-  const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState(null);
+  const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
+  const [tieuChuan, setTieuChuan] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -63,6 +69,8 @@ const ChuongTrinhDaoTao = () => {
       try {
         const response = await getThongTinCTDT(KhungCTDT_ID);
         setChuongTrinhDaoTao(response);
+        const tieuChuanData = await findTieuChuaByMaCtdt(KhungCTDT_ID);
+        setTieuChuan(tieuChuanData)
       } catch (error) {
         setError(error);
       } finally {
@@ -127,7 +135,7 @@ const ChuongTrinhDaoTao = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {chuongTrinhDaoTao ? (chuongTrinhDaoTao.tieuChuan.map((row, index) => (
+            {tieuChuan ? (tieuChuan.map((row, index) => (
               <TableRow key={row.id}>
                 <CustomTableCell>{index + 1}</CustomTableCell>
                 <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>

@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getAllPhanCongByIdPhongBan, getAllTieuChiWithIdTieuChuan, getThongTinCTDT, getTieuChuanWithMaCtdt } from "../../../../services/apiServices";
+import {
+    findTieuChuaByMaCtdt,
+    getAllPhanCongByIdPhongBan, getAllTieuChi,
+    getAllTieuChiWithIdTieuChuan,
+    getThongTinCTDT
+} from "../../../../services/apiServices";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
@@ -11,8 +16,9 @@ const TieuChi = ({ idTieuChuan, phongBanUser}) => {
     useState(() => {
         const fetchData = async () => {
             try {
-                const response = await getAllTieuChiWithIdTieuChuan(idTieuChuan)
-                setTieuChi(response)
+                const response = await getAllTieuChi();
+                const filterResult = response.filter((item) => item.idTieuChuan === idTieuChuan);
+                setTieuChi(filterResult)
             } catch (error) {
 
             }
@@ -69,7 +75,7 @@ const VietBaoCao = () => {
                             setPhanCong(response_3); // No need to wrap response_3 in an array
 
                             // Fetch TieuChuanWithMaCtdt
-                            const response_2 = await getTieuChuanWithMaCtdt(KhungCTDT_ID);
+                            const response_2 = await findTieuChuaByMaCtdt(KhungCTDT_ID);
                             const filteredStt = response_2.filter(item => item.stt >= response_3[0].sttTieuChuanBatDau && item.stt <= response_3[0].sttTieuChuanKetThuc);
                             setTieuChuan(filteredStt);
                         } else {

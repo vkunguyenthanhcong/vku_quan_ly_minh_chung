@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
+    findTieuChuaByMaCtdt, getAllChuongTrinhDaoTao,
     getCtdtDataByMaKDCL,
     getKdclData, getMinhChungByMaCtdt,
-    getTieuChiByMaCtdt,
-    getTieuChuanWithMaCtdt
+    getTieuChiByMaCtdt
 } from "../../../../services/apiServices";
 import { useNavigate } from "react-router-dom";
-import ChuongTrinhDaoTao from "../../../MainPage/components/ChuongTrinhDaoTao/ChuongTrinhDaoTao";
 
 
 const Total = ({maCtdt}) => {
@@ -20,7 +19,7 @@ const Total = ({maCtdt}) => {
         const fetchData = async () => {
 
             try {
-                const tieuChuan = await getTieuChuanWithMaCtdt(maCtdt);
+                const tieuChuan = await findTieuChuaByMaCtdt(maCtdt);
                 setTotalTieuChuan(tieuChuan.length);
                 const tieuChi = await getTieuChiByMaCtdt(maCtdt);
                 setTotalTieuChi(tieuChi.length);
@@ -50,19 +49,22 @@ const ListChuongTrinhDaoTao = ({maKdcl}) => {
     const  goToChuongTrinhDaoTao = (ChuongTrinh_ID) => {
         navigate(`../chi-tiet-chuong-trinh-dao-tao?ChuongTrinh_ID=${ChuongTrinh_ID}`);
     }
-
-    const fetchData = async () => {
-        try {
-            const result = await getCtdtDataByMaKDCL(maKdcl);
-            setChuongTrinhDaoTao(result);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const  goToDinhNghiaTieuChuan = (ChuongTrinh_ID) => {
+        navigate(`../dinh-nghia-tieu-chuan?ChuongTrinh_ID=${ChuongTrinh_ID}`);
+    }
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await getAllChuongTrinhDaoTao(maKdcl);
+                const filterData = result.filter((item) => item.chuanKdcl && item.chuanKdcl.maKdcl === maKdcl);
+                setChuongTrinhDaoTao(filterData);
+            } catch (err) {
+                setError(err);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchData();
     }, [maKdcl]);
 
@@ -73,7 +75,7 @@ const ListChuongTrinhDaoTao = ({maKdcl}) => {
                     <p><b>{index+1}. {item.tenCtdt}</b></p>
                     <Total maCtdt={item.maCtdt} />
                     <button className="btn btn-primary" onClick={() => goToChuongTrinhDaoTao(item.maCtdt)}>Chi tiết</button>
-                    
+                    <button className="btn btn-success ms-2" onClick={() => goToDinhNghiaTieuChuan(item.maCtdt)}>Định nghĩa tiêu chuẩn</button>
                 </div>
             ))}
         </div>
