@@ -158,10 +158,10 @@ const VietBaoCaoTieuChi = () => {
                             return {
                                 ...item,
                                 khoMinhChung: matchingItem.khoMinhChung,
-                                parentMaMc: matchingItem.parentMaMc,   // Copy parentMaMc from matching item
-                                childMaMc: matchingItem.childMaMc,     // Copy childMaMc from matching item
-                                maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`, // Copy maMinhChung from matching item
-                                idTieuChi: idTieuChi// Assign idTieuChi if found
+                                parentMaMc: matchingItem.parentMaMc,
+                                childMaMc: matchingItem.childMaMc,
+                                maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`,
+                                idTieuChi: idTieuChi
                             };
                         }
                     }
@@ -171,8 +171,8 @@ const VietBaoCaoTieuChi = () => {
                         idTieuChi: idTieuChi
                     };
                 });
-
             const minhChungFilter = updatedMinhChung.filter((item) => item.idTieuChi == TieuChi_ID);
+
             const suggestions = minhChungFilter.map(itemB => {
                 let parentMaMc = itemB.parentMaMc;
                 let childMaMc = itemB.childMaMc;
@@ -190,6 +190,7 @@ const VietBaoCaoTieuChi = () => {
                     tenMinhChung: itemB.khoMinhChung.tenMinhChung, maMinhChung: maMinhChung, link: itemB.linkLuuTru
                 };
             });
+            console.log(suggestions)
             setMinhChung(suggestions);
 
             const response_4 = await getAllPhieuDanhGia();

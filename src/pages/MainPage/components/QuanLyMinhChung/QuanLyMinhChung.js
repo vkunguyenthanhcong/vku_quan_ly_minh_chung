@@ -27,6 +27,8 @@ const QuanLyMinhChung = () =>{
 
     const GoiY_ID = queryParams.get('GoiY_ID');
     const TieuChi_ID = queryParams.get('TieuChi_ID');
+    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
+    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -77,7 +79,7 @@ const QuanLyMinhChung = () =>{
         }else{
             const response = await getKhoMinhChungWithId(EvidenceID, token);
             if(response == ''){
-                navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
+                navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
             }else{
                 setSelectedLoai(response.idLoai);
                 setSelectedDonVi(response.idDvbh);
@@ -110,7 +112,7 @@ const QuanLyMinhChung = () =>{
 
                 const response_1 = await updateKhoMinhChung(EvidenceID, minhChung, token);
                 setOpen(false);
-                navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
+                navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
             }else{
                 const formData = new FormData();
                 formData.append("file", file);
@@ -137,7 +139,7 @@ const QuanLyMinhChung = () =>{
 
                         const response_1 = await updateKhoMinhChung(EvidenceID,minhChung, token);
                         setOpen(false);
-                        navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
+                        navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
                     } catch (error) {
 
                     }
@@ -172,7 +174,7 @@ const QuanLyMinhChung = () =>{
 
                     const response_1 = await saveMinhChung(minhChung, token);
                     setOpen(false);
-                    navigate(`/quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}`);
+                    navigate(`quan-ly/minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
                 } catch (error) {
 
                 }

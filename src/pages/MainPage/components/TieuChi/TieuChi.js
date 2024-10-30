@@ -40,11 +40,11 @@ const Table_MinhChung = React.memo(({idGoiY, idTieuChi}) => {
             const result = await getAllMinhChung();
             const filterResult = result.filter((item)=> item.idGoiY == idGoiY);
             const updatedData = filterResult.map(item => {
-                const maMinhChung = `${item.parentMaMc}${item.childMaMc}`; // Combine fields
-                const {parentMaMc, childMaMc, ...rest} = item; // Destructure and remove parent and child
+                const maMinhChung = `${item.parentMaMc}${item.childMaMc}`;
+                const {parentMaMc, childMaMc, ...rest} = item;
                 return {
-                    ...rest, // Include all other properties
-                    maMinhChung // Add the new combined field
+                    ...rest,
+                    maMinhChung
                 };
             });
             setMinhChung(updatedData);
@@ -127,7 +127,7 @@ const Table_MinhChung = React.memo(({idGoiY, idTieuChi}) => {
                                            style={{width: '30%'}}>{row.khoMinhChung.tenMinhChung}</TableCell>
                                 <TableCell className='p-0' style={{width: '20%'}}>
                                     <button style={{width: '100%', marginTop: '5px'}} className='btn btn-secondary'
-                                            onClick={() => handleClickViewPDF(row.khoMinhChung.linkLuuTru)}>Xem
+                                            onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem
                                     </button>
                                     <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger'
                                             onClick={() => deleteMC(row.idMc, modifiedString)}>Xóa
