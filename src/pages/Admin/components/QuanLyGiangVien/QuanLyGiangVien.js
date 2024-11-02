@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {getAllUser, getPhongBan} from "../../../../services/apiServices";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+
 const formatPhoneNumber = (phoneNumber) => {
     // Use a regex to format the phone number
     return phoneNumber.replace(/(\d{4})(\d{3})(\d{3})/, '$1.$2.$3');
@@ -30,8 +31,24 @@ function QuanLyGiangVien() {
         }
         fetchData()
     }, [])
-    const handleChangePhongBan = (event) => {
+    const handleChangePhongBan = (userId, event) => {
+        const newIdPhongBan = event.target.value;
 
+        // Update the user state based on the user ID
+        setUser((prevUsers) =>
+            prevUsers.map((user) =>
+                user.id === userId
+                    ? {
+                        ...user,
+                        phongBan: {
+                            ...user.phongBan,
+                            idPhongBan: newIdPhongBan,
+                            tenPhongBan: phongBan.find(pb => pb.idPhongBan === parseInt(newIdPhongBan)).tenPhongBan,
+                        },
+                    }
+                    : user
+            )
+        );
     };
     if (loading) {
         return (<p>Loading...</p>)
@@ -69,17 +86,18 @@ function QuanLyGiangVien() {
                         </TableCell>
                         <TableCell>{item.email}</TableCell>
                         <TableCell>{formatPhoneNumber(item.sdt)}</TableCell>
-                        
+
                         <TableCell>
                             <select className="form-select" value={item.phongBan.idPhongBan}
-                                    onChange={handleChangePhongBan}>
-                                {phongBan.map((data) => (<option key={data.idPhongBan} value={data.idPhongBan}>
-                                    {data.tenPhongBan}
-                                </option>))}
+                                    onChange={(e) => handleChangePhongBan(item.id, e)}>
+                                {phongBan.map((data) => (
+                                    <option key={data.idPhongBan} value={data.idPhongBan}>
+                                        {data.tenPhongBan}
+                                    </option>))}
                             </select>
                         </TableCell>
                         <TableCell>
-                            <img src={item.avatar} width="50" height="50" />
+                            <img src={item.avatar} width="50" height="50"/>
                         </TableCell>
                         <TableCell>
                             <button className="btn btn-primary">Sửa</button>
