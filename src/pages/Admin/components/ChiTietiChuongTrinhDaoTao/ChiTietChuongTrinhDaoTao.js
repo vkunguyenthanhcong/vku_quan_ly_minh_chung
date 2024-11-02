@@ -25,6 +25,7 @@ const ChiTietChuongTrinhDaoTao = () => {
             try {
                 const result = await getThongTinCTDT(ChuongTrinh_ID);
                 setChuongTrinhDaoTao(result);
+                console.log(result)
                 setTenCTDT(result.tenCtdt);
                 if(result.khoa.tenKhoa != "" || result.nganh.tenNganh != ""){
                     const khoaData = await getKhoa();
@@ -109,40 +110,44 @@ const ChiTietChuongTrinhDaoTao = () => {
                     <Input className="form-control" value={tenCTDT} onChange={(e) => handleChangeTenCtdt(e.target.value)}/>
                     <br/><br/>
                     <p>- Chuẩn ánh giá ĐBCL : <button className="btn btn-secondary">{chuongTrinhDaoTao.chuanKdcl.tenKdcl}</button></p>
-                    <p>- Thuộc Khoa :
-                        <select
-                            className="form-select"
-                            value={selectedKhoa}
-                            onChange={(e) => handleSelectKhoa(e.target.value)}
-                        >
-                            {khoa.length > 0 ? (
-                                khoa.map((item) => (
-                                    <option key={item.maKhoa} value={item.maKhoa}>
-                                        {item.tenKhoa}
-                                    </option>
-                                ))
-                            ) : (
-                                <option>Không có Khoa</option>
-                            )}
-                        </select>
-                    </p>
-                    <p>- Thuộc Ngành :
-                        <select
-                            className="form-select"
-                            value={selectedNganh}
-                            onChange={(e) => handleSelectNganh(e.target.value)}
-                        >
-                            {nganh.length > 0 ? (
-                                nganh.filter(item=>item.maKhoa === selectedKhoa).map((item) => (
-                                    <option key={item.maNganh} value={item.maNganh}>
-                                        {item.tenNganh} - {item.trinhDo}
-                                    </option>
-                                ))
-                            ) : (
-                                <option>Không có Ngành</option>
-                            )}
-                        </select>
-                    </p>
+                    {chuongTrinhDaoTao?.loai === 1 && (
+                        <>
+                            <p>- Thuộc Khoa :</p>
+                            <select
+                                className="form-select"
+                                value={selectedKhoa}
+                                onChange={(e) => handleSelectKhoa(e.target.value)}
+                            >
+                                {khoa.length > 0 ? (
+                                    khoa.map((item) => (
+                                        <option key={item.maKhoa} value={item.maKhoa}>
+                                            {item.tenKhoa}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>Không có Khoa</option>
+                                )}
+                            </select>
+
+                            <p>- Thuộc Ngành :</p>
+                            <select
+                                className="form-select"
+                                value={selectedNganh}
+                                onChange={(e) => handleSelectNganh(e.target.value)}
+                            >
+                                {nganh.length > 0 ? (
+                                    nganh.filter(item => item.maKhoa === selectedKhoa).map((item) => (
+                                        <option key={item.maNganh} value={item.maNganh}>
+                                            {item.tenNganh} - {item.trinhDo}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option disabled>Không có Ngành</option>
+                                )}
+                            </select>
+                        </>
+                    )}
+                    <br/>
                     <button className="btn btn-success" onClick={() => updateCtdt()}>Cập Nhật</button>
                     <button className="btn btn-danger ms-1" onClick={() => deleteCtdt()}>Xóa</button>
                 </>

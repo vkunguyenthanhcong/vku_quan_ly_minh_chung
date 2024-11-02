@@ -166,17 +166,6 @@ export const deleteChuongTrinhDaoTao = (maCtdt, token) => {
             throw error;
         });
 };
-//Data Tieu Chi Theo Ma Chuong Trinh Dao Tao
-export const getTieuChiByMaCtdt = (maCtdt, token) => {
-    return api.get(`/tieuchi/findByMaCtdt/${maCtdt}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error fetching CTDT data:', error);
-            throw error;
-        });
-};
 // Lay Data Chuong Trinh Dao Tao
 export const getThongTinCTDT = (maCtdt, token) => {
     return api.get(`/ctdt/detail/${maCtdt}`, {

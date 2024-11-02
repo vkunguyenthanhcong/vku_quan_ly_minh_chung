@@ -7,7 +7,6 @@ import {
     deleteMinhChung,
     getTotalMinhChungWithTieuChi,
     getMinhChungByIdGoiY,
-    getTieuChiByMaCtdt,
     getAllTieuChi,
     getAllMocChuanWithIdTieuChi,
     getAllMocChuan, getAllGoiYWithIdMocChuan, getAllGoiY, getAllMinhChung

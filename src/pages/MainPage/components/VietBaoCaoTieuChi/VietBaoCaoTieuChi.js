@@ -50,7 +50,6 @@ import {
     Mention
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
-import './VietBaoCao.css'
 import {
     getAllGoiY,
     getAllMinhChung, getAllMocChuan, getAllPhieuDanhGia,
@@ -62,22 +61,6 @@ import {
 } from "../../../../services/apiServices";
 
 function MentionCustomization(editor) {
-    editor.conversion.for('upcast').elementToAttribute({
-        view: {
-            name: 'a', key: 'data-mention', classes: 'mention', attributes: {
-                href: true
-            }
-        }, model: {
-            key: 'mention', value: viewItem => {
-                const mentionAttribute = editor.plugins.get('Mention').toMentionAttribute(viewItem, {
-                    link: viewItem.getAttribute('href')
-                });
-
-                return mentionAttribute;
-            }
-        }, converterPriority: 'high'
-    });
-
     // Downcast the model 'mention' text attribute to a view <a> element.
     editor.conversion.for('downcast').attributeToElement({
         model: 'mention', view: (modelAttributeValue, {writer}) => {
@@ -86,14 +69,13 @@ function MentionCustomization(editor) {
             }
 
             return writer.createAttributeElement('a', {
-                class: 'mention', 'data-mention': modelAttributeValue.id, 'href': modelAttributeValue.link
+                class: 'mention', 'data-mention': modelAttributeValue.id, 'href': modelAttributeValue.link, 'data-name' : modelAttributeValue.name
             }, {
                 id: modelAttributeValue.uid
             });
         }, converterPriority: 'high'
     });
 }
-
 const VietBaoCaoTieuChi = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -190,7 +172,6 @@ const VietBaoCaoTieuChi = () => {
                     tenMinhChung: itemB.khoMinhChung.tenMinhChung, maMinhChung: maMinhChung, link: itemB.linkLuuTru
                 };
             });
-            console.log(suggestions)
             setMinhChung(suggestions);
 
             const response_4 = await getAllPhieuDanhGia();
@@ -243,7 +224,7 @@ const VietBaoCaoTieuChi = () => {
                     return minhChung
                         .filter((item) => item.maMinhChung.toLowerCase().includes(query.toLowerCase()))
                         .map((item) => ({
-                            id: '[' + item.maMinhChung + ']', name: item.tenMinhChung, link: item.link
+                                id: '[' + item.maMinhChung + ']', name: item.tenMinhChung, link: item.link, text : '[' + item.maMinhChung + ']'
                         }));
                 }, itemRenderer: (item) => `${item.name}`
             }]
@@ -251,6 +232,13 @@ const VietBaoCaoTieuChi = () => {
         toolbar: {
             items: ['undo', 'redo', '|', 'sourceEditing', 'showBlocks', '|', 'heading', '|', 'bold', 'italic', 'underline', '|', 'link', 'insertImageViaUrl', 'insertTable', 'blockQuote', 'htmlEmbed', '|', 'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'],
             shouldNotGroupWhenFull: false
+        },
+        fontFamily: {
+            options: [
+                'default',
+                'Times New Roman, Times, serif'
+            ],
+            supportAllValues: true
         },
         plugins: [MentionCustomization, Mention, Autoformat, AutoImage, Autosave, BalloonToolbar, BlockQuote, BlockToolbar, Bold, CloudServices, Essentials, FullPage, GeneralHtmlSupport, Heading, HtmlComment, HtmlEmbed, ImageBlock, ImageCaption, ImageInline, ImageInsertViaUrl, ImageResize, ImageStyle, ImageTextAlternative, ImageToolbar, ImageUpload, Indent, IndentBlock, Italic, Link, LinkImage, List, ListProperties, Paragraph, SelectAll, ShowBlocks, Table, TableCaption, TableCellProperties, TableColumnResize, TableProperties, TableToolbar, TextTransformation, TodoList, Underline, Undo, PasteFromOffice],
         balloonToolbar: ['bold', 'italic', '|', 'link', '|', 'bulletedList', 'numberedList'],
@@ -297,7 +285,7 @@ const VietBaoCaoTieuChi = () => {
         menuBar: {
             isVisible: true
         },
-        placeholder: 'Type or paste your content here!',
+        placeholder: 'Nhập hoặc dán dữ liệu vào đây!',
         table: {
             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
         }
@@ -351,7 +339,7 @@ const VietBaoCaoTieuChi = () => {
             data.append('thoiGianPhatHuy', formData.thoiGianPhatHuy);
             data.append('ghiChuPhatHuy', formData.ghiChuPhatHuy);
             data.append('mucDanhGia', formData.mucDanhGia);
-            if (phieuDanhGia === null) {
+            if (phieuDanhGia?.length == 0) {
                 const response = await savePhieuDanhGiaTieuChi(data);
                 if (response === "OK") {
                     alert('Lưu thành công')
@@ -365,7 +353,7 @@ const VietBaoCaoTieuChi = () => {
             }
 
         } catch (error) {
-
+            console.log(error)
         }
     }
     return (
@@ -534,7 +522,7 @@ const VietBaoCaoTieuChi = () => {
                         value={option}
                         id={option.toString()}
                         onChange={handleSet}
-                        checked={formData.mucDanhGia === option}
+                        checked={formData.mucDanhGia == option}
                     />
                     <label htmlFor={option.toString()}>{option}</label>
                 </div>))}
