@@ -69,7 +69,6 @@ const routes = [
       { path: "quan-ly-phong-ban", element: <ProtectedRoute element={<PhongBan />} requiredRoles={["ADMIN"]} /> },
       { path: "phan-cong", element: <ProtectedRoute element={<PhanCongBaoCao />} requiredRoles={["ADMIN"]} /> },
       { path: "quan-ly-giang-vien", element: <ProtectedRoute element={<QuanLyGiangVien />} requiredRoles={["ADMIN"]} /> },
-      { path: "them-chuong-trinh-dao-tao", element: <ProtectedRoute element={<ThemChuongTrinhDaoTao />} requiredRoles={["ADMIN"]} /> },
       { path: "dinh-nghia-tieu-chuan", element: <ProtectedRoute element={<DinhNghiaTieuChuan />} requiredRoles={["ADMIN"]} /> }
     ],
   }

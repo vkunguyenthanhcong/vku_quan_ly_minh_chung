@@ -18,22 +18,28 @@ const formatString = (inputString) => {
     const year = yearMatch ? yearMatch[0] : '';
     return `${abbreviation}${year}`;
 };
-const PopupForm = ({props}) => {
+const PopupForm = (props) => {
     const [open, setOpen] = useState(false);
     const handleChange = (e) => {
-        const {name, value} = e.target;
-        props.setFormData({...props.formData, [name] : value});
+        const { name, value } = e.target;
+        let updatedFormData = { ...props.formData, [name]: value };
+        if (name === "tenCtdt") {
+            updatedFormData = {
+                ...updatedFormData,
+                maCtdt: formatString(value),
+            };
+        }
+        props.setFormData(updatedFormData);
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setOpen(true)
         try {
             if(props.formData.loai != 0) {
-                props.setFormData({...props.formData, "maCtdt" : formatString(props.formData.tenCtdt)});
-                console.log(props.formData.maCtdt);
-                const response = await createChuongTrinhDaoTao(props.formData);
 
+                const response = await createChuongTrinhDaoTao(props.formData);
                 if (response === "OK") {
                     await props.fetchData();
                     setOpen(false);
@@ -253,6 +259,7 @@ const AdminChuongTrinhDaoTao = () => {
         loai : 0
     })
     const getChuanKDCL = async () => {
+        setLoading(true)
         try {
             const result = await getKdclData();
             setChuanKDCL(result);
@@ -292,10 +299,11 @@ const AdminChuongTrinhDaoTao = () => {
         trinhDo : trinhDo,
         nganh : nganh
     }
+    if(loading){return ('Loading...')}
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
             <LoadingProcess open={open}/>
-            <PopupForm props={props}/>
+            <PopupForm {...props}/>
             {
                 chuanKDCL.length > 0 ? (
                     chuanKDCL.map(({ maKdcl, tenKdcl }, index) => (
