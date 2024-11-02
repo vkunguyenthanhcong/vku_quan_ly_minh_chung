@@ -262,7 +262,7 @@ const AdminChuongTrinhDaoTao = () => {
         setLoading(true)
         try {
             const result = await getKdclData();
-            setChuanKDCL(result);s
+            setChuanKDCL(result);
         } catch (err) {
             setError(err);
         } finally {
