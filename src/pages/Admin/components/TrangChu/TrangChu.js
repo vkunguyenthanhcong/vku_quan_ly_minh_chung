@@ -15,9 +15,6 @@ const TrangChuAdmin = () => {
     const goToQuanLyGiangVien = () => {
         navigate('quan-ly-giang-vien')
     }
-    const goToThemChuongTrinhDaoTao = () => {
-        navigate(`them-chuong-trinh-dao-tao`)
-    }
     return (
         <div className="content" style={{background: "white", margin: "20px"}}>
             <div>
@@ -32,7 +29,7 @@ const TrangChuAdmin = () => {
                 <button style={{marginRight: '10px'}} className='btn btn-success' onClick={goToChuongTrinhDaoTao}>Quản
                     lý
                 </button>
-                <button className='btn btn-primary' onClick={goToThemChuongTrinhDaoTao}>Thêm</button>
+
             </div>
             <div className="mt-4">
                 <p>QUẢN LÝ PHÒNG BAN</p>

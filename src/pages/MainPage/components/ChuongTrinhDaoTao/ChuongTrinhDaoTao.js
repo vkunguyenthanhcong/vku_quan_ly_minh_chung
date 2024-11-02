@@ -3,8 +3,7 @@ import React, { useEffect, useState, memo } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   findTieuChuaByMaCtdt, getAllMinhChung,
-  getThongTinCTDT,
-  getTotalMinhChungWithTieuChuan
+  getThongTinCTDT
 } from '../../../../services/apiServices';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
