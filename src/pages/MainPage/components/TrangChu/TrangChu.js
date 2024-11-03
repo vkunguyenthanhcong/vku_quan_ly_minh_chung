@@ -165,7 +165,7 @@ const TrangChu = () => {
                 const filterTieuChuanData = tieuChuanData.filter(item => item.maCtdt == filterChuongTrinhDaoTao[0].maCtdt);
                 setTieuChuanSelected(filterTieuChuanData);
 
-                const minhChung = getAllMinhChung();
+                const minhChung = await getAllMinhChung();
                 setMinhChung(minhChung);
 
             } catch (error) {
@@ -196,6 +196,7 @@ const TrangChu = () => {
         }
     }
     const totalMinhChung = (idTieuChuan) => {
+
         if (minhChung.length > 0) {
             const total = minhChung.filter(item => item.idTieuChuan === idTieuChuan);
             return total.length;
