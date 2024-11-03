@@ -5,11 +5,8 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {
     getTieuChuanById,
     deleteMinhChung,
-    getTotalMinhChungWithTieuChi,
-    getMinhChungByIdGoiY,
     getAllTieuChi,
-    getAllMocChuanWithIdTieuChi,
-    getAllMocChuan, getAllGoiYWithIdMocChuan, getAllGoiY, getAllMinhChung
+    getAllMocChuan, getAllGoiY, getAllMinhChung
 } from '../../../../services/apiServices';
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
@@ -233,7 +230,7 @@ const TotalTieuChi = ({idTieuChi}) => {
     )
 }
 
-const TieuChi = () => {
+const TieuChi = ({TieuChuan_ID, KhungCTDT_ID}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tieuChuan, setTieuChuan] = useState([]);
@@ -241,8 +238,6 @@ const TieuChi = () => {
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
-    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
     const isModalOpen = useClickViewPdfStore((state) => state.isModalOpen);
     const closeModal = useClickViewPdfStore((state) => state.closeModal);
@@ -277,12 +272,7 @@ const TieuChi = () => {
                     border : 1px solid black !important}
                 `}
             </style>
-            <div>
-                {tieuChuan && tieuChuan.ctdt ?
-                    <p style={{fontSize: '20px', textAlign: 'center'}}><b>CHƯƠNG TRÌNH ĐÀO TẠO NGÀNH </b><b
-                        style={{color: 'green'}}>{tieuChuan.ctdt.tenCtdt}</b></p>
-                    : 'Loading...'}
-            </div>
+
             <TableContainer component={Paper}>
                 <Table className='font-Inter'>
                     <TableHead>
