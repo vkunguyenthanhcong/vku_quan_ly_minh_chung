@@ -12,20 +12,24 @@ import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
 import {useClickViewPdfStore} from "../../../../stores";
 
-const Table_MinhChung = React.memo(({idGoiY, idTieuChi}) => {
+const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfer, dataTransfer}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [minhChung, setMinhChung] = useState([]);
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
-    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
 
     const handleClickViewPDF = useClickViewPdfStore((state) => state.handleClickViewPDF);
 
     const navigate = useNavigate();
     const handleClick = (idGoiY, idTieuChi) => {
-        navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}&TieuChuan_ID=${TieuChuan_ID}`);
+        // navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}&TieuChuan_ID=${TieuChuan_ID}`);
+        setNoCase(3)
+        setDataTransfer({
+            ...dataTransfer,
+            GoiY_ID : idGoiY,
+            TieuChi_ID : idTieuChi
+        })
     };
     const deleteMC = async (idMc, parentMaMc) => {
         deleteMinhChung(idMc, parentMaMc);
@@ -141,7 +145,7 @@ const Table_MinhChung = React.memo(({idGoiY, idTieuChi}) => {
 
     );
 });
-const Table_GoiY = React.memo(({idMocChuan, idTieuChi}) => {
+const Table_GoiY = React.memo(({setNoCase, idMocChuan, idTieuChi, setDataTransfer, dataTransfer}) => {
     const [goiY, setGoiY] = useState([]);
     useEffect(() => {
         const fetchMocChuan = async () => {
@@ -164,7 +168,7 @@ const Table_GoiY = React.memo(({idMocChuan, idTieuChi}) => {
                             <span>{row.tenGoiY}</span>
                         </TableCell>
                         <TableCell style={{width: '75%', maxWidth: '100%', border: 'none', height: '100%'}}>
-                            <Table_MinhChung idGoiY={row.idGoiY} idTieuChi={idTieuChi}/>
+                            <Table_MinhChung setNoCase={setNoCase} idGoiY={row.idGoiY} idTieuChi={idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>
                         </TableCell>
                     </TableRow>
                     {index < goiY.length - 1 && <hr style={{border: '1px solid black'}}/>}
@@ -174,7 +178,7 @@ const Table_GoiY = React.memo(({idMocChuan, idTieuChi}) => {
 
     );
 });
-const Table_MocChuan = React.memo(({idTieuChi}) => {
+const Table_MocChuan = React.memo(({idTieuChi, setNoCase, setDataTransfer, dataTransfer}) => {
     const [mocChuan, setMocChuan] = useState([]);
     useEffect(() => {
         const fetchMocChuan = async () => {
@@ -196,7 +200,7 @@ const Table_MocChuan = React.memo(({idTieuChi}) => {
                         <TableCell style={{width: '20%'}}
                                    className='border-1'>{index + 1}. {row.tenMocChuan}</TableCell>
                         <TableCell className='border-1 p-0' style={{width: '80%'}}>
-                            <Table_GoiY idMocChuan={row.idMocChuan} idTieuChi={idTieuChi}/>
+                            <Table_GoiY setNoCase={setNoCase} idMocChuan={row.idMocChuan} idTieuChi={idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -230,7 +234,7 @@ const TotalTieuChi = ({idTieuChi}) => {
     )
 }
 
-const TieuChi = ({TieuChuan_ID, KhungCTDT_ID}) => {
+const TieuChi = ({TieuChuan_ID, KhungCTDT_ID, setNoCase, setDataTransfer, dataTransfer}) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tieuChuan, setTieuChuan] = useState([]);
@@ -304,7 +308,7 @@ const TieuChi = ({TieuChuan_ID, KhungCTDT_ID}) => {
                                     <p key={index}>{item.trim()}</p>
                                 ))}</TableCell>
                                 <TableCell colSpan={3} className='p-0'>
-                                    <Table_MocChuan idTieuChi={row.idTieuChi}/>
+                                    <Table_MocChuan setNoCase={setNoCase} idTieuChi={row.idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>
                                 </TableCell>
                                 <TableCell style={{verticalAlign: 'top'}}><TotalTieuChi
                                     idTieuChi={row.idTieuChi}/></TableCell>
