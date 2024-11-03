@@ -25,7 +25,6 @@ const ChiTietChuongTrinhDaoTao = () => {
             try {
                 const result = await getThongTinCTDT(ChuongTrinh_ID);
                 setChuongTrinhDaoTao(result);
-                console.log(result)
                 setTenCTDT(result.tenCtdt);
                 if(result.khoa.tenKhoa != "" || result.nganh.tenNganh != ""){
                     const khoaData = await getKhoa();

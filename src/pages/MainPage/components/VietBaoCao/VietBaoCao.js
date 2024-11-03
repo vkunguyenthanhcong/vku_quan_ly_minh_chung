@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
     findTieuChuaByMaCtdt,
     getAllPhanCongByIdPhongBan, getAllTieuChi,
-    getAllTieuChiWithIdTieuChuan,
     getThongTinCTDT
 } from "../../../../services/apiServices";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 
-const TieuChi = ({ idTieuChuan, phongBanUser}) => {
+const TieuChi = ({ idTieuChuan, phongBanUser, setNoCase, setDataTransfer}) => {
     const [tieuChi, setTieuChi] = useState([])
 
     const navigate = useNavigate()
@@ -26,7 +25,13 @@ const TieuChi = ({ idTieuChuan, phongBanUser}) => {
         fetchData()
     }, [])
     const goToVietBaoCao = (idTieuChi) => {
-        navigate(`../viet-bao-cao-tieu-chi?TieuChuan_ID=${idTieuChuan}&TieuChi_ID=${idTieuChi}&NhomCongTac=${phongBanUser}`)
+        setNoCase(3)
+        setDataTransfer({
+            TieuChuan_ID : idTieuChuan,
+            TieuChi_ID : idTieuChi,
+            NhomCongTac : phongBanUser
+        })
+        // navigate(`../viet-bao-cao-tieu-chi?TieuChuan_ID=${idTieuChuan}&TieuChi_ID=${idTieuChi}&NhomCongTac=${phongBanUser}`)
     }
     
     return (
@@ -43,10 +48,9 @@ const TieuChi = ({ idTieuChuan, phongBanUser}) => {
 
 }
 
-const VietBaoCao = () => {
+const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer}) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
 
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(true)
@@ -146,7 +150,7 @@ const VietBaoCao = () => {
                                                         <TableCell className=""></TableCell>
                                                     </TableRow>
                                                     <TieuChi idTieuChuan={item.idTieuChuan}
-                                                             phongBanUser={phongBanUser}/>
+                                                             phongBanUser={phongBanUser} setNoCase={setNoCase} setDataTransfer={setDataTransfer}/>
                                                 </React.Fragment>
                                             ))}
 

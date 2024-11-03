@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
     createChuongTrinhDaoTao,
     findTieuChuaByMaCtdt,
@@ -8,9 +8,10 @@ import {
     getKdclData,
     getKhoa, getNganh
 } from "../../../../services/apiServices";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {Button, Form, Modal} from "react-bootstrap";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+
 const formatString = (inputString) => {
     const words = inputString.split(' ');
     const abbreviation = words.map((word) => word.charAt(0).toUpperCase()).join('');
@@ -21,8 +22,8 @@ const formatString = (inputString) => {
 const PopupForm = (props) => {
     const [open, setOpen] = useState(false);
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        let updatedFormData = { ...props.formData, [name]: value };
+        const {name, value} = e.target;
+        let updatedFormData = {...props.formData, [name]: value};
         if (name === "tenCtdt") {
             updatedFormData = {
                 ...updatedFormData,
@@ -37,16 +38,25 @@ const PopupForm = (props) => {
         e.preventDefault();
         setOpen(true)
         try {
-            if(props.formData.loai != 0) {
+            if (props.formData.loai != 0) {
 
                 const response = await createChuongTrinhDaoTao(props.formData);
                 if (response === "OK") {
                     await props.fetchData();
                     setOpen(false);
                     props.handleClose();
+                    props.setFormData({
+                        maCtdt: "",
+                        tenCtdt: "",
+                        maKdcl: "",
+                        maKhoa: "",
+                        trinhDo: "",
+                        soTinChi: 0,
+                        maNganh: "",
+                        loai: 0
+                    })
                 }
-            }else
-            {
+            } else {
                 alert("Vui lòng chọn loại chương trình");
             }
 
@@ -82,7 +92,8 @@ const PopupForm = (props) => {
 
                         <Form.Group controlId="namBanHanh">
                             <Form.Label>Loại Chương Trình</Form.Label>
-                            <Form.Control name="loai" required as="select" value={props.formData.loai} onChange={handleChange}>
+                            <Form.Control name="loai" required as="select" value={props.formData.loai}
+                                          onChange={handleChange}>
                                 <option value="0">Chọn Loại Chương Trình...</option>
                                 <option value="1">Kiểm Định Chất Lượng Đào Tạo</option>
                                 <option value="2">Kiểm Định Chất Lượng CSGD</option>
@@ -191,7 +202,7 @@ const Total = ({maCtdt}) => {
 
     return (
         <>
-        <p>Thống kê : {totalTieuChuan} Tiêu chuân | {totalTieuChi} Tiêu chí | {totalMinhChung} Minh chứng</p>
+            <p>Thống kê : {totalTieuChuan} Tiêu chuân | {totalTieuChi} Tiêu chí | {totalMinhChung} Minh chứng</p>
         </>
     )
 }
@@ -201,10 +212,10 @@ const ListChuongTrinhDaoTao = ({maKdcl}) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const  goToChuongTrinhDaoTao = (ChuongTrinh_ID) => {
+    const goToChuongTrinhDaoTao = (ChuongTrinh_ID) => {
         navigate(`../chi-tiet-chuong-trinh-dao-tao?ChuongTrinh_ID=${ChuongTrinh_ID}`);
     }
-    const  goToDinhNghiaTieuChuan = (ChuongTrinh_ID) => {
+    const goToDinhNghiaTieuChuan = (ChuongTrinh_ID) => {
         navigate(`../dinh-nghia-tieu-chuan?ChuongTrinh_ID=${ChuongTrinh_ID}`);
     }
 
@@ -224,13 +235,16 @@ const ListChuongTrinhDaoTao = ({maKdcl}) => {
     }, [maKdcl]);
 
     return (
-        <div style={{marginLeft : '10px'}}>
+        <div style={{marginLeft: '10px'}}>
             {chuongTrinhDaoTao.map((item, index) => (
-                <div key={item.maCtdt} style={{marginBottom : '10px'}}>
-                    <p><b>{index+1}. {item.tenCtdt}</b></p>
-                    <Total maCtdt={item.maCtdt} />
-                    <button className="btn btn-primary" onClick={() => goToChuongTrinhDaoTao(item.maCtdt)}>Chi tiết</button>
-                    <button className="btn btn-success ms-2" onClick={() => goToDinhNghiaTieuChuan(item.maCtdt)}>Định nghĩa tiêu chuẩn</button>
+                <div key={item.maCtdt} style={{marginBottom: '10px'}}>
+                    <p><b>{index + 1}. {item.tenCtdt}</b></p>
+                    <Total maCtdt={item.maCtdt}/>
+                    <button className="btn btn-primary" onClick={() => goToChuongTrinhDaoTao(item.maCtdt)}>Chi tiết
+                    </button>
+                    <button className="btn btn-success ms-2" onClick={() => goToDinhNghiaTieuChuan(item.maCtdt)}>Định
+                        nghĩa tiêu chuẩn
+                    </button>
                 </div>
             ))}
         </div>
@@ -247,16 +261,19 @@ const AdminChuongTrinhDaoTao = () => {
     const handleShow = () => setShow(true);
     const [khoa, setKhoa] = useState([]);
     const [nganh, setNganh] = useState([]);
-    const [trinhDo, setTrinhDo] = useState([{idTrinhDo : "Cao Đẳng", tenTrinhDo : "Cao Đẳng"}, {idTrinhDo : "Đại Học", tenTrinhDo : "Đại Học"}, {idTrinhDo : "Cao Học", tenTrinhDo : "Cao Học"}]);
+    const [trinhDo, setTrinhDo] = useState([{idTrinhDo: "Cao Đẳng", tenTrinhDo: "Cao Đẳng"}, {
+        idTrinhDo: "Đại Học",
+        tenTrinhDo: "Đại Học"
+    }, {idTrinhDo: "Cao Học", tenTrinhDo: "Cao Học"}]);
     const [formData, setFormData] = useState({
-        maCtdt : "",
-        tenCtdt : "",
+        maCtdt: "",
+        tenCtdt: "",
         maKdcl: "",
-        maKhoa : "",
-        trinhDo : "",
-        soTinChi : 0,
-        maNganh : "",
-        loai : 0
+        maKhoa: "",
+        trinhDo: "",
+        soTinChi: 0,
+        maNganh: "",
+        loai: 0
     })
     const getChuanKDCL = async () => {
         setLoading(true)
@@ -290,23 +307,25 @@ const AdminChuongTrinhDaoTao = () => {
         setFormData({...formData, "maKdcl": maKdcl});
     }
     const props = {
-        formData : formData,
-        setFormData : setFormData,
-        khoa : khoa,
-        handleClose : handleClose,
-        show : show,
-        fetchData : getChuanKDCL,
-        trinhDo : trinhDo,
-        nganh : nganh
+        formData: formData,
+        setFormData: setFormData,
+        khoa: khoa,
+        handleClose: handleClose,
+        show: show,
+        fetchData: getChuanKDCL,
+        trinhDo: trinhDo,
+        nganh: nganh
     }
-    if(loading){return ('Loading...')}
+    if (loading) {
+        return ('Loading...')
+    }
     return (
-        <div className="content" style={{ background: "white", margin: "20px" }}>
+        <div className="content" style={{background: "white", margin: "20px"}}>
             <LoadingProcess open={open}/>
             <PopupForm {...props}/>
             {
                 chuanKDCL.length > 0 ? (
-                    chuanKDCL.map(({ maKdcl, tenKdcl }, index) => (
+                    chuanKDCL.map(({maKdcl, tenKdcl}, index) => (
                         <div key={maKdcl}>
                             <div className="row">
                                 <div className="col-3">
@@ -323,7 +342,7 @@ const AdminChuongTrinhDaoTao = () => {
                                     </button>
                                 </div>
                             </div>
-                            <ListChuongTrinhDaoTao maKdcl={maKdcl} />
+                            <ListChuongTrinhDaoTao maKdcl={maKdcl}/>
                         </div>
                     ))
                 ) : (
