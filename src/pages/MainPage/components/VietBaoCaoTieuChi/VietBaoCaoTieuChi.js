@@ -59,7 +59,6 @@ import {
     savePhieuDanhGiaTieuChi,
     updatePhieuDanhGiaTieuChi
 } from "../../../../services/apiServices";
-
 function MentionCustomization(editor) {
     // Downcast the model 'mention' text attribute to a view <a> element.
     editor.conversion.for('downcast').attributeToElement({
@@ -77,6 +76,15 @@ function MentionCustomization(editor) {
     });
 }
 const VietBaoCaoTieuChi = ({dataTransfer}) => {
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+    const handleMouseMove = (event) => {
+        setMousePosition({
+            y: `${event.clientY + 50}`,
+            x: `${event.clientX}`,
+        });
+    };
+
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = dataTransfer.TieuChuan_ID;
@@ -197,10 +205,8 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                         mucDanhGia: firstItem.mucDanhGia
                     });
                 } else {
-                    // Optionally handle the case when no items match
                     setPhieuDanhGia([]);
-                    setMoTa(''); // Clear or set default values as needed
-                    // Other setters can also be reset or cleared
+                    setMoTa('');
                 }
             }
 
@@ -357,7 +363,28 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         }
     }
     return (
-        <>
+        <div onMouseMove={handleMouseMove}>
+            <style>
+                {`
+                .mention::after {
+                  content: attr(data-name); /* Display the data-name content */
+                  position: fixed;
+                  top: ${mousePosition.y}px;
+                  left: ${mousePosition.x}px;
+                  transform: translate(-50%, -50%); /* Move back to exact center */
+                  padding: 5px;
+                  background-color: black;
+                  color: white;
+                  border-radius: 4px;
+                  white-space: nowrap; /* Prevent wrapping */
+                  opacity: 0; /* Start hidden */
+                  pointer-events: none; /* Disable mouse events */
+                  transition: opacity 0.2s ease-in-out; /* Smooth transition */
+                  z-index: 1000; /* Make sure it appears on top */
+                }
+
+                `}
+            </style>
             {minhChung.length > 0 ? (<div className="content bg-white m-3 p-4">
                 <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b></p>
                 <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
@@ -366,25 +393,27 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 <p>Tiêu chí : {tieuChi.tenTieuChi}</p>
 
                 <p>1. Mô tả</p>
-                <div className="main-container">
+                <div className="main-container" >
                     <div
                         className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
                         ref={editorContainerRef}
                     >
                         <div className="editor-container__editor">
                             <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onReady={handleEditorReady}
-                                    onChange={handleEditorChange}
-                                    data={moTa}
-                                />)}
+                                {isLayoutReady && (
+                                    <CKEditor
+                                        editor={ClassicEditor}
+                                        config={editorConfig}
+                                        onReady={handleEditorReady}
+                                        onChange={handleEditorChange}
+                                        data={moTa}
+                                    />)}
                             </div>
                         </div>
                     </div>
 
                 </div>
+
 
                 <p>2. Điểm mạnh</p>
                 <div className="main-container">
@@ -532,7 +561,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                     Lưu
                 </button>
             </div>) : (<></>)}
-        </>);
+        </div>);
 
 }
 export default VietBaoCaoTieuChi;

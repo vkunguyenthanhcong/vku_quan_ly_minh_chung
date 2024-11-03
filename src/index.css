@@ -24,6 +24,16 @@ body {
   border : 1px solid black;
   padding : 10px;
 }
+.mention {
+  position: relative;
+  cursor: pointer;
+}
+
+
+.mention:hover::after {
+  opacity: 1; /* Show tooltip on hover */
+}
+
 
 .btn-primary {
   background-color: var(--primary-color) !important;
