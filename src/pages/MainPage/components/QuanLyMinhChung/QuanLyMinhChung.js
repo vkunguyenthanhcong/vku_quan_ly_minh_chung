@@ -19,16 +19,16 @@ import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess
 
 
 
-const QuanLyMinhChung = () =>{
+const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
     const token = localStorage.getItem('token');
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const EvidenceID = queryParams.get('EvidenceID');
+    const EvidenceID = dataTransfer.idMc;
 
-    const GoiY_ID = queryParams.get('GoiY_ID');
-    const TieuChi_ID = queryParams.get('TieuChi_ID');
-    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
-    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
+    const GoiY_ID = dataTransfer.GoiY_ID;
+    const TieuChi_ID = dataTransfer.TieuChi_ID;
+    const TieuChuan_ID = dataTransfer.TieuChuan_ID;
+    const KhungCTDT_ID = dataTransfer.KhungCTDT_ID;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
@@ -77,9 +77,10 @@ const QuanLyMinhChung = () =>{
         if(EvidenceID == null) {
             return;
         }else{
-            const response = await getKhoMinhChungWithId(EvidenceID, token);
+            const response = await getKhoMinhChungWithId(EvidenceID);
             if(response == ''){
-                navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+                // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+                setNoCase(3);
             }else{
                 setSelectedLoai(response.idLoai);
                 setSelectedDonVi(response.idDvbh);
@@ -110,9 +111,14 @@ const QuanLyMinhChung = () =>{
                 minhChung.append('thoigian', ngayPhatHanh);
                 minhChung.append('linkLuuTru', uploadedFile);
 
-                const response_1 = await updateKhoMinhChung(EvidenceID, minhChung, token);
-                setOpen(false);
-                navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+                const response_1 = await updateKhoMinhChung(EvidenceID, minhChung);
+                if(response_1 == "OK"){
+                    setOpen(false);
+                    setNoCase(3);
+                }
+
+                // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+
             }else{
                 const formData = new FormData();
                 formData.append("file", file);
@@ -138,8 +144,12 @@ const QuanLyMinhChung = () =>{
                         minhChung.append('linkLuuTru', response.url);
 
                         const response_1 = await updateKhoMinhChung(EvidenceID,minhChung, token);
-                        setOpen(false);
-                        navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+
+                        // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+                        if(response_1 == "OK"){
+                            setOpen(false);
+                            setNoCase(3);
+                        }
                     } catch (error) {
 
                     }
@@ -173,8 +183,12 @@ const QuanLyMinhChung = () =>{
                     minhChung.append('linkLuuTru', response.url);
 
                     const response_1 = await saveMinhChung(minhChung, token);
-                    setOpen(false);
-                    navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+
+                    // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
+                    if(response_1 == "OK"){
+                        setOpen(false);
+                        setNoCase(3);
+                    }
                 } catch (error) {
 
                 }
@@ -183,7 +197,7 @@ const QuanLyMinhChung = () =>{
     };
     return (
         <div className="content" style={{margin: '20px', padding: '20px'}}>
-            {EvidenceID == null ? <p><b>THÊM MINH CHỨNG</b></p> : <p><b>CHỈNH SỬA MINH CHỨNG</b></p>}
+            {(EvidenceID == null || EvidenceID == "") ? <p><b>THÊM MINH CHỨNG</b></p> : <p><b>CHỈNH SỬA MINH CHỨNG</b></p>}
             <label htmlFor="loaiCongVan"><b>Loại công văn</b></label>
             <select id="loaiCongVan" className='form-select' value={selectedLoai}
                     onChange={(e) => setSelectedLoai(e.target.value)} required>

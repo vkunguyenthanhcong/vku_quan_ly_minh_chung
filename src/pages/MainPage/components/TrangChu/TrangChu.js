@@ -113,6 +113,8 @@ import BaoCaoTuDanhGia from "../BaoCaoTuDanhGia/BaoCaoTuDanhGia";
 import VietBaoCaoTieuChi from "../VietBaoCaoTieuChi/VietBaoCaoTieuChi";
 import VietBaoCao from "../VietBaoCao/VietBaoCao";
 import TieuChi from "../TieuChi/TieuChi";
+import MinhChung from "../MinhChung/minhChung";
+import QuanLyMinhChung from "../QuanLyMinhChung/QuanLyMinhChung";
 
 //danh sach chuong trinh dao tao
 const CustomTableCell = styled(TableCell)(({theme}) => ({
@@ -137,7 +139,8 @@ const TrangChu = () => {
         TieuChuan_ID: "",
         TieuChi_ID: "",
         NhomCongTac: "",
-        KhungCTDT_ID: ""
+        KhungCTDT_ID: "",
+        GoiY_ID : ""
     })
     const [minhChung, setMinhChung] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -174,6 +177,7 @@ const TrangChu = () => {
         fetchDataFromAPI();
     }, []);
     const onChangeSelectChuanKdcl = (e) => {
+        setNoCase(1)
         setSelectChuanKdcl(e.target.value);
         setSelectCtdt("");
     }
@@ -182,6 +186,7 @@ const TrangChu = () => {
         setNoCase(1);
     }
     const onChangeSelectCtdt = async (e) => {
+        setNoCase(1)
         setSelectCtdt(e.target.value);
         const filterTieuChuan = tieuChuan.filter(item => item.maCtdt === e.target.value);
         if (filterTieuChuan.length > 0) {
@@ -198,7 +203,7 @@ const TrangChu = () => {
             return 0;
         }
     };
-    const QuanLyMinhChung = () => {
+    const QLMC = ({dataTransfer}) => {
         const goToTieuChi = (idTieuChuan) => {
             setDataTransfer({
                 ...dataTransfer,
@@ -206,7 +211,6 @@ const TrangChu = () => {
                 KhungCTDT_ID: selectCtdt
             })
             setNoCase(2);
-
         }
         return (
             <TableContainer>
@@ -294,13 +298,19 @@ const TrangChu = () => {
                                             {(() => {
                                                 switch (noCase) {
                                                     case 1 :
-                                                        return <QuanLyMinhChung/>
+                                                        return <QLMC/>
                                                     case 2 :
                                                         return selectCtdt !== "" ?
                                                             <TieuChi KhungCTDT_ID={selectCtdt}
-                                                                     TieuChuan_ID={dataTransfer.TieuChuan_ID}/> : null;
+                                                                     TieuChuan_ID={dataTransfer.TieuChuan_ID} setNoCase={setNoCase} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>: null;
+                                                    case 3 :
+                                                        return selectCtdt !== "" ?
+                                                            <MinhChung KhungCTDT_ID={selectCtdt} dataTransfer={dataTransfer} setDataTransfer={setDataTransfer} setNoCase={setNoCase}/> : null;
+                                                    case 4 :
+                                                        return selectCtdt !== "" ?
+                                                            <QuanLyMinhChung dataTransfer={dataTransfer} setNoCase={setNoCase}/> : null; // them minh chung
                                                     default:
-                                                        return <QuanLyMinhChung/>;
+                                                        return <QLMC/>;
                                                 }
                                             })()}
                                         </>
@@ -317,11 +327,16 @@ const TrangChu = () => {
                                             {(() => {
                                                 switch (noCase) {
                                                     case 1 :
-                                                        return <QuanLyMinhChung/>
+                                                        return <QLMC/>
                                                     case 2 :
-                                                        return <TieuChi/>
+                                                        return selectCtdt !== "" ?
+                                                            <TieuChi KhungCTDT_ID={selectCtdt}
+                                                                     TieuChuan_ID={dataTransfer.TieuChuan_ID} setNoCase={setNoCase} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>: null;
+                                                    case 3 :
+                                                        return selectCtdt !== "" ?
+                                                            <MinhChung KhungCTDT_ID={selectCtdt} dataTransfer={dataTransfer}/> : null;
                                                     default:
-                                                        return <QuanLyMinhChung/>;
+                                                        return <QLMC/>;
                                                 }
                                             })()}
                                         </>
