@@ -20,6 +20,11 @@ body {
   border: 1px solid #ccc; /* Optional: Add a border for clarity */
 }
 
+.easy-table, .easy-table td {
+  border : 1px solid black;
+  padding : 10px;
+}
+
 .btn-primary {
   background-color: var(--primary-color) !important;
   border: var(--primary-color) !important;
