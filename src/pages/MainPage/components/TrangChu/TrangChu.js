@@ -334,7 +334,10 @@ const TrangChu = () => {
                                                                      TieuChuan_ID={dataTransfer.TieuChuan_ID} setNoCase={setNoCase} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>: null;
                                                     case 3 :
                                                         return selectCtdt !== "" ?
-                                                            <MinhChung KhungCTDT_ID={selectCtdt} dataTransfer={dataTransfer}/> : null;
+                                                            <MinhChung KhungCTDT_ID={selectCtdt} dataTransfer={dataTransfer} setDataTransfer={setDataTransfer} setNoCase={setNoCase}/> : null;
+                                                    case 4 :
+                                                        return selectCtdt !== "" ?
+                                                            <QuanLyMinhChung dataTransfer={dataTransfer} setNoCase={setNoCase}/> : null; // them minh chung
                                                     default:
                                                         return <QLMC/>;
                                                 }
