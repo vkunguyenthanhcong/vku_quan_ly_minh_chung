@@ -112,6 +112,7 @@ import {useNavigate, useLocation} from 'react-router-dom';
 import BaoCaoTuDanhGia from "../BaoCaoTuDanhGia/BaoCaoTuDanhGia";
 import VietBaoCaoTieuChi from "../VietBaoCaoTieuChi/VietBaoCaoTieuChi";
 import VietBaoCao from "../VietBaoCao/VietBaoCao";
+import TieuChi from "../TieuChi/TieuChi";
 
 //danh sach chuong trinh dao tao
 const CustomTableCell = styled(TableCell)(({theme}) => ({
@@ -133,9 +134,10 @@ const TrangChu = () => {
     const [tieuChuanSelected, setTieuChuanSelected] = useState([]);
     const [noCase, setNoCase] = useState(1);
     const [dataTransfer, setDataTransfer] = useState({
-        TieuChuan_ID : "",
-        TieuChi_ID : "",
-        NhomCongTac : ""
+        TieuChuan_ID: "",
+        TieuChi_ID: "",
+        NhomCongTac: "",
+        KhungCTDT_ID: ""
     })
     const [minhChung, setMinhChung] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -196,7 +198,48 @@ const TrangChu = () => {
             return 0;
         }
     };
+    const QuanLyMinhChung = () => {
+        const goToTieuChi = (idTieuChuan) => {
+            setDataTransfer({
+                ...dataTransfer,
+                TieuChuan_ID: idTieuChuan,
+                KhungCTDT_ID: selectCtdt
+            })
+            setNoCase(2);
 
+        }
+        return (
+            <TableContainer>
+                <Table className='font-Inter'>
+                    <TableHead>
+                        <TableRow id='table-row-color'>
+                            <CustomTableHeadCell>STT</CustomTableHeadCell>
+                            <CustomTableHeadCell>Tiêu Chuẩn</CustomTableHeadCell>
+                            <CustomTableHeadCell>Minh Chứng</CustomTableHeadCell>
+                            <CustomTableHeadCell>Số lượng minh chứng đã thu
+                                thập</CustomTableHeadCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {tieuChuanSelected ? (tieuChuanSelected.map((row, index) => (
+                            <TableRow key={row.id}>
+                                <CustomTableCell>{index + 1}</CustomTableCell>
+                                <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
+                                <CustomTableCell>
+                                    <button className='btn btn-light text-white'
+                                            onClick={() => goToTieuChi(row.idTieuChuan)}>
+                                        Quản lý minh chứng
+                                    </button>
+                                </CustomTableCell>
+                                <CustomTableCell>{totalMinhChung(row.idTieuChuan)} minh
+                                    chứng</CustomTableCell>
+                            </TableRow>
+                        ))) : 'Loading...'}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )
+    }
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 
@@ -248,34 +291,18 @@ const TrangChu = () => {
                                 {
                                     selectedItem.loai == 2 ? (
                                         <>
-                                            <TableContainer>
-                                                <Table className='font-Inter'>
-                                                    <TableHead>
-                                                        <TableRow id='table-row-color'>
-                                                            <CustomTableHeadCell>STT</CustomTableHeadCell>
-                                                            <CustomTableHeadCell>Tiêu Chuẩn</CustomTableHeadCell>
-                                                            <CustomTableHeadCell>Minh Chứng</CustomTableHeadCell>
-                                                            <CustomTableHeadCell>Số lượng minh chứng đã thu
-                                                                thập</CustomTableHeadCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {tieuChuanSelected ? (tieuChuanSelected.map((row, index) => (
-                                                            <TableRow key={row.id}>
-                                                                <CustomTableCell>{index + 1}</CustomTableCell>
-                                                                <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
-                                                                <CustomTableCell>
-                                                                    <button className='btn btn-light text-white'>Quản lý
-                                                                        minh chứng
-                                                                    </button>
-                                                                </CustomTableCell>
-                                                                <CustomTableCell>{totalMinhChung(row.idTieuChuan)} minh
-                                                                    chứng</CustomTableCell>
-                                                            </TableRow>
-                                                        ))) : 'Loading...'}
-                                                    </TableBody>
-                                                </Table>
-                                            </TableContainer>
+                                            {(() => {
+                                                switch (noCase) {
+                                                    case 1 :
+                                                        return <QuanLyMinhChung/>
+                                                    case 2 :
+                                                        return selectCtdt !== "" ?
+                                                            <TieuChi KhungCTDT_ID={selectCtdt}
+                                                                     TieuChuan_ID={dataTransfer.TieuChuan_ID}/> : null;
+                                                    default:
+                                                        return <QuanLyMinhChung/>;
+                                                }
+                                            })()}
                                         </>
                                     ) : (
                                         <>
@@ -287,34 +314,16 @@ const TrangChu = () => {
                                             <p>- Thuộc Trình độ : <b>{selectedItem.trinhDo}</b></p>
                                             <p>- Số tín chỉ : <b>{selectedItem.soTinChi}</b></p>
 
-                                            <TableContainer>
-                                                <Table className='font-Inter'>
-                                                    <TableHead>
-                                                        <TableRow id='table-row-color'>
-                                                            <CustomTableHeadCell>STT</CustomTableHeadCell>
-                                                            <CustomTableHeadCell>Tiêu Chuẩn</CustomTableHeadCell>
-                                                            <CustomTableHeadCell>Minh Chứng</CustomTableHeadCell>
-                                                            <CustomTableHeadCell>Số lượng minh chứng đã thu
-                                                                thập</CustomTableHeadCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {tieuChuanSelected ? (tieuChuanSelected.map((row, index) => (
-                                                            <TableRow key={row.id}>
-                                                                <CustomTableCell>{index + 1}</CustomTableCell>
-                                                                <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
-                                                                <CustomTableCell>
-                                                                    <button className='btn btn-light text-white'>Quản lý
-                                                                        minh chứng
-                                                                    </button>
-                                                                </CustomTableCell>
-                                                                <CustomTableCell>{totalMinhChung(row.idTieuChuan)} minh
-                                                                    chứng</CustomTableCell>
-                                                            </TableRow>
-                                                        ))) : 'Loading...'}
-                                                    </TableBody>
-                                                </Table>
-                                            </TableContainer>
+                                            {(() => {
+                                                switch (noCase) {
+                                                    case 1 :
+                                                        return <QuanLyMinhChung/>
+                                                    case 2 :
+                                                        return <TieuChi/>
+                                                    default:
+                                                        return <QuanLyMinhChung/>;
+                                                }
+                                            })()}
                                         </>
                                     )
                                 }
@@ -326,13 +335,17 @@ const TrangChu = () => {
                         {(() => {
                             switch (noCase) {
                                 case 1:
-                                    return selectCtdt !== "" ? <BaoCaoTuDanhGia KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}/> : null;
+                                    return selectCtdt !== "" ?
+                                        <BaoCaoTuDanhGia KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}/> : null;
                                 case 2:
-                                    return selectCtdt !== "" ? <VietBaoCao KhungCTDT_ID={selectCtdt} setNoCase={setNoCase} setDataTransfer={setDataTransfer}/> : null;
+                                    return selectCtdt !== "" ?
+                                        <VietBaoCao KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}
+                                                    setDataTransfer={setDataTransfer}/> : null;
                                 case 3:
-                                    return<VietBaoCaoTieuChi dataTransfer={dataTransfer}/> ;
+                                    return <VietBaoCaoTieuChi dataTransfer={dataTransfer}/>;
                                 default:
-                                    return selectCtdt !== "" ? <BaoCaoTuDanhGia KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}/> : null;
+                                    return selectCtdt !== "" ?
+                                        <BaoCaoTuDanhGia KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}/> : null;
                             }
                         })()}
                     </>
