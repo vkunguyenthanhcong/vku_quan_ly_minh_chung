@@ -52,11 +52,15 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
   );
   
   const menuItems = [
-    ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản lý', isLink: true }] : []), // Nếu role là "ADMIN", thêm mục vào mảng
-    { to: '/quan-ly?action=QuanLyTieuChuan', label: 'Quản lý tiêu chuẩn', isLink: true },
-    { to: '/quan-ly?action=DinhNghiaTieuChuan', label: 'Định nghĩa tiêu chuẩn', isLink: true },
-    { to: '/quan-ly?action=BaoCaoTuDanhGia', label: 'Báo cáo tự đánh giá', isLink: true }
+    ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản Lý', isLink: true }] : []),
+    { to: '/quan-ly', label: 'Trang Chủ', isLink: true }
   ];
+    // const menuItems = [
+    //     ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản lý', isLink: true }] : []),
+    //     { to: '/quan-ly?action=QuanLyTieuChuan', label: 'Quản lý tiêu chuẩn', isLink: true },
+    //     { to: '/quan-ly?action=DinhNghiaTieuChuan', label: 'Định nghĩa tiêu chuẩn', isLink: true },
+    //     { to: '/quan-ly?action=BaoCaoTuDanhGia', label: 'Báo cáo tự đánh giá', isLink: true }
+    // ];
   
   return (
     <div className={`menu-scroll no-padding ${isScreenSmall ? 'text-center' : ''}`}>
@@ -78,7 +82,7 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
         <Row>
           <Col md={4}>
             <img
-              className='avatar-circle'
+              className='avatar-oval'
               src={user ? user.avatar : ''}
               style={{ maxHeight: '100px', border: '5px solid white' }}
               alt={user ? `${user.fullName}` : 'User Avatar'}

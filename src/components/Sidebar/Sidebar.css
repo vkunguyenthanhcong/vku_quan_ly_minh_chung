@@ -31,9 +31,11 @@
   background-color: white;
 }
 
-.avatar-circle {
-  border-radius: 50%;
-  
+.avatar-oval {
+  width: 80px; /* Adjust the width as needed */
+  height: 200px; /* Adjust the height to make it oval */
+  border-radius: 50%; /* Makes it oval */
+  object-fit: cover;
 }
 .list-style {
   list-style: none; /* Remove default list styling */

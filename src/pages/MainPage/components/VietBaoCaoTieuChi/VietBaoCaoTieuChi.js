@@ -76,12 +76,12 @@ function MentionCustomization(editor) {
         }, converterPriority: 'high'
     });
 }
-const VietBaoCaoTieuChi = () => {
+const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const TieuChuan_ID = queryParams.get('TieuChuan_ID');
-    const TieuChi_ID = queryParams.get('TieuChi_ID');
-    const idPhongBan = queryParams.get('NhomCongTac');
+    const TieuChuan_ID = dataTransfer.TieuChuan_ID;
+    const TieuChi_ID = dataTransfer.TieuChi_ID;
+    const idPhongBan = dataTransfer.NhomCongTac;
     const [phieuDanhGia, setPhieuDanhGia] = useState(null)
 
     const [loading, setLoading] = useState(true);

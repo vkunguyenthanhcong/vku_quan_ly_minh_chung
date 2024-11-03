@@ -83,7 +83,7 @@ export const updateNamBanHanh = (namBanHanh, maKdcl, token) => {
 };
 // Xoa chuan kiem dinh chat luong
 export const deleteChuanKDCL = (maKdcl, token) => {
-    return api.delete(`/chuankdcl/deleteChuanKDCL?maKdcl=${maKdcl}`, {
+    return api.delete(`/chuankdcl?maKdcl=${maKdcl}`, {
         headers: { Authorization: `Bearer ${token}` }
     }).then(response => response.data)
         .catch(error => {
@@ -180,6 +180,17 @@ export const getThongTinCTDT = (maCtdt, token) => {
 // Data Tieu Chuan Theo Ma Chuong Trinh Dao Tao
 export const findTieuChuaByMaCtdt = (maCtdt, token) => {
     return api.get(`/tieuchuan/findByMaCtdt/${maCtdt}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching CTDT data:', error);
+            throw error;
+        });
+};
+// Data Tieu Chuan
+export const getAllTieuChuan = (maCtdt, token) => {
+    return api.get(`/tieuchuan`, {
         headers: { Authorization: `Bearer ${token}` }
     })
         .then(response => response.data)

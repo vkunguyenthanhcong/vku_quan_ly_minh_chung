@@ -24,10 +24,9 @@ import {
     convertInchesToTwip
 } from 'docx';
 
-const BaoCaoTuDanhGia = () => {
+const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const KhungCTDT_ID = queryParams.get('KhungCTDT_ID');
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
@@ -700,7 +699,8 @@ const BaoCaoTuDanhGia = () => {
         return (<p>Loading...</p>)
     }
     const goToVietBaoCao = () => {
-        navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
+        setNoCase(2)
+        // navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
     }
     return (
         <div className="content bg-white m-3 p-4">
