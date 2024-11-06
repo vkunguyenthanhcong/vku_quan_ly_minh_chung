@@ -315,7 +315,7 @@ const DinhNghiaTieuChuan = () => {
 
                         {tieuChuan.length ? tieuChuan.map((item, index) => (
                             <React.Fragment key={index}>
-                                <TableRow style={{backgroundColor : "#f6f6ee"}} key={`tieuChuan-${index}`}>
+                                <TableRow id={`tieuChuan-${item.stt}`} style={{backgroundColor : "#f6f6ee"}} key={`tieuChuan-${index}`}>
                                     <TableCell className="fw-bold" width={150}>{item.stt}</TableCell>
                                     <TableCell className="fw-bold">{item.tenTieuChuan}</TableCell>
                                     <TableCell width={200}>

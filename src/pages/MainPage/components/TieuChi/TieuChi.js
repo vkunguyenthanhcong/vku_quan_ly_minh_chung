@@ -6,7 +6,7 @@ import {
     getTieuChuanById,
     deleteMinhChung,
     getAllTieuChi,
-    getAllMocChuan, getAllGoiY, getAllMinhChung
+    getAllMocChuan, getAllGoiY, getAllMinhChung, getAllKhoMinhChung
 } from '../../../../services/apiServices';
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
@@ -38,13 +38,16 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
     const fetchData = async () => {
         try {
             const result = await getAllMinhChung();
+            const allKhoMinhChung = await getAllKhoMinhChung();
             const filterResult = result.filter((item)=> item.idGoiY == idGoiY);
             const updatedData = filterResult.map(item => {
                 const maMinhChung = `${item.parentMaMc}${item.childMaMc}`;
+                const khoMinhChung = allKhoMinhChung.find(kmc => kmc.idKhoMinhChung === item.idKhoMinhChung);
                 const {parentMaMc, childMaMc, ...rest} = item;
                 return {
                     ...rest,
-                    maMinhChung
+                    maMinhChung,
+                    khoMinhChung : khoMinhChung
                 };
             });
             setMinhChung(updatedData);

@@ -23,6 +23,7 @@ import {
 } from "../../../../services/apiServices";
 import PdfPreview from "../../../../services/PdfPreview";
 import {createMaMinhChung, format2Number} from "../../../../services/formatNumber";
+import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
 
 const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => {
@@ -45,6 +46,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [open, setOpen] = useState(false);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -59,20 +61,23 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
             const idTieuChuanArray = tieuChuanData.map(item => item.idTieuChuan);
             const mocChuanData = await getAllMocChuan();
             const minhChungData = await getAllMinhChung();
+
             const goiYAll = await getAllGoiY();
+            const khoMinhChungData = await getAllKhoMinhChung();
             const updatedMinhChung = minhChungData
                 .filter(item => idTieuChuanArray.includes(item.idTieuChuan))
                 .map(item => {
                     const maMinhChung = `${item.parentMaMc || 'H1'}${item.childMaMc || ''}`;
                     const idMocChuan = goiYAll.find((gy) => gy.idGoiY == item.idGoiY).idMocChuan;
                     const idTieuChi = mocChuanData.find((mc) => mc.idMocChuan == idMocChuan).idTieuChi;
-                    if (item.maDungChung !== 0) {
+                    const khoMinhChung = khoMinhChungData.find(kmc => kmc.idKhoMinhChung === item.idKhoMinhChung);
+                    if (item.maDungChung != 0) {
                         const matchingItem = minhChungData.find(mc => mc.idMc === item.maDungChung);
 
                         if (matchingItem) {
                             return {
                                 ...item,
-                                khoMinhChung: matchingItem.khoMinhChung,
+                                khoMinhChung: khoMinhChung,
                                 parentMaMc: matchingItem.parentMaMc,   // Copy parentMaMc from matching item
                                 childMaMc: matchingItem.childMaMc,     // Copy childMaMc from matching item
                                 maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`, // Copy maMinhChung from matching item
@@ -81,14 +86,13 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                         }
                     }
                     return {
-                        ...item,
+                        ...item,khoMinhChung: khoMinhChung,
                         maMinhChung,
                         idTieuChi: idTieuChi
                     };
                 });
             const tieuChiData = await getTieuChiById(TieuChi_ID);
             const loaiVanBanData = await getAllLoaiMinhChung();
-            const khoMinhChungData = await getAllKhoMinhChung();
             const goiYData = await getGoiYById(GoiY_ID);
             setMinhChung(updatedMinhChung);
             setLoaiVanBan(loaiVanBanData);
@@ -157,6 +161,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     };
 
     const saveFromKMCtoMC = async (idKmc, idParent) => {
+        setOpen(true)
         if (tieuChi !== "") {
             try {
                 const response = await getTieuChuanById(TieuChuan_ID);
@@ -183,6 +188,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
 
                     const response_1 = await saveFromKMCtoMinhChung(dataMinhChung);
                     if(response_1 === "OK"){
+                        setOpen(false)
                         fetchData();
                     }
                 }
@@ -193,6 +199,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
 
     };
     const saveDungChung = async (idKmc, idMc) => {
+        setOpen(true)
         try {
             const dataMinhChung = new FormData();
 
@@ -203,6 +210,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
 
             const response = await saveMinhChungDungChung(dataMinhChung);
             if(response === "OK"){
+                setOpen(false)
                 fetchData();
             }
         } catch (err) {
@@ -212,8 +220,10 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     };
     const deleteMC = async (idMc, parentMaMc) => {
         try {
+            setOpen(true);
             const response = await deleteMinhChung(idMc, parentMaMc);
-            if (response) {
+            if (response == "OK") {
+                setOpen(false);
                 fetchData();
             } else {
                 setError('Failed to delete Minh Chung.');
@@ -237,7 +247,6 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     const Button_Them = ({idKMC, idParent}) => {
 
         const response = minhChung.filter(item => item.khoMinhChung.idKhoMinhChung == idKMC);
-
         // Component DungChung nhận props là data
         const DungChung = ({data}) => {
             const filteredData = data.filter(item => item.idTieuChi == TieuChi_ID);
@@ -269,6 +278,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
             className="content"
             style={{background: "white", margin: "20px", padding: "20px"}}
         >
+            <LoadingProcess open={open}/>
             <p style={{fontSize: "20px"}}>
                 Tìm kiếm minh chứng cho Tiêu Chuẩn Mục tiêu và chuẩn đầu ra của chương
                 trình đào tạo
@@ -427,19 +437,15 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                             </TableHead>
                             <TableBody>
                                 {minhChung && minhChung
-                                    .filter(item => item.idGoiY == GoiY_ID) // Filter based on GoiY_ID
+                                    .filter(item => item.idGoiY == GoiY_ID)
                                     .map((item, index) => {
-                                        // Find the matching item if maDungChung is not 0
                                         const filteredItem = item.maDungChung !== 0
                                             ? minhChung.find(i => i.idMc === item.maDungChung)
                                             : null;
-
-                                        // Determine which maMinhChung to display
                                         const maMinhChungDisplay = item.maDungChung === 0
                                             ? item.maMinhChung
                                             : (filteredItem ? filteredItem.maMinhChung : '');
 
-                                        // Prepare modifiedString only if maDungChung is 0
                                         const modifiedString = item.maDungChung === 0
                                             ? item.maMinhChung.slice(0, -3) + '.'
                                             : null;
