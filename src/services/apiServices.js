@@ -199,6 +199,19 @@ export const getAllTieuChuan = (maCtdt, token) => {
             throw error;
         });
 };
+export const deleteTieuChuan = (id, token) => {
+    return api.delete(`/tieuchuan/${id}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //them tieu chuan moi
 export const insertNewTieuChuan = (formData, token) => {
     return api.post(`/tieuchuan`, formData, {
@@ -351,6 +364,19 @@ export const insertNewMocChuan = (formData, token) => {
             throw error;
         });
 };
+export const deleteMocChuan = (id, token) => {
+    return api.delete(`/mocchuan/${id}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //update moc chuan
 export const updateMocChuan = (formData, token) => {
     return api.put(`/mocchuan`, formData, {
@@ -378,12 +404,27 @@ export const updateGoiY = (formData, token) => {
             throw error;
         });
 };
-//Data Minh Chung theo Tieu Chi
-export const getMinhChungWithIdTieuChi = (criteriaID, token) => {
-    return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
+export const deleteGoiY = (id, token) => {
+    return api.delete(`/goiy/${id}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const deleteTieuChi = (id, token) => {
+    return api.delete(`/tieuchi/${id}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;

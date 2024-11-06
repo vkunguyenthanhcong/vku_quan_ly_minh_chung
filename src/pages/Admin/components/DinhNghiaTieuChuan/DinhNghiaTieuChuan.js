@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useLocation} from "react-router-dom";
 import {
+    deleteGoiY, deleteMocChuan, deleteTieuChi, deleteTieuChuan,
     findTieuChuaByMaCtdt, getAllGoiY, getAllMocChuan, getAllTieuChi,
     getThongTinCTDT, insertNewMocChuan,
     insertNewTieuChi,
@@ -174,9 +175,11 @@ const DinhNghiaTieuChuan = () => {
     });
 
     const fetchData = async () => {
+
         try {
             const response = await getThongTinCTDT(ChuongTrinh_ID);
             setChuongTrinhDaoTao(response);
+
             const tieuChuanData = await findTieuChuaByMaCtdt(ChuongTrinh_ID);
             const tieuChiData = await getAllTieuChi();
             const mocChuanData = await getAllMocChuan();
@@ -215,7 +218,6 @@ const DinhNghiaTieuChuan = () => {
                     tieuChi: filteredTieuChi.filter(tc => tc.idTieuChuan === tch.idTieuChuan)  // Only return filtered tieuChi for this tieuChuan
                 };
             });
-
             setTieuChuan(updatedTieuChuan);
         } catch (e) {
             setLoading(true);
@@ -236,10 +238,18 @@ const DinhNghiaTieuChuan = () => {
             accept: async () => {
                 let response;
                 if(title === "Gợi Ý"){
-                    response = await updateChuongTrinhDaoTao(id);
+                    response = await deleteGoiY(id);
+                }else if(title === "Mốc Chuẩn"){
+                    response = await deleteMocChuan(id);
+                }
+                else if(title === "Tiêu Chí"){
+                    response = await deleteTieuChi(id);
+                }
+                else if(title === "Tiêu Chuẩn"){
+                    response = await deleteTieuChuan(id);
                 }
                 if(response === "OK"){
-                    alert('Cập nhật thành công');
+                    fetchData();
                 }else{
                     alert('Có lỗi trong quá trình xử lý');
                 }
@@ -322,7 +332,7 @@ const DinhNghiaTieuChuan = () => {
                                             handleShow();
                                         }}>Chỉnh sửa</button>
                                         <br/>
-                                        <button className='btn btn-danger mt-1'>Xóa</button>
+                                        <button className='btn btn-danger mt-1' onClick={()=>deleteData(item.idTieuChuan, "Tiêu Chuẩn")}>Xóa</button>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
@@ -366,7 +376,7 @@ const DinhNghiaTieuChuan = () => {
                                                         }}>Chỉnh sửa
                                                 </button>
                                                 <br/>
-                                                <button className='btn btn-danger mt-1'>Xóa</button>
+                                                <button className='btn btn-danger mt-1' onClick={()=>deleteData(i.idTieuChi, "Tiêu Chí")}>Xóa</button>
                                             </TableCell>
 
                                         </TableRow>
@@ -411,7 +421,7 @@ const DinhNghiaTieuChuan = () => {
                                                                 }}>Chỉnh sửa
                                                         </button>
                                                         <br/>
-                                                        <button className='btn btn-danger mt-1'>Xóa</button>
+                                                        <button className='btn btn-danger mt-1' onClick={()=>deleteData(mc.idMocChuan, "Mốc Chuẩn")}>Xóa</button>
                                                     </TableCell>
                                                 </TableRow>
                                                 <TableRow>
@@ -456,7 +466,7 @@ const DinhNghiaTieuChuan = () => {
                                                                         }}>Chỉnh sửa
                                                                 </button>
                                                                 <br/>
-                                                                <button className='btn btn-danger mt-1'>Xóa</button>
+                                                                <button className='btn btn-danger mt-1' onClick={() => deleteData(gy.idGoiY, 'Gợi Ý')}>Xóa</button>
                                                             </TableCell>
                                                         </TableRow>
                                                     ))}
