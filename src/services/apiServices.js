@@ -365,6 +365,19 @@ export const updateMocChuan = (formData, token) => {
             throw error;
         });
 };
+export const updateGoiY = (formData, token) => {
+    return api.put(`/goiy`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //Data Minh Chung theo Tieu Chi
 export const getMinhChungWithIdTieuChi = (criteriaID, token) => {
     return api.get(`/minhchung/findByIdTieuChi/${criteriaID}`, {
