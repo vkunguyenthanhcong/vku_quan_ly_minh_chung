@@ -51,7 +51,7 @@ import {
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
 import {
-    getAllGoiY,
+    getAllGoiY, getAllKhoMinhChung,
     getAllMinhChung, getAllMocChuan, getAllPhieuDanhGia,
     getPhongBanById,
     getTieuChiById,
@@ -59,6 +59,8 @@ import {
     savePhieuDanhGiaTieuChi,
     updatePhieuDanhGiaTieuChi
 } from "../../../../services/apiServices";
+import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+
 function MentionCustomization(editor) {
     // Downcast the model 'mention' text attribute to a view <a> element.
     editor.conversion.for('downcast').attributeToElement({
@@ -68,15 +70,19 @@ function MentionCustomization(editor) {
             }
 
             return writer.createAttributeElement('a', {
-                class: 'mention', 'data-mention': modelAttributeValue.id, 'href': modelAttributeValue.link, 'data-name' : modelAttributeValue.name
+                class: 'mention',
+                'data-mention': modelAttributeValue.id,
+                'href': modelAttributeValue.link,
+                'data-name': modelAttributeValue.name
             }, {
                 id: modelAttributeValue.uid
             });
         }, converterPriority: 'high'
     });
 }
+
 const VietBaoCaoTieuChi = ({dataTransfer}) => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
 
     const handleMouseMove = (event) => {
         setMousePosition({
@@ -91,9 +97,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const TieuChi_ID = dataTransfer.TieuChi_ID;
     const idPhongBan = dataTransfer.NhomCongTac;
     const [phieuDanhGia, setPhieuDanhGia] = useState(null)
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [show, setShow] = useState(true);
     const editorContainerRef = useRef(null);
     const editorRef = useRef(null);
     const [isLayoutReady, setIsLayoutReady] = useState(false);
@@ -107,6 +111,8 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const [diemManh, setDiemManh] = useState('');
     const [diemYeu, setDiemYeu] = useState('');
 
+    const [booleanMention, setBooleanMention] = useState(false);
+    let mentionConfig;
     const [formData, setFormData] = useState({
         noiDungKhacPhuc: '',
         donViKhacPhuc: '',
@@ -118,6 +124,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         ghiChuPhatHuy: '',
         mucDanhGia: 0
     });
+
 
     const options = [1, 2, 3, 4, 5, 6, 7];
 
@@ -133,21 +140,22 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             setNhomCongTac(response_3);
 
             const allMinhChungData = await getAllMinhChung();
+            const allKhoMinhChungData = await getAllKhoMinhChung();
             const mocChuanData = await getAllMocChuan();
-            const minhChungData = await getAllMinhChung();
             const goiYAll = await getAllGoiY();
             const updatedMinhChung = allMinhChungData
                 .map(item => {
                     const maMinhChung = `${item.parentMaMc || 'H1'}${item.childMaMc || ''}`;
                     const idMocChuan = goiYAll.find((gy) => gy.idGoiY == item.idGoiY).idMocChuan;
                     const idTieuChi = mocChuanData.find((mc) => mc.idMocChuan == idMocChuan).idTieuChi;
-                    if (item.maDungChung !== 0) {
-                        const matchingItem = minhChungData.find(mc => mc.idMc === item.maDungChung);
+                    const khoMinhChung = allKhoMinhChungData.find((kmc) => kmc.idKhoMinhChung === item.idKhoMinhChung);
+                    if (item.allMinhChungData !== 0) {
+                        const matchingItem = allMinhChungData.find(mc => mc.idMc === item.maDungChung);
 
                         if (matchingItem) {
                             return {
                                 ...item,
-                                khoMinhChung: matchingItem.khoMinhChung,
+                                khoMinhChung: khoMinhChung,
                                 parentMaMc: matchingItem.parentMaMc,
                                 childMaMc: matchingItem.childMaMc,
                                 maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`,
@@ -157,12 +165,13 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                     }
                     return {
                         ...item,
+                        khoMinhChung: khoMinhChung,
                         maMinhChung,
                         idTieuChi: idTieuChi
                     };
                 });
             const minhChungFilter = updatedMinhChung.filter((item) => item.idTieuChi == TieuChi_ID);
-
+            minhChungFilter.length > 0 ? (setBooleanMention(true)) : (setBooleanMention(false));
             const suggestions = minhChungFilter.map(itemB => {
                 let parentMaMc = itemB.parentMaMc;
                 let childMaMc = itemB.childMaMc;
@@ -177,7 +186,9 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 }
                 const maMinhChung = `${parentMaMc}${childMaMc}`;
                 return {
-                    tenMinhChung: itemB.khoMinhChung.tenMinhChung, maMinhChung: maMinhChung, link: itemB.linkLuuTru
+                    tenMinhChung: itemB.khoMinhChung.tenMinhChung,
+                    maMinhChung: maMinhChung,
+                    link: "https://drive.google.com/file/d/" + itemB.linkLuuTru + "/preview"
                 };
             });
             setMinhChung(suggestions);
@@ -204,14 +215,20 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                         ghiChuPhatHuy: firstItem.ghiChuPhatHuy,
                         mucDanhGia: firstItem.mucDanhGia
                     });
+
+
                 } else {
                     setPhieuDanhGia([]);
                     setMoTa('');
                 }
             }
 
+
+            setBooleanMention(true)
+            setShow(false)
         };
         fetchData();
+
     }, [TieuChuan_ID, TieuChi_ID, idPhongBan]);
 
 
@@ -226,13 +243,18 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const editorConfig = {
         mention: {
             feeds: [{
-                marker: '[', feed: (query) => {
+                marker: '[',
+                feed: (query) => {
                     return minhChung
                         .filter((item) => item.maMinhChung.toLowerCase().includes(query.toLowerCase()))
                         .map((item) => ({
-                                id: '[' + item.maMinhChung + ']', name: item.tenMinhChung, link: item.link, text : '[' + item.maMinhChung + ']'
+                            id: '[' + item.maMinhChung + ']',
+                            name: item.tenMinhChung,
+                            link: item.link,
+                            text: '[' + item.maMinhChung + ']'
                         }));
-                }, itemRenderer: (item) => `${item.name}`
+                },
+                itemRenderer: (item) => `${item.name}`
             }]
         },
         toolbar: {
@@ -295,7 +317,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         table: {
             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
         }
-    };
+    }
 
     const handleEditorChange = (event, editor) => {
         if (editor && editor.getData) {
@@ -364,6 +386,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     }
     return (
         <div onMouseMove={handleMouseMove}>
+            <LoadingProcess open={show}/>
             <style>
                 {`
                 .mention::after {
@@ -385,7 +408,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
 
                 `}
             </style>
-            {minhChung.length > 0 ? (<div className="content bg-white m-3 p-4">
+            {booleanMention == true ? (<div className="content bg-white m-3 p-4">
                 <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b></p>
                 <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
                     <span>Loading...</span>)}</p>
@@ -393,7 +416,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 <p>Tiêu chí : {tieuChi.tenTieuChi}</p>
 
                 <p>1. Mô tả</p>
-                <div className="main-container" >
+                <div className="main-container">
                     <div
                         className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
                         ref={editorContainerRef}
@@ -560,7 +583,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 <button className="btn btn-success" onClick={savePhieuDanhGia}>
                     Lưu
                 </button>
-            </div>) : (<></>)}
+            </div>) : (null)}
         </div>);
 
 }
