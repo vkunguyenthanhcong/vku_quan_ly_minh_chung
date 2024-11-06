@@ -4,7 +4,7 @@ import {
     findTieuChuaByMaCtdt, getAllGoiY, getAllMocChuan, getAllTieuChi,
     getThongTinCTDT, insertNewMocChuan,
     insertNewTieuChi,
-    insertNewTieuChuan, saveGoiY, updateChuongTrinhDaoTao, updateMocChuan, updateTieuChi, updateTieuChuan
+    insertNewTieuChuan, saveGoiY, updateChuongTrinhDaoTao, updateGoiY, updateMocChuan, updateTieuChi, updateTieuChuan
 } from "../../../../services/apiServices";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import {Button, Form, Modal} from "react-bootstrap";
@@ -31,11 +31,13 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
 
     const handleChange = (e) => {
 
-        const { name, type, checked, value } = e.target;
+        const { name, value, checked } = e.target;
         setFormData((prevFormData) => ({
             ...prevFormData,
-            [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
+            [name]: (name == "batBuoc" ? (checked == true ? 1 : 0) : value),
         }));
+
+
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -50,7 +52,7 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
                 } else if (formData.title === 'Mốc Chuẩn') {
                     response = await insertNewMocChuan(formData);
                 }else if (formData.title === 'Gợi Ý') {
-                    response  = await saveGoiY(formData);
+                    response = await saveGoiY(formData);
                 }
             }else{
                 if (formData.title === 'Tiêu Chuẩn') {
@@ -59,6 +61,8 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
                     response = await updateTieuChi(formData);
                 } else if (formData.title === 'Mốc Chuẩn') {
                     response = await updateMocChuan(formData);
+                } else if (formData.title === 'Gợi Ý') {
+                    response = await updateGoiY(formData);
                 }
             }
             if (response === "OK") {
@@ -71,7 +75,8 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
                     stt: 0,
                     yeuCau: '',
                     idParent: '',
-                    id: 0
+                    id: 0,
+                    batBuoc : 1
                 });
             }
         } catch (error) {
@@ -130,7 +135,7 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
                                 <Form.Check
                                     type="checkbox"
                                     name="batBuoc"
-                                    checked={formData.batBuoc}
+                                    checked={formData.batBuoc == 1 ? true : false}
                                     onChange={handleChange}
                                 />
                             </Form.Group>) : (null)}
@@ -421,7 +426,7 @@ const DinhNghiaTieuChuan = () => {
                                                                     yeuCau: '',
                                                                     idParent: mc.idMocChuan,
                                                                     id : 0,
-                                                                    batBuoc: 'checked'
+                                                                    batBuoc: 1
                                                                 });
                                                                 handleShow();
                                                             }}
@@ -444,7 +449,8 @@ const DinhNghiaTieuChuan = () => {
                                                                                 stt: 0,
                                                                                 yeuCau: '',
                                                                                 idParent: mc.idMocChuan,
-                                                                                id: gy.idGoiY
+                                                                                id: gy.idGoiY,
+                                                                                batBuoc : gy.batBuoc
                                                                             });
                                                                             handleShow();
                                                                         }}>Chỉnh sửa
