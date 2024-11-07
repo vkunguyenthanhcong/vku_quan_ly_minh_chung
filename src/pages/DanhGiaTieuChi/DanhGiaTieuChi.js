@@ -77,10 +77,7 @@ const DanhGiaTieuChi = () => {
 
         // Hàm xử lý các ô trong bảng
         const parseTableCell = (cell) => {
-            const textRuns = [];
-            if (cell.textContent.trim()) {
-                textRuns.push(createTextRun(cell));
-            }
+            const textRuns = parseChildNodes(cell.childNodes);
             return new TableCell({
                 children: [new Paragraph({children: textRuns, spacing: {line: 360}})],
                 verticalAlign: VerticalAlign.CENTER,
@@ -672,6 +669,18 @@ const DanhGiaTieuChi = () => {
 
     return (
         <>
+            <style>
+                {
+                    `table {
+                          width: 100%;
+                          border-collapse: collapse;
+                        }
+                        td, th {
+                          border: 1px solid #ddd;
+                          padding: 8px;
+                        }`
+                }
+            </style>
             {phieuDanhGia && phieuDanhGia.length > 0 ? (
                 phieuDanhGia.map((item, index) => (
                     <div ref={contentRef} className="a4-size" id="phieudanhgia" key={index}>

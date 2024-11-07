@@ -701,6 +701,9 @@ const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
     }
     return (
         <div className="content bg-white m-3 p-4">
+            <style>
+
+            </style>
             <p>BÁO CÁO TỰ ĐÁNH GIÁ <b>{chuongTrinhDaoTao.tenCtdt}</b></p>
             <b>Kế hoạch</b>
             <div className="mt-2">
