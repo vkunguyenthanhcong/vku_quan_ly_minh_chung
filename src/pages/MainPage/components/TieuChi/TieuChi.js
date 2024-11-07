@@ -32,24 +32,40 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
         })
     };
     const deleteMC = async (idMc, parentMaMc) => {
-        deleteMinhChung(idMc, parentMaMc);
-        fetchData();
+        const response = await deleteMinhChung(idMc, parentMaMc);
+        if(response === "OK"){
+            fetchData();
+        }
     }
     const fetchData = async () => {
         try {
             const result = await getAllMinhChung();
             const allKhoMinhChung = await getAllKhoMinhChung();
-            const filterResult = result.filter((item)=> item.idGoiY == idGoiY);
-            const updatedData = filterResult.map(item => {
-                const maMinhChung = `${item.parentMaMc}${item.childMaMc}`;
+            const filterMinhChung = result.filter((item)=> item.idGoiY == idGoiY);
+            const updatedData = filterMinhChung.map(item => {
+                let maMinhChung;
+                let linkLuuTru;
+                let parentMaMc;
+                if(item.maDungChung == 0){
+                    maMinhChung = `${item.parentMaMc}${item.childMaMc}`;
+                    linkLuuTru = item.linkLuuTru;
+                    parentMaMc = item.parentMaMc;
+                }else{
+                    const filter = result.find((rs) => rs.idMc == item.maDungChung);
+                    maMinhChung = `${filter.parentMaMc}${filter.childMaMc}`;
+                    linkLuuTru = filter.linkLuuTru;
+                    parentMaMc = 0;
+                }
                 const khoMinhChung = allKhoMinhChung.find(kmc => kmc.idKhoMinhChung === item.idKhoMinhChung);
-                const {parentMaMc, childMaMc, ...rest} = item;
                 return {
-                    ...rest,
-                    maMinhChung,
-                    khoMinhChung : khoMinhChung
+                    ...item,
+                    maMinhChung : maMinhChung,
+                    khoMinhChung : khoMinhChung,
+                    linkLuuTru : linkLuuTru,
+                    parentMaMc :parentMaMc
                 };
             });
+
             setMinhChung(updatedData);
         } catch (err) {
             setError(err);
@@ -118,13 +134,9 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
                 </TableHead>
                 <TableBody>
                     {minhChung.map((row, index) => {
-                        const filteredItem = minhChung.filter(i => i.idMc === row.maDungChung);
-                        const maMinhChungDisplay = row.maDungChung === 0 ? row.maMinhChung : (filteredItem[0].maMinhChung);
-                        const modifiedString = row.maDungChung === 0 ? (row.maMinhChung.slice(0, -3) + '.') : (0);
-
                         return (
                             <TableRow key={index} className='border-black'>
-                                <TableCell className='p-1' style={{width: '25%'}}>{maMinhChungDisplay}</TableCell>
+                                <TableCell className='p-1' style={{width: '25%'}}>{row.maMinhChung}</TableCell>
                                 <TableCell className='p-1' style={{width: '25%'}}>{row.khoMinhChung.soHieu}</TableCell>
                                 <TableCell className='p-1'
                                            style={{width: '30%'}}>{row.khoMinhChung.tenMinhChung}</TableCell>
@@ -132,8 +144,8 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
                                     <button style={{width: '100%', marginTop: '5px'}} className='btn btn-secondary'
                                             onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}>Xem
                                     </button>
-                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger'
-                                            onClick={() => deleteMC(row.idMc, modifiedString)}>Xóa
+                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger' onClick={()=>deleteMC(row.idMc, row.parentMaMc)}
+                                            >Xóa
                                     </button>
                                 </TableCell>
                             </TableRow>
@@ -243,8 +255,6 @@ const TieuChi = ({TieuChuan_ID, KhungCTDT_ID, setNoCase, setDataTransfer, dataTr
     const [tieuChuan, setTieuChuan] = useState([]);
     const [tieuChi, setTieuChi] = useState([]);
 
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
 
     const isModalOpen = useClickViewPdfStore((state) => state.isModalOpen);
     const closeModal = useClickViewPdfStore((state) => state.closeModal);
