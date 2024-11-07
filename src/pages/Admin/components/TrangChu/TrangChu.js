@@ -20,7 +20,7 @@ const TrangChuAdmin = () => {
             <div>
                 <p>QUẢN LÝ CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</p>
                 <hr/>
-                <button className='btn btn-success' onClick={goToChuanKiemDinh}>Quản lý</button>
+                <button className='btn btn-success' onClick={goToChuanKiemDinh}>Quản lý và chia nhóm đánh giá</button>
             </div>
 
             <div className="mt-4">

@@ -180,7 +180,7 @@ const ChuanKiemDinh = () => {
     const handleEditClick = (id) => {
         setData((prevList) =>
             prevList.map((item) =>
-                item.maKdcl === id ? {...item, isEditing: true} : item
+                item.maKdcl === id ? {...item, isEditing: item.isEditing ? false : true} : item
             )
         );
     };

@@ -1,39 +1,45 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import './LogInForm.css';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-import { login } from '../../../../services/apiServices';
-import { useNavigate } from 'react-router-dom';
-const LogInForm = ({ isVisible, onClose }) => {
+import {Container, Row, Col, Button} from 'react-bootstrap';
+import {login} from '../../../../services/apiServices';
+import {useNavigate} from 'react-router-dom';
+import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+
+const LogInForm = ({isVisible, onClose}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('')
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-    try {
-        const userData = await login(email, password)
-        if (userData.token) {
-            localStorage.setItem('token', userData.token)
-            localStorage.setItem('role', userData.role)
-            localStorage.setItem('phongBan', userData.phongBan.idPhongBan)
-            if(userData.role === "ADMIN"){
-                navigate('/admin');
-            }else if(userData.role === "USER"){
-                navigate('/quan-ly');
+        setOpen(true);
+        try {
+            const userData = await login(email, password)
+            if (userData.token) {
+                localStorage.setItem('token', userData.token)
+                localStorage.setItem('role', userData.role)
+                localStorage.setItem('phongBan', userData.phongBan.idPhongBan)
+                setOpen(false);
+                if (userData.role === "ADMIN") {
+                    navigate('/admin');
+                } else if (userData.role === "USER") {
+                    navigate('/quan-ly');
+                }
+            } else {
+                alert("Đăng Nhập Thất Bại. Vui Lòng Kiểm Tra Lại Tài Khoản Hoặc Mật Khẩu!!!")
+                setOpen(false)
+                setError(userData.message)
             }
-        }else{
-            setError(userData.message)
+
+        } catch (error) {
+            setError(error.message)
+            setTimeout(() => {
+                setOpen(false)
+                setError('');
+            }, 5000);
         }
-        
-    } catch (error) {
-        console.log(error)
-        setError(error.message)
-        setTimeout(()=>{
-            setError('');
-        }, 5000);
-    }
     }
     const handleEmailChange = (e) => {
         setEmail(e.target.value);
@@ -52,6 +58,7 @@ const LogInForm = ({ isVisible, onClose }) => {
 
     return (
         <div className="login-overlay">
+            <LoadingProcess open={open}/>
             <div className="login-form">
                 <button className="close-btn" onClick={onClose}>x</button>
 
@@ -70,13 +77,13 @@ const LogInForm = ({ isVisible, onClose }) => {
 
                 <label htmlFor="">Mật khẩu</label><br/>
                 <div className="password-container">
-                <input
-                    type={showPassword ? 'text' : 'password'}
-                    className="form-control"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    required
-                />
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        className="form-control"
+                        value={password}
+                        onChange={handlePasswordChange}
+                        required
+                    />
                     <button type="button" className="eye-icon" onClick={handleTogglePassword}>
                         {showPassword ? <i className='fas fa-eye' style={{}}></i> :
                             <i className='fas fa-eye-slash' style={{}}></i>}

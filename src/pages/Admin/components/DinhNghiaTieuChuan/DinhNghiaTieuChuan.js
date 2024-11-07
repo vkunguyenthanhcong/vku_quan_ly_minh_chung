@@ -11,6 +11,8 @@ import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow}
 import {Button, Form, Modal} from "react-bootstrap";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
+import AlphabetFilter from "../../../../components/AlphabetFilter/AlphabetFilter";
+import StandardFilter from "../../../../components/AlphabetFilter/AlphabetFilter";
 
 const findMissingSTT = (arr) => {
     if (arr.length > 0) {
@@ -259,9 +261,13 @@ const DinhNghiaTieuChuan = () => {
             }
         });
     }
-
+    const [activeStandard, setActiveStandard] = useState(window.location.hash);
+    const getNumber = () => {
+        setActiveStandard(window.location.hash);
+    }
     return (
         <div className="content" style={{background: "white", margin: "20px"}}>
+            <StandardFilter activeStandard={activeStandard} getNumber={getNumber} soLuongTieuChuan={chuongTrinhDaoTao?.chuanKdcl?.soLuongTieuChuan}/>
             <ConfirmDialog />
             <LoadingProcess open={open}/>
             <PopupForm show={show} handleClose={handleClose} fetchData={fetchData} formData={formData}

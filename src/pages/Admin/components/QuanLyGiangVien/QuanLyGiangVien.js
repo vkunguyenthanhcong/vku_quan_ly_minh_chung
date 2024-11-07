@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {getAllUser, getPhongBan} from "../../../../services/apiServices";
+import {getAllUser, getPhongBan, updateUser} from "../../../../services/apiServices";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
 const formatPhoneNumber = (phoneNumber) => {
     // Use a regex to format the phone number
@@ -13,6 +14,7 @@ function QuanLyGiangVien() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [phongBan, setPhongBan] = useState([]);
+    const [open, setOpen] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -33,8 +35,6 @@ function QuanLyGiangVien() {
     }, [])
     const handleChangePhongBan = (userId, event) => {
         const newIdPhongBan = event.target.value;
-
-        // Update the user state based on the user ID
         setUser((prevUsers) =>
             prevUsers.map((user) =>
                 user.id === userId
@@ -50,6 +50,28 @@ function QuanLyGiangVien() {
             )
         );
     };
+    const editGiangVien = async (idGiangVien) => {
+        setOpen(true)
+        const filterGiangVien = user.find((item) => item.id === idGiangVien);
+
+        if (filterGiangVien) {
+            const formData = {
+                id : filterGiangVien.id,
+                idPhongBan : filterGiangVien.phongBan.idPhongBan,
+            }
+            try {
+                const response = await updateUser(formData);
+
+                if(response == "OK"){
+                    setOpen(false)
+                    alert("Cập nhật thành công");
+                }
+            }catch (e) {
+                setOpen(false)
+                console.log(e)
+            }
+        }
+    }
     if (loading) {
         return (<p>Loading...</p>)
     }
@@ -57,6 +79,7 @@ function QuanLyGiangVien() {
         return error
     }
     return (<div className="content" style={{background: "white", margin: "20px"}}>
+        <LoadingProcess open={open}/>
         <TableContainer component={Paper}>
             <Table className="font-Inter">
                 <TableHead>
@@ -100,7 +123,7 @@ function QuanLyGiangVien() {
                             <img src={item.avatar} width="50" height="50"/>
                         </TableCell>
                         <TableCell>
-                            <button className="btn btn-primary">Sửa</button>
+                            <button className="btn btn-primary" onClick={() => editGiangVien(item.id)}>Sửa</button>
                             <br/>
                             <button className="btn btn-danger mt-2">Xóa</button>
                         </TableCell>

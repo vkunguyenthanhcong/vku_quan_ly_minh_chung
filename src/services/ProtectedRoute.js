@@ -2,7 +2,6 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 
-// Function to check if the token is expired or invalid
 const isTokenExpired = (token) => {
     if (!token) return true;
 
@@ -16,7 +15,6 @@ const isTokenExpired = (token) => {
     }
 };
 
-// Function to check if the user is authenticated and has the required role
 const checkAuthAndRole = (requiredRoles) => {
     const token = localStorage.getItem('token');
     if (!token || isTokenExpired(token)) {
@@ -31,10 +29,11 @@ const ProtectedRoute = ({ element, requiredRoles, ...rest }) => {
     const location = useLocation();
 
     return checkAuthAndRole(requiredRoles) ? (
-        React.cloneElement(element, rest) // Render the protected component
+        React.cloneElement(element, rest)
     ) : (
-        <Navigate to="/" state={{ from: location }} replace /> // Redirect to login if not authenticated or role does not match
+        <Navigate to="/" state={{ from: location }} replace />
     );
 };
+
 
 export default ProtectedRoute;

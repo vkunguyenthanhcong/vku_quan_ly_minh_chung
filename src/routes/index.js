@@ -26,8 +26,8 @@ import VietBaoCao from '../pages/MainPage/components/VietBaoCao/VietBaoCao';
 import VietBaoCaoTieuChi from '../pages/MainPage/components/VietBaoCaoTieuChi/VietBaoCaoTieuChi';
 import DanhGiaTieuChi from '../pages/DanhGiaTieuChi/DanhGiaTieuChi';
 import QuanLyGiangVien from "../pages/Admin/components/QuanLyGiangVien/QuanLyGiangVien";
-import ThemChuongTrinhDaoTao from "../pages/Admin/components/ThemChuongTrinhDaoTao/ThemChuongTrinhDaoTao";
 import DinhNghiaTieuChuan from "../pages/Admin/components/DinhNghiaTieuChuan/DinhNghiaTieuChuan";
+import PublicRoute from "../services/PublicRoute";
 
 const routes = [
   {
@@ -48,7 +48,7 @@ const routes = [
   },
   {
     path: "/",
-    element: <HomePage />,
+    element: <PublicRoute element={<HomePage />} />,
   },
   {
     path: "/danh-muc-minh-chung",

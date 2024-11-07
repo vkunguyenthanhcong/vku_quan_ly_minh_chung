@@ -49,6 +49,19 @@ export const getThongTinDangNhap = (token) => {
             throw error;
         });
 };
+export const updateUser = (formData, token) => {
+    return api.put(`http://localhost:1309/admin/update`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 
 //chuan kiem dinh chat luong du lieu
 export const getKdclData = (token) => {
