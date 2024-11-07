@@ -54,10 +54,7 @@ const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
 
         // Hàm xử lý các ô trong bảng
         const parseTableCell = (cell) => {
-            const textRuns = [];
-            if (cell.textContent.trim()) {
-                textRuns.push(createTextRun(cell));
-            }
+            const textRuns = parseChildNodes(cell.childNodes);
             return new TableCell({
                 children: [new Paragraph({children: textRuns, spacing: {line: 360}})],
                 verticalAlign: VerticalAlign.CENTER,
