@@ -37,11 +37,11 @@ body {
 
 .btn-primary {
   background-color: var(--primary-color) !important;
-  border: var(--primary-color) !important;
+  border: #3347b7 !important;
 }
 .btn-success {
   background-color: var(--secondary-color) !important;
-  border: var(--secondary-color) !important;
+  border: #197a65 !important;
 }
 .btn-light {
   background-color: var(--third-color) !important;
