@@ -130,7 +130,7 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
                                            style={{width: '30%'}}>{row.khoMinhChung.tenMinhChung}</TableCell>
                                 <TableCell className='p-0' style={{width: '20%'}}>
                                     <button style={{width: '100%', marginTop: '5px'}} className='btn btn-secondary'
-                                            onClick={() => handleClickViewPDF(row.linkLuuTru)}>Xem
+                                            onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}>Xem
                                     </button>
                                     <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger'
                                             onClick={() => deleteMC(row.idMc, modifiedString)}>Xóa

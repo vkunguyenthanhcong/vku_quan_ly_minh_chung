@@ -458,7 +458,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                                     <div>
                                                         <button
                                                             className="btn btn-secondary"
-                                                            onClick={() => handleClickViewPDF(item.linkLuuTru)}
+                                                            onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + item.linkLuuTru + "/preview")}
                                                         >
                                                             Xem nhanh
                                                         </button>
