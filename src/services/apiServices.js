@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-
+const ipAddress = "localhost"
 const api = axios.create({
-    baseURL: 'http://localhost:1309/api', // Replace with your API base URL
+    baseURL: `http://${ipAddress}:1309/api`, // Replace with your API base URL
     timeout: 20000, // Optional: set a timeout for requests
     headers: {
         'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ api.interceptors.request.use(
 
 //Thong tin user
 export const getThongTinDangNhap = (token) => {
-    return api.get(`http://localhost:1309/adminuser/get-profile`, {
+    return api.get(`http://${ipAddress}:1309/adminuser/get-profile`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
@@ -50,7 +50,7 @@ export const getThongTinDangNhap = (token) => {
         });
 };
 export const updateUser = (formData, token) => {
-    return api.put(`http://localhost:1309/admin/update`, formData, {
+    return api.put(`http://${ipAddress}:1309/admin/update`, formData, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
@@ -671,7 +671,7 @@ export const getMinhChungKhongDungChung = (token) => {
 };
 // Dang nhap
 export const login = (email, password) => {
-    return api.post('http://localhost:1309/auth/login', { email, password }).then(response => response.data)
+    return api.post(`http://${ipAddress}:1309/auth/login`, { email, password }).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
             throw error;
