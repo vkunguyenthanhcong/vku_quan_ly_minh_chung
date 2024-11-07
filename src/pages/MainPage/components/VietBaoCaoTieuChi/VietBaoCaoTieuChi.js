@@ -384,6 +384,10 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             console.log(error)
         }
     }
+    const viewPhieuDanhGia = () => {
+        window.open(`danh-gia-tieu-chi?TieuChuan_ID=${TieuChuan_ID}&TieuChi_ID=${TieuChi_ID}`, '_blank');
+    };
+
     return (
         <div onMouseMove={handleMouseMove}>
             <LoadingProcess open={show}/>
@@ -580,9 +584,18 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 </div>))}
 
                 <br/>
-                <button className="btn btn-success" onClick={savePhieuDanhGia}>
-                    Lưu
-                </button>
+                <div className="row">
+                    <div className="col-1">
+                        <button className="btn btn-success" onClick={savePhieuDanhGia}>
+                            Lưu
+                        </button>
+                    </div>
+                    <div className="col-3">
+                        <button className="btn btn-success" onClick={viewPhieuDanhGia}>
+                            Xem phiếu đánh giá
+                        </button>
+                    </div>
+                </div>
             </div>) : (null)}
         </div>);
 

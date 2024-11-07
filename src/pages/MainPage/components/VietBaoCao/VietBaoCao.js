@@ -33,6 +33,9 @@ const TieuChi = ({ idTieuChuan, phongBanUser, setNoCase, setDataTransfer}) => {
         })
         // navigate(`../viet-bao-cao-tieu-chi?TieuChuan_ID=${idTieuChuan}&TieuChi_ID=${idTieuChi}&NhomCongTac=${phongBanUser}`)
     }
+    const viewPhieuDanhGia = (idTieuChi) => {
+        window.open(`danh-gia-tieu-chi?TieuChuan_ID=${idTieuChuan}&TieuChi_ID=${idTieuChi}`, '_blank');
+    }
     
     return (
         <>
@@ -41,6 +44,7 @@ const TieuChi = ({ idTieuChuan, phongBanUser, setNoCase, setDataTransfer}) => {
                     <TableCell className="" style={{ width: '10%' }}>Tiêu chí {item.stt}</TableCell>
                     <TableCell className="">{item.tenTieuChi}</TableCell>
                     <TableCell><button className="btn btn-success" onClick={() => goToVietBaoCao(item.idTieuChi)}>Viết Báo Cáo</button></TableCell>
+                    <TableCell><button className="btn btn-success" onClick={()=>viewPhieuDanhGia(item.idTieuChi)}>Phiếu đánh giá</button></TableCell>
                 </TableRow>
             ))}
         </>
@@ -137,6 +141,7 @@ const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer}) => {
                                                 <TableCell className="text-white" style={{width: '10%'}}>STT</TableCell>
                                                 <TableCell className="text-white">Tiêu Chuẩn</TableCell>
                                                 <TableCell className="text-white">Viết báo cáo</TableCell>
+                                                <TableCell className="text-white">Phiếu đánh giá</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -145,9 +150,8 @@ const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer}) => {
                                                     <TableRow>
                                                         <TableCell className=""
                                                                    style={{width: '10%'}}><b>{index+1}</b></TableCell>
-                                                        <TableCell className=""><b>Tiêu
+                                                        <TableCell className="" colSpan={3}><b>Tiêu
                                                             chuẩn {item.stt}. {item.tenTieuChuan}</b></TableCell>
-                                                        <TableCell className=""></TableCell>
                                                     </TableRow>
                                                     <TieuChi idTieuChuan={item.idTieuChuan}
                                                              phongBanUser={phongBanUser} setNoCase={setNoCase} setDataTransfer={setDataTransfer}/>
