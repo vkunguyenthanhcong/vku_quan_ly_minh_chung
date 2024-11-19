@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from "react";
 import {
     getAllMinhChung,
-    getAllPhieuDanhGia, getPhongBanById, getTieuChiById, getTieuChuanById
+    getAllPhieuDanhGia, getAllPhieuDanhGiaTieuChuan, getAllTieuChi, getPhongBanById, getTieuChiById, getTieuChuanById
 } from "../../services/apiServices";
 import {useLocation} from "react-router-dom";
 import {saveAs} from 'file-saver';
@@ -35,11 +35,10 @@ const replaceTextInLinks = (html, replacements) => {
     return updatedHtml;
 };
 
-const DanhGiaTieuChi = () => {
+const DanhGiaTieuChuan = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = queryParams.get('TieuChuan_ID');
-    const TieuChi_ID = queryParams.get('TieuChi_ID');
     const [phieuDanhGia, setPhieuDanhGia] = useState([]);
     const [phongBan, setPhongBan] = useState([])
     const [tieuChuan, setTieuChuan] = useState([])
@@ -49,9 +48,9 @@ const DanhGiaTieuChi = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await getAllPhieuDanhGia();
+                const response = await getAllPhieuDanhGiaTieuChuan();
                 const filtered = response.filter(
-                    (item) => item.idTieuChuan == TieuChuan_ID && item.idTieuChi == TieuChi_ID
+                    (item) => item.idTieuChuan == TieuChuan_ID
                 );
                 setPhieuDanhGia(filtered);
                 if (filtered.length > 0) {
@@ -60,8 +59,9 @@ const DanhGiaTieuChi = () => {
                 }
                 const tieuChuanData = await getTieuChuanById(TieuChuan_ID);
                 setTieuChuan(tieuChuanData);
-                const tieuChiData = await getTieuChiById(TieuChi_ID);
-                setTieuChi(tieuChiData);
+                const tieuChiData = await getAllTieuChi();
+                const tieuChiFilter = tieuChiData.filter((item) => item.idTieuChuan == TieuChuan_ID);
+                setTieuChi(tieuChiFilter);
 
                 const mc = await getAllMinhChung();
                 const updateMc = mc.filter(item=>item.idTieuChuan == TieuChuan_ID).map(row=>{
@@ -86,10 +86,10 @@ const DanhGiaTieuChi = () => {
         };
 
         // Fetch data only if both IDs are available
-        if (TieuChuan_ID && TieuChi_ID) {
+        if (TieuChuan_ID) {
             fetchData();
         }
-    }, [TieuChuan_ID, TieuChi_ID]);
+    }, [TieuChuan_ID]);
 
     const contentRef = useRef(null);
     const convertHtmlToDocxParagraphs = (html) => {
@@ -114,7 +114,7 @@ const DanhGiaTieuChi = () => {
         const parseTableCell = (cell, isBold) => {
             const textRuns = parseChildNodes(cell.childNodes, isBold);
             return new TableCell({
-                children: [new Paragraph({children: textRuns, spacing: {line: 360}})],
+                children: [new Paragraph({children: textRuns, spacing: {line: 360}, alignment: AlignmentType.CENTER,})],
                 verticalAlign: VerticalAlign.CENTER,
             });
         };
@@ -127,25 +127,31 @@ const DanhGiaTieuChi = () => {
 
             return new TableRow({
                 children: tableCells,
+                verticalAlign: VerticalAlign.CENTER
             });
         };
 
         // Hàm xử lý bảng
         const parseTable = (table) => {
-            // Select rows from thead and tbody
             const headerRows = Array.from(table.querySelectorAll("thead tr"));
-
             const bodyRows = Array.from(table.querySelectorAll("tbody tr"));
-
             const tableRows = [
                 ...headerRows.map(parseTableRow),
                 ...bodyRows.map(parseTableRow)
             ];
-
-            return new Table({
-                rows: tableRows,
-                width: { size: 100, type: WidthType.PERCENTAGE }, // Set table width to 100%
-            });
+            if(table.id == "mucdanhgia"){
+                return new Table({
+                    rows: tableRows,
+                    alignment : AlignmentType.CENTER,
+                    width: { size: 50, type: WidthType.PERCENTAGE }, // Set table width to 100%
+                });
+            }else{
+                return new Table({
+                    rows: tableRows,
+                    width: { size: 100, type: WidthType.PERCENTAGE }, // Set table width to 100%
+                    spacing: {line: 360},
+                });
+            }
         };;
 
         // Hàm xử lý các node con theo kiểu khác nhau
@@ -153,6 +159,7 @@ const DanhGiaTieuChi = () => {
             const textRuns = [];
 
             nodes.forEach((child) => {
+                console.log(child)
                 if (child.nodeType === Node.TEXT_NODE) {
                     if (child.textContent.trim()) {
                         textRuns.push(createTextRun(child, isBold, isItalic, isUnderline));
@@ -211,14 +218,9 @@ const DanhGiaTieuChi = () => {
                 );
             } else if (node.nodeName === "FIGURE" && node.classList.contains("table")) {
                 const table = node.querySelector("table");
+
                 if (table) {
                     paragraphs.push(parseTable(table));
-                    paragraphs.push(
-                        new Paragraph({
-                            children: [],
-                            spacing: {line: 360},
-                        })
-                    );
                 }
             } else if (node.nodeName === "UL") {
                 node.childNodes.forEach((li) => {
@@ -234,6 +236,16 @@ const DanhGiaTieuChi = () => {
                         );
                     }
                 });
+            } else if (node.nodeName === "H2" || node.nodeName === "H1" || node.nodeName === "H3") {
+                const textRuns = parseChildNodes(node.childNodes);
+                paragraphs.push(
+                    new Paragraph({
+                        children: textRuns,
+                        indent: {firstLine: 720},
+                        spacing: {line: 360},
+                        alignment: AlignmentType.JUSTIFIED,
+                    })
+                );
             }
         };
 
@@ -261,11 +273,11 @@ const DanhGiaTieuChi = () => {
                                 alignment: AlignmentType.START,
                                 style: {
                                     paragraph: {
-                                        indent: {firstLine: 720},
+
                                     },
                                     run: {
                                         font: "Times New Roman",
-                                        bold: true,
+                                        italic : true,
                                         size: 26
                                     },
                                 },
@@ -306,7 +318,7 @@ const DanhGiaTieuChi = () => {
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: 'PHIẾU ĐÁNH GIÁ TIÊU CHÍ',
+                                    text: `TIÊU CHUẨN ${tieuChuan.stt}. ${tieuChuan.tenTieuChuan}`.toUpperCase(),
                                     size: 28,
                                     bold: true,
                                     font: "Times New Roman",
@@ -318,86 +330,30 @@ const DanhGiaTieuChi = () => {
                             },
                             alignment: AlignmentType.CENTER,
                         }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: `Nhóm công tác: ${phongBan.tenPhongBan}`,
-                                    size: 26,
-                                    font: "Times New Roman",
-                                    bold: true
-                                })
-                            ],
-                            spacing: {
-                                line: 360,
-                            },
-                            indent: {
-                                firstLine: 720,
-                            },
-                            alignment: AlignmentType.JUSTIFIED
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: `Tiêu chuẩn ${tieuChuan.stt}: ${tieuChuan.tenTieuChuan}`,
-                                    size: 26,
-                                    font: "Times New Roman",
-                                    bold: true
-                                })
-                            ],
-                            spacing: {
-
-                                line: 360,
-                            },
-                            indent: {
-                                firstLine: 720,
-                            },
-                            alignment: AlignmentType.JUSTIFIED
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: `Tiêu chí ${tieuChi.stt}: ${tieuChi.tenTieuChi}`,
-                                    size: 26,
-                                    font: "Times New Roman",
-                                    bold: true
-                                })
-                            ],
-                            spacing: {
-
-                                line: 360,
-                            },
-                            indent: {
-                                firstLine: 720,
-                            },
-                            alignment: AlignmentType.JUSTIFIED
-                        }),
-                        new Paragraph({
-                            children: [
-                                new TextRun({
-                                    text: 'Mô tả',
-                                    size: 26,
-                                    font: "Times New Roman",
-                                    bold: true
-                                })
-                            ],
-                            numbering: {
-                                reference: "my-crazy-numbering",
-                                level: 0,
-                            },
-                            spacing: {
-                                line: 360,
-                            },
-                        }),
                         ...[].concat(
                             ...phieuDanhGia.map((item) => convertHtmlToDocxParagraphs(item.moTa))
                         ),
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: 'Điểm mạnh',
+                                    text: `Đánh giá chung về Tiêu chuẩn ${tieuChuan.stt}`,
                                     size: 26,
                                     font: "Times New Roman",
-                                    bold: true
+                                    bold : true
+                                })
+                            ],
+                            spacing: {
+                                line: 360,
+                            },
+                        }),
+
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: 'Tóm tắt các điểm mạnh',
+                                    size: 26,
+                                    font: "Times New Roman",
+                                    italics : true
                                 })
                             ],
                             numbering: {
@@ -414,10 +370,10 @@ const DanhGiaTieuChi = () => {
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: 'Điểm tồn tại',
+                                    text: 'Tóm tắt các điểm tồn tại',
                                     size: 26,
                                     font: "Times New Roman",
-                                    bold: true
+                                    italics: true
                                 })
                             ],
                             numbering: {
@@ -434,10 +390,10 @@ const DanhGiaTieuChi = () => {
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: 'Kế hoạch hành động',
+                                    text: 'Kế hoạch cải tiến',
                                     size: 26,
                                     font: "Times New Roman",
-                                    bold: true
+                                    italics: true
                                 })
                             ],
                             numbering: {
@@ -450,15 +406,15 @@ const DanhGiaTieuChi = () => {
 
                         }),
                         ...[].concat(
-                            ...phieuDanhGia.map((item) => convertHtmlToDocxParagraphs(`<p>${item.keHoach}</p>`))
+                            ...phieuDanhGia.map((item) => convertHtmlToDocxParagraphs(item.keHoach))
                         ),
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: 'Mức đánh giá tiêu chí',
+                                    text: 'Mức đánh giá',
                                     size: 26,
                                     font: "Times New Roman",
-                                    bold: true
+                                    italics: true
                                 })
                             ],
                             numbering: {
@@ -471,7 +427,7 @@ const DanhGiaTieuChi = () => {
                             },
                         }),
                         ...[].concat(
-                            ...phieuDanhGia.map((item) => createTableMucDanhGia(item.mucDanhGia))
+                            ...phieuDanhGia.map((item) => convertHtmlToDocxParagraphs(item.mucDanhGia))
                         ),
 
                     ],
@@ -736,67 +692,30 @@ const DanhGiaTieuChi = () => {
                         `}
                         </style>
                         <div className="a4-content">
-                            <p className="heading-1">
-                                <b style={{fontSize: '14pt'}}>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b>
+                            <p className="heading-1 mb-3">
+                                <b className="text-uppercase" style={{fontSize: '14pt'}}>TIÊU CHUẨN {tieuChuan.stt}. {tieuChuan.tenTieuChuan}</b>
                             </p>
-                            <p className="a4-tab mt-3" style={{textAlign: "justify"}}><b>Nhóm công
-                                tác: {phongBan.tenPhongBan}</b></p>
-                            <p className="a4-tab" style={{textAlign: "justify"}}><b>Tiêu
-                                chuẩn {tieuChuan.stt} : {tieuChuan.tenTieuChuan}</b>
-                            </p>
-                            <p className="a4-tab" style={{textAlign: "justify"}}><b>Tiêu chí {tieuChi.stt} : {tieuChi.tenTieuChi}</b>
-                            </p>
-                            <p className="a4-tab"><b>1. Mô tả</b></p>
                             <p className="a4-mota">
                                 <div dangerouslySetInnerHTML={{__html: mota}}/>
                             </p>
-                            <p className="a4-tab"><b>2. Điểm mạnh</b></p>
+                            <p className="mt-3"><b>Đánh giá chung về Tiêu chuẩn {tieuChuan.stt}</b></p>
+                            <p><i>1. Tóm tắt các điểm mạnh</i></p>
                             <p className="a4-mota">
                                 <div dangerouslySetInnerHTML={{__html: item.diemManh}}/>
                             </p>
-                            <p className="a4-tab"><b>3. Điểm tồn tại</b></p>
+                            <p><i>2. Tóm tắt các điểm tồn tại</i></p>
                             <p className="a4-mota">
                                 <div dangerouslySetInnerHTML={{__html: item.diemTonTai}}/>
                             </p>
-                            <p className="a4-tab"><b>4. Kế hoạch hành động</b></p>
+                            <p><i>3. Kế hoạch cải tiến</i></p>
                             <p className="a4-mota">
                                 <div dangerouslySetInnerHTML={{__html: item.keHoach}}/>
                             </p>
-                            <p className="a4-tab mt-2"><b>5. Mức đánh giá tiêu chí</b></p>
-                            <table style={{width: "100%"}}>
-                                <thead>
-                                <tr>
-                                    <td colSpan={7} style={{
-                                        border: "1px solid black",
-                                        padding: "8px",
-                                        textAlign: "center"
-                                    }}><b>Thang đánh giá</b></td>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    {[1, 2, 3, 4, 5, 6, 7].map((num) => (
-                                        <td key={num} style={{
-                                            border: "1px solid black",
-                                            padding: "8px",
-                                            textAlign: "center"
-                                        }}>{num}</td>
-                                    ))}
-                                </tr>
-                                <tr>
-                                    {[1, 2, 3, 4, 5, 6, 7].map((num) => (
-                                        <td key={num} style={{
-                                            border: "1px solid black",
-                                            padding: "8px",
-                                            textAlign: "center"
-                                        }}>
-                                            {num === (item.mucDanhGia) ? "X" : ""}
-                                        </td>
-                                    ))}
-                                </tr>
-                                </tbody>
-                            </table>
-                            <p className="text-end mt-5"><b>Người Viết Báo Cáo</b></p>
+                            <p><i>4. Mức đánh giá</i></p>
+                            <p className="a4-mota">
+                                <div dangerouslySetInnerHTML={{__html: item.mucDanhGia}}/>
+                            </p>
+
                         </div>
                     </div>
                 ))
@@ -813,4 +732,4 @@ const DanhGiaTieuChi = () => {
     );
 };
 
-export default DanhGiaTieuChi;
+export default DanhGiaTieuChuan;

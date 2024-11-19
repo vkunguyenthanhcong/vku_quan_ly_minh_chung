@@ -6,22 +6,19 @@ import {
     getTieuChuanById,
     deleteMinhChung,
     getAllTieuChi,
-    getAllMocChuan, getAllGoiY, getAllMinhChung, getAllKhoMinhChung
+    getAllMocChuan, getAllGoiY, getAllMinhChung, getAllKhoMinhChung, downSlotMinhChung, upSlotMinhChung
 } from '../../../../services/apiServices';
 import './TieuChi.css';
 import PdfPreview from "../../../../services/PdfPreview";
 import {useClickViewPdfStore} from "../../../../stores";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
-const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfer, dataTransfer}) => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [minhChung, setMinhChung] = useState([]);
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
+const Table_MinhChung = ({setNoCase, idGoiY, idTieuChi,setDataTransfer, dataTransfer, minhChung, fetchData}) => {
+    console.log(minhChung)
 
     const handleClickViewPDF = useClickViewPdfStore((state) => state.handleClickViewPDF);
 
-    const navigate = useNavigate();
     const handleClick = (idGoiY, idTieuChi) => {
         // navigate(`/quan-ly/minh-chung?GoiY_ID=${idGoiY}&TieuChi_ID=${idTieuChi}&KhungCTDT_ID=${KhungCTDT_ID}&TieuChuan_ID=${TieuChuan_ID}`);
         setNoCase(3)
@@ -37,48 +34,27 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
             fetchData();
         }
     }
-    const fetchData = async () => {
+
+    const downSlotMC = async (idMc) => {
         try {
-            const result = await getAllMinhChung();
-            const allKhoMinhChung = await getAllKhoMinhChung();
-            const filterMinhChung = result.filter((item)=> item.idGoiY == idGoiY);
-            const updatedData = filterMinhChung.map(item => {
-                let maMinhChung;
-                let linkLuuTru;
-                let parentMaMc;
-                if(item.maDungChung == 0){
-                    maMinhChung = `${item.parentMaMc}${item.childMaMc}`;
-                    linkLuuTru = item.linkLuuTru;
-                    parentMaMc = item.parentMaMc;
-                }else{
-                    const filter = result.find((rs) => rs.idMc == item.maDungChung);
-                    maMinhChung = `${filter.parentMaMc}${filter.childMaMc}`;
-                    linkLuuTru = filter.linkLuuTru;
-                    parentMaMc = 0;
-                }
-                const khoMinhChung = allKhoMinhChung.find(kmc => kmc.idKhoMinhChung === item.idKhoMinhChung);
-                return {
-                    ...item,
-                    maMinhChung : maMinhChung,
-                    khoMinhChung : khoMinhChung,
-                    linkLuuTru : linkLuuTru,
-                    parentMaMc :parentMaMc
-                };
-            });
-
-            setMinhChung(updatedData);
-        } catch (err) {
-            setError(err);
-        } finally {
-            setLoading(false);
+            const response = await downSlotMinhChung(idMc);
+            if(response == "OK"){
+                fetchData();
+            }
+        }catch (e) {
+            console.log(e);
         }
-    };
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
+    }
+    const upSlotMC = async (idMc) => {
+        try {
+            const response = await upSlotMinhChung(idMc);
+            if(response == "OK"){
+                fetchData();
+            }
+        }catch (e) {
+            console.log(e);
+        }
+    }
     return (
         <>
 
@@ -133,7 +109,7 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
                     }
                 </TableHead>
                 <TableBody>
-                    {minhChung.map((row, index) => {
+                    {minhChung.filter(item=>item.idGoiY == idGoiY).map((row, index) => {
                         return (
                             <TableRow key={index} className='border-black'>
                                 <TableCell className='p-1' style={{width: '25%'}}>{row.maMinhChung}</TableCell>
@@ -144,9 +120,27 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
                                     <button style={{width: '100%', marginTop: '5px'}} className='btn btn-secondary'
                                             onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}>Xem
                                     </button>
-                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger' onClick={()=>deleteMC(row.idMc, row.parentMaMc)}
-                                            >Xóa
+                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger'
+                                            onClick={() => deleteMC(row.idMc, row.parentMaMc)}
+                                    >Xóa
                                     </button>
+                                    <br/>
+                                    {row.childMaMc == "01" ? (null) : (
+                                        <>
+                                            <button style={{width: '100%', marginTop: '5px'}}
+                                                    className='btn btn-primary' onClick={()=>upSlotMC(row.idMc)}>
+                                                <FontAwesomeIcon icon={faArrowUp}/>
+                                            </button>
+                                            <br/>
+                                        </>
+                                    )}
+                                    {row.stt == minhChung.length ? (null) : (<>
+                                        <button style={{width: '100%', marginTop: '5px'}}
+                                                className='btn btn-primary' onClick={()=>downSlotMC(row.idMc)}>
+                                            <FontAwesomeIcon icon={faArrowDown}/>
+                                        </button>
+                                        <br/>
+                                    </>)}
                                 </TableCell>
                             </TableRow>
                         );
@@ -159,8 +153,8 @@ const Table_MinhChung = React.memo(({setNoCase, idGoiY, idTieuChi,setDataTransfe
         </>
 
     );
-});
-const Table_GoiY = React.memo(({setNoCase, idMocChuan, idTieuChi, setDataTransfer, dataTransfer}) => {
+};
+const Table_GoiY = ({setNoCase, idMocChuan, idTieuChi, setDataTransfer, dataTransfer, minhChung, fetchData}) => {
     const [goiY, setGoiY] = useState([]);
     useEffect(() => {
         const fetchMocChuan = async () => {
@@ -183,7 +177,7 @@ const Table_GoiY = React.memo(({setNoCase, idMocChuan, idTieuChi, setDataTransfe
                             <span>{row.tenGoiY}</span>
                         </TableCell>
                         <TableCell style={{width: '75%', maxWidth: '100%', border: 'none', height: '100%'}}>
-                            <Table_MinhChung setNoCase={setNoCase} idGoiY={row.idGoiY} idTieuChi={idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>
+                            <Table_MinhChung setNoCase={setNoCase} idGoiY={row.idGoiY} idTieuChi={idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer} minhChung={minhChung} fetchData={fetchData}/>
                         </TableCell>
                     </TableRow>
                     {index < goiY.length - 1 && <hr style={{border: '1px solid black'}}/>}
@@ -192,8 +186,8 @@ const Table_GoiY = React.memo(({setNoCase, idMocChuan, idTieuChi, setDataTransfe
         </>
 
     );
-});
-const Table_MocChuan = React.memo(({idTieuChi, setNoCase, setDataTransfer, dataTransfer}) => {
+};
+const Table_MocChuan = ({idTieuChi, setNoCase, setDataTransfer, dataTransfer, minhChung, fetchData}) => {
     const [mocChuan, setMocChuan] = useState([]);
     useEffect(() => {
         const fetchMocChuan = async () => {
@@ -215,14 +209,14 @@ const Table_MocChuan = React.memo(({idTieuChi, setNoCase, setDataTransfer, dataT
                         <TableCell style={{width: '20%'}}
                                    className='border-1'>{index + 1}. {row.tenMocChuan}</TableCell>
                         <TableCell className='border-1 p-0' style={{width: '80%'}}>
-                            <Table_GoiY setNoCase={setNoCase} idMocChuan={row.idMocChuan} idTieuChi={idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>
+                            <Table_GoiY setNoCase={setNoCase} idMocChuan={row.idMocChuan} idTieuChi={idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer} minhChung={minhChung} fetchData={fetchData}/>
                         </TableCell>
                     </TableRow>
                 </TableBody>
             ))}
         </>
     );
-});
+};
 
 const TotalTieuChi = ({idTieuChi}) => {
     const [loading, setLoading] = useState(true);
@@ -254,11 +248,50 @@ const TieuChi = ({TieuChuan_ID, KhungCTDT_ID, setNoCase, setDataTransfer, dataTr
     const [error, setError] = useState(null);
     const [tieuChuan, setTieuChuan] = useState([]);
     const [tieuChi, setTieuChi] = useState([]);
+    const [minhChung, setMinhChung] = useState([])
 
 
     const isModalOpen = useClickViewPdfStore((state) => state.isModalOpen);
     const closeModal = useClickViewPdfStore((state) => state.closeModal);
     const link = useClickViewPdfStore((state) => state.link);
+
+    const fetchData = async () => {
+        try {
+            const result = await getAllMinhChung();
+            const allKhoMinhChung = await getAllKhoMinhChung();
+            let i = 0;
+            const updatedData = result.map(item => {
+                i++;
+                let maMinhChung;
+                let linkLuuTru;
+                let parentMaMc;
+                if(item.maDungChung == 0){
+                    maMinhChung = `${item.parentMaMc}${item.childMaMc}`;
+                    linkLuuTru = item.linkLuuTru;
+                    parentMaMc = item.parentMaMc;
+                }else{
+                    const filter = result.find((rs) => rs.idMc == item.maDungChung);
+                    maMinhChung = `${filter.parentMaMc}${filter.childMaMc}`;
+                    linkLuuTru = filter.linkLuuTru;
+                    parentMaMc = 0;
+                }
+                const khoMinhChung = allKhoMinhChung.find(kmc => kmc.idKhoMinhChung === item.idKhoMinhChung);
+                return {
+                    ...item,
+                    stt : i,
+                    maMinhChung : maMinhChung,
+                    khoMinhChung : khoMinhChung,
+                    linkLuuTru : linkLuuTru,
+                    parentMaMc :parentMaMc
+                };
+            });
+            setMinhChung(updatedData);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchDataFromAPI = async () => {
@@ -275,6 +308,7 @@ const TieuChi = ({TieuChuan_ID, KhungCTDT_ID, setNoCase, setDataTransfer, dataTr
             }
         };
         fetchDataFromAPI();
+        fetchData();
     }, [TieuChuan_ID, KhungCTDT_ID]);
     return (
         <div className="content" style={{background: "white", margin: '20px', padding: '20px'}}>
@@ -321,7 +355,7 @@ const TieuChi = ({TieuChuan_ID, KhungCTDT_ID, setNoCase, setDataTransfer, dataTr
                                     <p key={index}>{item.trim()}</p>
                                 ))}</TableCell>
                                 <TableCell colSpan={3} className='p-0'>
-                                    <Table_MocChuan setNoCase={setNoCase} idTieuChi={row.idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/>
+                                    <Table_MocChuan setNoCase={setNoCase} idTieuChi={row.idTieuChi} setDataTransfer={setDataTransfer} dataTransfer={dataTransfer} minhChung={minhChung} fetchData={fetchData}/>
                                 </TableCell>
                                 <TableCell style={{verticalAlign: 'top'}}><TotalTieuChi
                                     idTieuChi={row.idTieuChi}/></TableCell>

@@ -113,6 +113,7 @@ import MinhChung from "../MinhChung/minhChung";
 import QuanLyMinhChung from "../QuanLyMinhChung/QuanLyMinhChung";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import VietBaoCaoTieuChuan from "../VietBaoCaoTieuChuan/VietBaoCaoTieuChuan";
 
 //danh sach chuong trinh dao tao
 const CustomTableCell = styled(TableCell)(({theme}) => ({
@@ -202,6 +203,13 @@ const TrangChu = () => {
             return 0;
         }
     };
+    const ChangeNoCase = () => {
+        if(noCase == 4 && selectChucNang == 2){
+            setNoCase(noCase - 2)
+        }else{
+            setNoCase(noCase-1)
+        }
+    }
     const QLMC = ({dataTransfer}) => {
         const goToTieuChi = (idTieuChuan) => {
             setDataTransfer({
@@ -287,7 +295,7 @@ const TrangChu = () => {
             <hr/>
             {
                 noCase != 1 ? (
-                    <button onClick={() => setNoCase(noCase - 1)} className="btn btn-success mb-3">
+                    <button onClick={ChangeNoCase} className="btn btn-success mb-3">
                         <FontAwesomeIcon icon={faArrowLeft} className="me-2"/> Trở về
                     </button>
                 ) : (null)
@@ -381,9 +389,11 @@ const TrangChu = () => {
                                 case 2:
                                     return selectCtdt !== "" ?
                                         <VietBaoCao KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}
-                                                    setDataTransfer={setDataTransfer}/> : null;
+                                                    setDataTransfer={setDataTransfer} dataTransfer={dataTransfer}/> : null;
                                 case 3:
                                     return <VietBaoCaoTieuChi dataTransfer={dataTransfer}/>;
+                                case 4:
+                                    return <VietBaoCaoTieuChuan dataTransfer={dataTransfer}/>
                                 default:
                                     return selectCtdt !== "" ?
                                         <BaoCaoTuDanhGia KhungCTDT_ID={selectCtdt} setNoCase={setNoCase}/> : null;

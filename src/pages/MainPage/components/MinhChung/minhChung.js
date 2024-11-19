@@ -390,6 +390,9 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                 {khoMinhChung.map((row, index) => (
                                     <TableRow>
                                         <TableCell>
+                                            <b>{row.soHieu}</b>
+                                        </TableCell>
+                                        <TableCell>
                                             <b>{row.tenMinhChung}</b>
                                         </TableCell>
                                         <TableCell width={150}>
@@ -470,6 +473,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                                         >
                                                             Xóa
                                                         </button>
+
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
