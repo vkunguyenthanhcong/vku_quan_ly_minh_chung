@@ -723,8 +723,8 @@ const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
             <b>Viết báo cáo</b>
             <div className="mt-2">
                 <Row>
-                    <Col md={2} xs={12}>
-                        <button className="btn btn-success" onClick={() => goToVietBaoCao()}>Viết báo cáo tiêu chí
+                    <Col md={3} xs={12}>
+                        <button className="btn btn-success" onClick={() => goToVietBaoCao()}>Viết báo cáo tiêu chuẩn / tiêu chí
                         </button>
                     </Col>
                 </Row>

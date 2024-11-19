@@ -93,6 +93,11 @@ body {
   text-indent: 1.2cm;
   text-align: justify;
 }
+.a4-mota div h1,h2{
+  text-indent: 1.2cm;
+  font-size: 13pt !important;
+  text-align: justify;
+}
 .a4-mota div ul li{
   margin-left: 0.8cm;
 }

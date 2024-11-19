@@ -1,6 +1,6 @@
+
 import React, {useEffect, useState, useRef} from "react";
 import {CKEditor} from '@ckeditor/ckeditor5-react';
-import {useLocation} from "react-router-dom";
 import {
     ClassicEditor,
     Autoformat,
@@ -52,15 +52,71 @@ import {
 import 'ckeditor5/ckeditor5.css';
 import {
     getAllGoiY, getAllKhoMinhChung,
-    getAllMinhChung, getAllMocChuan, getAllPhieuDanhGia,
+    getAllMinhChung, getAllMocChuan, getAllPhieuDanhGia, getAllPhieuDanhGiaTieuChuan, getAllTieuChi,
     getPhongBanById,
     getTieuChiById,
     getTieuChuanById,
-    savePhieuDanhGiaTieuChi,
-    updatePhieuDanhGiaTieuChi
+    savePhieuDanhGiaTieuChi, savePhieuDanhGiaTieuChuan,
+    updatePhieuDanhGiaTieuChi, updatePhieuDanhGiaTieuChuan
 } from "../../../../services/apiServices";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+function removeDuplicateParagraphs(htmlString) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const paragraphs = Array.from(doc.querySelectorAll('p, h1, h2, h3, h4, h5, h6, figure, ul, li')); // Collect all target elements
 
+    const uniqueContent = new Set();
+    const uniqueParagraphs = paragraphs.filter(element => {
+        // Check if it's the "Tự đánh giá" content
+        if (element.textContent.trim().startsWith("Tự đánh giá:")) {
+            return true; // Always keep "Tự đánh giá" paragraphs
+        }
+
+        const content = element.outerHTML; // Full HTML of the element
+        if (uniqueContent.has(content)) {
+            return false; // Skip duplicates
+        }
+        uniqueContent.add(content);
+        return true;
+    });
+
+    return uniqueParagraphs.map(element => element.outerHTML).join('');
+}
+
+function cleanHTML(inputHTML) {
+    // Create a temporary container to parse the HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(inputHTML, 'text/html');
+
+    // Select all figure elements
+    const figures = doc.querySelectorAll('figure');
+
+    // If there are more than one figure elements, remove the excess ones
+    if (figures.length > 1) {
+        // Loop through all figure elements starting from the second one and remove them
+        for (let i = 1; i < figures.length; i++) {
+            figures[i].remove();
+        }
+    }
+
+    // Now we have only the first figure, but we need to remove extra <thead> from other tables
+    // Select all tables in the document
+    const tables = doc.querySelectorAll('table');
+
+    // If there are tables, remove the thead in tables except the first one
+    if (tables.length > 1) {
+        for (let i = 1; i < tables.length; i++) {
+            const table = tables[i];
+            const thead = table.querySelector('thead');
+            if (thead) {
+                thead.remove(); // Remove the <thead> element from the extra tables
+            }
+        }
+    }
+
+    // Return the modified HTML string (only the first figure and its table remain intact)
+    return doc.body.innerHTML;
+}
 function MentionCustomization(editor) {
     editor.conversion.for('downcast').attributeToElement({
         model: 'mention', view: (modelAttributeValue, {writer}) => {
@@ -80,7 +136,7 @@ function MentionCustomization(editor) {
     });
 }
 
-const VietBaoCaoTieuChi = ({dataTransfer}) => {
+const VietBaoCaoTieuChuan = ({dataTransfer}) => {
     const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
 
     const handleMouseMove = (event) => {
@@ -90,145 +146,194 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         });
     };
 
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
     const TieuChuan_ID = dataTransfer.TieuChuan_ID;
     const TieuChi_ID = dataTransfer.TieuChi_ID;
     const idPhongBan = dataTransfer.NhomCongTac;
-    const [phieuDanhGia, setPhieuDanhGia] = useState(null)
     const [show, setShow] = useState(true);
     const editorContainerRef = useRef(null);
     const editorRef = useRef(null);
     const [isLayoutReady, setIsLayoutReady] = useState(false);
     const [editorInstance, setEditorInstance] = useState(null);
     const [tieuChuan, setTieuChuan] = useState([])
-    const [tieuChi, setTieuChi] = useState([])
     const [minhChung, setMinhChung] = useState([])
     const [nhomCongTac, setNhomCongTac] = useState(null)
 
     const [moTa, setMoTa] = useState('');
     const [diemManh, setDiemManh] = useState('');
     const [diemYeu, setDiemYeu] = useState('');
-    const [keHoach, setKeHoach] = useState("<figure class=\"table\"><table><thead><tr><th>TT</th><th>Mục tiêu</th><th>Nội dung</th><th>Đơn vị/ cá nhân thực hiện</th><th>Thời gian thực hiện</th><th>Ghi chú</th></tr></thead></table></figure>");
+    const [keHoach, setKeHoach] = useState('<figure class="table"></figure>');
+    const [mucDanhGia, setMucDanhGia] = useState('');
 
     const [booleanMention, setBooleanMention] = useState(false);
-    let mentionConfig;
-    const [formData, setFormData] = useState({
-        noiDungKhacPhuc: '',
-        donViKhacPhuc: '',
-        thoiGianKhacPhuc: '',
-        ghiChuKhacPhuc: '',
-        noiDungPhatHuy: '',
-        donViPhatHuy: '',
-        thoiGianPhatHuy: '',
-        ghiChuPhatHuy: '',
-        mucDanhGia: 0
-    });
+    const [idPhieuDanhGia, setIdPhieuDanhGia] = useState(0)
+
 
 
     const options = [1, 2, 3, 4, 5, 6, 7];
-    const fetchData = async () => {
+    useEffect(() => {
+        const fetchData = async () => {<figure class="table"></figure>
+
+
+            const response_3 = await getPhongBanById(idPhongBan);
+            setNhomCongTac(response_3);
+
+            const allMinhChungData = await getAllMinhChung();
+            const allKhoMinhChungData = await getAllKhoMinhChung();
+            const updatedMinhChung = allMinhChungData.filter(i => i.idTieuChuan == TieuChuan_ID)
+                .map(item => {
+                    const maMinhChung = `${item.parentMaMc || 'H1'}${item.childMaMc || ''}`;
+                    const khoMinhChung = allKhoMinhChungData.find((kmc) => kmc.idKhoMinhChung === item.idKhoMinhChung);
+                    if (item.allMinhChungData !== 0) {
+                        const matchingItem = allMinhChungData.find(mc => mc.idMc === item.maDungChung);
+                        if (matchingItem) {
+                            return {
+                                ...item,
+                                khoMinhChung: khoMinhChung,
+                                parentMaMc: matchingItem.parentMaMc,
+                                childMaMc: matchingItem.childMaMc,
+                                maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`
+                            };
+                        }
+                    }
+                    return {
+                        ...item,
+                        khoMinhChung: khoMinhChung,
+                        maMinhChung
+                    };
+                });
+            const minhChungFilter = updatedMinhChung.filter((item) => item.idTieuChi == TieuChi_ID);
+            minhChungFilter.length > 0 ? (setBooleanMention(true)) : (setBooleanMention(false));
+            const suggestions = minhChungFilter.map(itemB => {
+                let parentMaMc = itemB.parentMaMc;
+                let childMaMc = itemB.childMaMc;
+
+                if (parentMaMc == "0" && childMaMc == "0") {
+                    const correspondingA = allMinhChungData.find(itemA => itemA.idMc == itemB.maDungChung);
+
+                    if (correspondingA) {
+                        parentMaMc = correspondingA.parentMaMc;
+                        childMaMc = correspondingA.childMaMc;
+                    }
+                }
+                const maMinhChung = `${parentMaMc}${childMaMc}`;
+                return {
+                    tenMinhChung: itemB.khoMinhChung.tenMinhChung,
+                    maMinhChung: maMinhChung,
+                    link: "https://drive.google.com/file/d/" + itemB.linkLuuTru + "/preview"
+                };
+            });
+            setMinhChung(suggestions);
+
+            setBooleanMention(true)
+            setShow(false)
+        };
+        fetchData();
+
+    }, [TieuChuan_ID, TieuChi_ID, idPhongBan]);
+    const fetchMinhChung = async (TieuChuan_ID) => {
         const response = await getTieuChuanById(TieuChuan_ID);
         setTieuChuan(response);
 
-        const response_2 = await getTieuChiById(TieuChi_ID);
-        setTieuChi(response_2);
+        const tieuChiData = await getAllTieuChi();
+        const filterTieuChi = tieuChiData.filter(item => item.idTieuChuan == TieuChuan_ID).sort((a, b) => a.stt - b.stt);
+        const phieuDanhGiaTieuChi = await getAllPhieuDanhGia();
+        const phieuDanhGiaTieuChuan = await getAllPhieuDanhGiaTieuChuan();
+        const filterPhieuDanhGia = phieuDanhGiaTieuChuan.filter((item) => item.idTieuChuan == TieuChuan_ID);
+        if (filterPhieuDanhGia.length == 0) {
+            let newMoTa = '';
+            let newDiemManh = '';
+            let newDiemYeu = '';
+            let newKeHoach = '';
+            let newMucDanhGia = '';
+            let totalScore = 0;
+            let totalTieuChi = 0;
+            filterTieuChi.forEach((tc) => {
+                const filterPhieuDanhGia = phieuDanhGiaTieuChi.filter((item) => item.idTieuChuan == TieuChuan_ID && item.idTieuChi == tc.idTieuChi);
+                if (filterPhieuDanhGia && filterPhieuDanhGia.length > 0) {
+                    const moTaContent = filterPhieuDanhGia.map(phieu => phieu.moTa).join(' ');
+                    const mucDanhGiaContent = filterPhieuDanhGia.map(phieu => phieu.mucDanhGia).join(', ');
+                    newMoTa += `
+                      <h2 style="font-size: 16px"><b><i>Tiêu chí ${response.stt}.${tc.stt}. ${tc.tenTieuChi}</i></b></h2>
+                      ${moTaContent}
+                      <p><b>Tự đánh giá: ${mucDanhGiaContent}/7</b></p>`;
+                    newDiemManh += filterPhieuDanhGia
+                        .map(item => item.diemManh)
+                        .filter(diemManh => diemManh !== '' && diemManh !== null)
+                        .map(diemManh => {
+                            if (diemManh.includes('<ul>') || diemManh.includes('<li>')) {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(diemManh, 'text/html');
+                                const liElements = doc.querySelectorAll('ul li');
 
-        const response_3 = await getPhongBanById(idPhongBan);
-        setNhomCongTac(response_3);
+                                const liTexts = Array.from(liElements).map(li => li.innerText.trim());
 
-        const allMinhChungData = await getAllMinhChung();
-        const allKhoMinhChungData = await getAllKhoMinhChung();
-        const mocChuanData = await getAllMocChuan();
-        const goiYAll = await getAllGoiY();
-        const updatedMinhChung = allMinhChungData
-            .map(item => {
-                const maMinhChung = `${item.parentMaMc || 'H1'}${item.childMaMc || ''}`;
-                const idMocChuan = goiYAll.find((gy) => gy.idGoiY == item.idGoiY).idMocChuan;
-                const idTieuChi = mocChuanData.find((mc) => mc.idMocChuan == idMocChuan).idTieuChi;
-                const khoMinhChung = allKhoMinhChungData.find((kmc) => kmc.idKhoMinhChung === item.idKhoMinhChung);
-                if (item.allMinhChungData !== 0) {
-                    const matchingItem = allMinhChungData.find(mc => mc.idMc === item.maDungChung);
+                                return liTexts.map(item => `<li>${item}</li>`).join('');
+                            } else {
+                                return `<li>${diemManh.trim()}</li>`;
+                            }
+                        })
+                        .join(', ');
+                    newDiemYeu += filterPhieuDanhGia
+                        .map(item => item.diemTonTai)
+                        .filter(diemTonTai => diemTonTai !== '' && diemTonTai !== null)
+                        .map(diemTonTai => {
+                            if (diemTonTai.includes('<ul>') || diemTonTai.includes('<li>')) {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(diemTonTai, 'text/html');
+                                const liElements = doc.querySelectorAll('ul li');
 
-                    if (matchingItem) {
-                        return {
-                            ...item,
-                            khoMinhChung: khoMinhChung,
-                            parentMaMc: matchingItem.parentMaMc,
-                            childMaMc: matchingItem.childMaMc,
-                            maMinhChung: `${matchingItem.parentMaMc || 'H1'}${matchingItem.childMaMc || ''}`,
-                            idTieuChi: idTieuChi
-                        };
-                    }
+                                const liTexts = Array.from(liElements).map(li => li.innerText.trim());
+
+                                return liTexts.map(item => `<li>${item}</li>`).join('');
+                            } else {
+                                return `<li>${diemTonTai.trim()}</li>`;
+                            }
+                        })
+                        .join(', ');
+
+                    newKeHoach += filterPhieuDanhGia
+                        .map(item => item.keHoach)
+                        .filter(keHoach => keHoach !== '' && keHoach !== null)
+                        .map(keHoach => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(keHoach, 'text/html');
+                            const tbody = doc.querySelector('tbody');
+                            if (tbody) {
+                                const tbodyContent = tbody.outerHTML;
+                                return tbodyContent + ' ';
+                            } else {
+
+                            }
+                        });
+                    newMucDanhGia += filterPhieuDanhGia
+                        .map((item) => {
+                            totalScore += item.mucDanhGia;
+                            totalTieuChi = tc.stt;
+                            return `<tr><td>Tiêu chí ${response.stt}.${tc.stt}</td><td>${item.mucDanhGia}</td></tr>`;
+                        })
+                        .join('');
+
+
                 }
-                return {
-                    ...item,
-                    khoMinhChung: khoMinhChung,
-                    maMinhChung,
-                    idTieuChi: idTieuChi
-                };
             });
-        const minhChungFilter = updatedMinhChung.filter((item) => item.idTieuChi == TieuChi_ID);
-        minhChungFilter.length > 0 ? (setBooleanMention(true)) : (setBooleanMention(false));
-        const suggestions = minhChungFilter.map(itemB => {
-            let parentMaMc = itemB.parentMaMc;
-            let childMaMc = itemB.childMaMc;
 
-            if (parentMaMc == "0" && childMaMc == "0") {
-                const correspondingA = allMinhChungData.find(itemA => itemA.idMc == itemB.maDungChung);
-
-                if (correspondingA) {
-                    parentMaMc = correspondingA.parentMaMc;
-                    childMaMc = correspondingA.childMaMc;
-                }
-            }
-            const maMinhChung = `${parentMaMc}${childMaMc}`;
-            return {
-                tenMinhChung: itemB.khoMinhChung.tenMinhChung,
-                maMinhChung: maMinhChung,
-                link: "https://drive.google.com/file/d/" + itemB.linkLuuTru + "/preview"
-            };
-        });
-        setMinhChung(suggestions);
-
-        const response_4 = await getAllPhieuDanhGia();
-        if (response_4) {
-            const filterPhieuDanhGia = response_4.filter((item) => item.idTieuChuan == TieuChuan_ID && item.idTieuChi == TieuChi_ID);
-            if (filterPhieuDanhGia && filterPhieuDanhGia.length > 0) {
-                const firstItem = filterPhieuDanhGia[0];
-
-                setPhieuDanhGia(filterPhieuDanhGia);
-                setMoTa(firstItem.moTa);
-                setDiemManh(firstItem.diemManh);
-                setDiemYeu(firstItem.diemTonTai);
-                setKeHoach(firstItem.keHoach);
-
-                setFormData({
-                    noiDungKhacPhuc: firstItem.noiDungKhacPhuc,
-                    donViKhacPhuc: firstItem.donViKhacPhuc,
-                    thoiGianKhacPhuc: firstItem.thoiGianKhacPhuc,
-                    ghiChuKhacPhuc: firstItem.ghiChuKhacPhuc,
-                    noiDungPhatHuy: firstItem.noiDungPhatHuy,
-                    donViPhatHuy: firstItem.donViPhatHuy,
-                    thoiGianPhatHuy: firstItem.thoiGianPhatHuy,
-                    ghiChuPhatHuy: firstItem.ghiChuPhatHuy,
-                    mucDanhGia: firstItem.mucDanhGia
-                });
-
-
-            } else {
-                setPhieuDanhGia([]);
-                setMoTa('');
-            }
+            setMoTa(newMoTa);
+            setDiemManh(newDiemManh);
+            setDiemYeu(`<ul>${newDiemYeu}</ul>`);
+            setKeHoach(`<figure class="table"><table><thead><tr><th>TT</th><th>Mục tiêu</th><th>Nội dung</th><th>Đơn vị/ cá nhân thực hiện</th><th>Thời gian thực hiện</th><th>Ghi chú</th></tr></thead>${newKeHoach}</table></figure>`);
+            setMucDanhGia(`<figure class="table"><table id="mucdanhgia"><thead><tr><th class="text-center">Tiêu chuẩn/Tiêu chí</th><th class="text-center">Tự đánh giá</th></tr><tr><th class="text-center"><i>Tiêu chuẩn ${response.stt}</i></th><th class="text-center">${totalScore / totalTieuChi}</th></tr></thead><tbody class="text-center">${newMucDanhGia}</tbody></table></figure>`);
+        }else{
+            setIdPhieuDanhGia(filterPhieuDanhGia[0].idPhieuDanhGiaTieuChuan);
+            setMoTa(filterPhieuDanhGia[0].moTa);
+            setMucDanhGia(filterPhieuDanhGia[0].mucDanhGia);
+            setDiemManh(filterPhieuDanhGia[0].diemManh);
+            setDiemYeu(filterPhieuDanhGia[0].diemTonTai);
+            setKeHoach(filterPhieuDanhGia[0].keHoach);
         }
-
-
-        setBooleanMention(true)
-        setShow(false)
     };
-    useEffect(() => {
-        fetchData();
-    }, [TieuChuan_ID, TieuChi_ID, idPhongBan]);
+    useEffect(()=>{
+        fetchMinhChung(TieuChuan_ID);
+    },[TieuChuan_ID])
 
 
     useEffect(() => {
@@ -293,7 +398,18 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             }]
         },
         image: {
-            toolbar: ['toggleImageCaption', 'imageTextAlternative', '|', 'imageStyle:inline', 'imageStyle:wrapText', 'imageStyle:breakText', '|', 'resizeImage']
+            toolbar: [
+                'toggleImageCaption',
+                'imageTextAlternative',
+                '|',
+                'imageStyle:inline',
+                'imageStyle:wrapText',
+                'imageStyle:breakText',
+                '|',
+                'resizeImage',
+                '|',
+                'ckboxImageEdit'
+            ]
         },
         link: {
             addTargetToExternalLinks: true, defaultProtocol: 'https://', decorators: {
@@ -322,6 +438,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         if (editor && editor.getData) {
             try {
                 const data = editor.getData();
+                console.log(data)
                 setMoTa(data);
             } catch (error) {
                 console.error('Error handling editor change:', error);
@@ -343,44 +460,32 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const handleSetKeHoach = (event, editor) => {
         const data = editor.getData();
         setKeHoach(data)
-
     }
-    const handleSet = (event) => {
-        const {name, value} = event.target;
-        setFormData({
-            ...formData, [name]: value
-        });
-    };
+    const handleChangeMucDanhGia = (event, editor) => {
+        const data = editor.getData();
+        setMucDanhGia(data)
+    }
 
     const savePhieuDanhGia = async () => {
         try {
             const data = new FormData();
             data.append('idPhongBan', idPhongBan);
             data.append('idTieuChuan', TieuChuan_ID);
-            data.append('idTieuChi', TieuChi_ID);
 
             data.append('moTa', moTa);
             data.append('diemManh', diemManh);
             data.append('diemTonTai', diemYeu);
-            data.append('noiDungKhacPhuc', formData.noiDungKhacPhuc);
-            data.append('donViKhacPhuc', formData.donViKhacPhuc);
-            data.append('thoiGianKhacPhuc', formData.thoiGianKhacPhuc);
-            data.append('ghiChuKhacPhuc', formData.ghiChuKhacPhuc);
-            data.append('noiDungPhatHuy', formData.noiDungPhatHuy);
-            data.append('donViPhatHuy', formData.donViPhatHuy);
-            data.append('thoiGianPhatHuy', formData.thoiGianPhatHuy);
-            data.append('ghiChuPhatHuy', formData.ghiChuPhatHuy);
-            data.append('mucDanhGia', formData.mucDanhGia);
-            data.append("keHoach", keHoach)
-            if (phieuDanhGia?.length == 0) {
-                const response = await savePhieuDanhGiaTieuChi(data);
+            data.append("keHoach", keHoach);
+            data.append("mucDanhGia", mucDanhGia);
+            if (idPhieuDanhGia == 0) {
+                const response = await savePhieuDanhGiaTieuChuan(data);
                 if (response === "OK") {
-                    fetchData()
+                    fetchMinhChung(TieuChuan_ID);
                     alert('Lưu thành công')
                 }
             } else {
-                data.append('idPhieuDanhGia', phieuDanhGia[0].idPhieuDanhGiaTieuChi)
-                const response = await updatePhieuDanhGiaTieuChi(data);
+                data.append('idPhieuDanhGia', idPhieuDanhGia)
+                const response = await updatePhieuDanhGiaTieuChuan(data);
                 if (response === "OK") {
                     alert('Lưu thành công')
                 }
@@ -391,7 +496,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         }
     }
     const viewPhieuDanhGia = () => {
-        window.open(`danh-gia-tieu-chi?TieuChuan_ID=${TieuChuan_ID}&TieuChi_ID=${TieuChi_ID}`, '_blank');
+        window.open(`danh-gia-tieu-chuan?TieuChuan_ID=${TieuChuan_ID}`, '_blank');
     };
 
     return (
@@ -419,11 +524,10 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 `}
             </style>
             {booleanMention == true ? (<div className="content bg-white m-3 p-4">
-                <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b></p>
+                <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHUẨN</b></p>
                 <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
                     <span>Loading...</span>)}</p>
                 <p>Tiêu chuẩn {tieuChuan.stt} : {tieuChuan.tenTieuChuan}</p>
-                <p>Tiêu chí {tieuChi.stt} : {tieuChi.tenTieuChi}</p>
 
                 <p>1. Mô tả</p>
                 <div className="main-container">
@@ -506,19 +610,24 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 </div>
 
                 <p className="mt-2">5. Mức đánh giá</p>
+                <div className="main-container">
+                    <div
+                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                        ref={editorContainerRef}
+                    >
+                        <div className="editor-container__editor">
+                            <div ref={editorRef} spellCheck={false}>
+                                {isLayoutReady && (<CKEditor
+                                    editor={ClassicEditor}
+                                    config={editorConfig}
+                                    onChange={handleChangeMucDanhGia}
+                                    data={mucDanhGia}
+                                />)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                {options.map((option) => (<div key={option}>
-                    <input
-                        className="me-1"
-                        type="radio"
-                        name="mucDanhGia"
-                        value={option}
-                        id={option.toString()}
-                        onChange={handleSet}
-                        checked={formData.mucDanhGia == option}
-                    />
-                    <label htmlFor={option.toString()}>{option}</label>
-                </div>))}
 
                 <br/>
                 <div className="row">
@@ -537,4 +646,4 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         </div>);
 
 }
-export default VietBaoCaoTieuChi;
+export default VietBaoCaoTieuChuan;

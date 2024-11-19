@@ -52,7 +52,7 @@ const TieuChi = ({ idTieuChuan, phongBanUser, setNoCase, setDataTransfer}) => {
 
 }
 
-const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer}) => {
+const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer, dataTransfer}) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
 
@@ -106,7 +106,15 @@ const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer}) => {
             }
         };
         fetchData();
-    }, [KhungCTDT_ID, phongBanUser]); 
+    }, [KhungCTDT_ID, phongBanUser]);
+    const VietBaoCaoTieuChuan = (idTieuChuan) =>{
+        setNoCase(4)
+        setDataTransfer({
+            ...dataTransfer,
+            TieuChuan_ID : idTieuChuan,
+            NhomCongTac : phongBanUser
+        })
+    }
     return (
         <div className="content bg-white m-3 p-4">
             {chuongTrinhDaoTao && chuongTrinhDaoTao.length > 0 ? (
@@ -150,8 +158,9 @@ const VietBaoCao = ({KhungCTDT_ID, setNoCase, setDataTransfer}) => {
                                                     <TableRow>
                                                         <TableCell className=""
                                                                    style={{width: '10%'}}><b>{index+1}</b></TableCell>
-                                                        <TableCell className="" colSpan={3}><b>Tiêu
+                                                        <TableCell className="" colSpan={1}><b>Tiêu
                                                             chuẩn {item.stt}. {item.tenTieuChuan}</b></TableCell>
+                                                        <TableCell colSpan={2}><button className="btn btn-success" onClick={()=>VietBaoCaoTieuChuan(item.idTieuChuan)}>Viết Báo Cáo Tiêu Chuẩn</button></TableCell>
                                                     </TableRow>
                                                     <TieuChi idTieuChuan={item.idTieuChuan}
                                                              phongBanUser={phongBanUser} setNoCase={setNoCase} setDataTransfer={setDataTransfer}/>

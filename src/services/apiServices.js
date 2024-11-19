@@ -581,7 +581,7 @@ export const searchLoaiVanBanByDate = (tenMc, soHieu, idLoai, startDate, endDate
 };
 // Xoa Minh Chung
 export const deleteMinhChung = (idMc, parentMaMc, token) => {
-    return api.get(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`, {
+    return api.delete(`/minhchung/delete?idMc=${idMc}&parentMaMc=${parentMaMc}`, {
         headers: { Authorization: `Bearer ${token}` }
     })
         .then(response => response.data)
@@ -621,6 +621,31 @@ export const createFolderCTDT = (tenCtdt, token) => {
 // Luu Minh Chung
 export const saveMinhChung = (minhChung, token) => {
     return api.post('/khominhchung', minhChung, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//change slot minhchung
+export const downSlotMinhChung = (idMc, token) => {
+    return api.put(`/minhchung/down/${idMc}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const upSlotMinhChung = (idMc, token) => {
+    return api.put(`/minhchung/up/${idMc}`, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
@@ -867,6 +892,19 @@ export const savePhieuDanhGiaTieuChi = (formData, token) => {
             throw error;
         });
 };
+//phieu danh gia tieu chi
+export const savePhieuDanhGiaTieuChuan = (formData, token) => {
+    return api.post('/phieudanhgiatieuchuan', formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //update phieu danh gia tieu chi
 export const updatePhieuDanhGiaTieuChi = (formData, token) => {
     return api.put('/phieudanhgiatieuchi', formData, {
@@ -880,9 +918,34 @@ export const updatePhieuDanhGiaTieuChi = (formData, token) => {
             throw error;
         });
 };
-//get phieu danh gia by maCtdt
+export const updatePhieuDanhGiaTieuChuan = (formData, token) => {
+    return api.put('/phieudanhgiatieuchuan', formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//get phieu danh gia tieu chi
 export const getAllPhieuDanhGia = (token) => {
     return api.get(`/phieudanhgiatieuchi`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//get phieu danh gia tieu chuan
+export const getAllPhieuDanhGiaTieuChuan = (token) => {
+    return api.get(`/phieudanhgiatieuchuan`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
