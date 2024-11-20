@@ -57,7 +57,7 @@ import {
     getTieuChiById,
     getTieuChuanById,
     savePhieuDanhGiaTieuChi, savePhieuDanhGiaTieuChuan,
-    updatePhieuDanhGiaTieuChi, updatePhieuDanhGiaTieuChuan
+    updatePhieuDanhGiaTieuChi, updatePhieuDanhGiaTieuChuan, uploadImage, urlDefault
 } from "../../../../services/apiServices";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 function removeDuplicateParagraphs(htmlString) {
@@ -135,8 +135,47 @@ function MentionCustomization(editor) {
         }, converterPriority: 'high'
     });
 }
+class MyUploadAdapter {
+    constructor(loader) {
+        this.loader = loader;
+    }
+
+    async upload() {
+        try {
+            const file = await this.loader.file;
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Replace with your API call to upload the image
+            const imagePath = await uploadImage(formData); // e.g., '/uploads/1732009349333_14.jpg'
+
+            // Construct the full URL for CKEditor
+            const fullUrl = `${urlDefault}${imagePath}`;
+            console.log(fullUrl);
+            return {
+                default: fullUrl, // CKEditor will use this to display the image
+            };
+        } catch (error) {
+            console.error("Image upload failed", error);
+            return Promise.reject(error);
+        }
+    }
+
+    abort() {
+        // Handle abort if necessary
+    }
+}
+
+// Plugin to integrate the custom adapter with CKEditor
+function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+        return new MyUploadAdapter(loader);
+    };
+}
+
 
 const VietBaoCaoTieuChuan = ({dataTransfer}) => {
+
     const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
 
     const handleMouseMove = (event) => {
@@ -345,6 +384,7 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
     };
 
     const editorConfig = {
+        extraPlugins: [MyCustomUploadAdapterPlugin],
         mention: {
             feeds: [{
                 marker: '[',
@@ -438,7 +478,6 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
         if (editor && editor.getData) {
             try {
                 const data = editor.getData();
-                console.log(data)
                 setMoTa(data);
             } catch (error) {
                 console.error('Error handling editor change:', error);
@@ -524,6 +563,7 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
                 `}
             </style>
             {booleanMention == true ? (<div className="content bg-white m-3 p-4">
+
                 <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHUẨN</b></p>
                 <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
                     <span>Loading...</span>)}</p>

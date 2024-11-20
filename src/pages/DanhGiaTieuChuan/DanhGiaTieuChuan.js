@@ -3,6 +3,7 @@ import {
     getAllMinhChung,
     getAllPhieuDanhGia, getAllPhieuDanhGiaTieuChuan, getAllTieuChi, getPhongBanById, getTieuChiById, getTieuChuanById
 } from "../../services/apiServices";
+
 import {useLocation} from "react-router-dom";
 import {saveAs} from 'file-saver';
 import {
@@ -18,7 +19,7 @@ import {
     TableRow,
     WidthType,
     VerticalAlign,
-    convertInchesToTwip
+    convertInchesToTwip, ImageRun
 } from 'docx';
 const replaceTextInLinks = (html, replacements) => {
     if (!html || !Array.isArray(replacements) || replacements.length === 0) {
@@ -45,6 +46,7 @@ const DanhGiaTieuChuan = () => {
     const [tieuChi, setTieuChi] = useState([])
     const [minhChung, setMinhChung] = useState([])
     const [mota, setMota] = useState('');
+    const [image, setImage] = useState('');
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -152,14 +154,43 @@ const DanhGiaTieuChuan = () => {
                     spacing: {line: 360},
                 });
             }
-        };;
+        };
+        const convertToBase64 = async (url) => {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
 
-        // Hàm xử lý các node con theo kiểu khác nhau
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(blob);
+                });
+            } catch (error) {
+                console.error("Error converting image to Base64:", error);
+                throw error; // Rethrow the error to handle it outside
+            }
+        };
+
+        const parseImage = async (img) => {
+            const src = img.src; // The URL of the image
+            const altText = img.alt || ''; // Alt text for the image
+            const width = img.width;
+            const height = img.height;
+            const base64 = await convertToBase64(src);
+            return new ImageRun({
+                data: base64,
+                transformation: {
+                    width: width,
+                    height: height,
+                },
+                altText: altText,
+            });
+        }
         const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false) => {
             const textRuns = [];
 
             nodes.forEach((child) => {
-                console.log(child)
                 if (child.nodeType === Node.TEXT_NODE) {
                     if (child.textContent.trim()) {
                         textRuns.push(createTextRun(child, isBold, isItalic, isUnderline));
@@ -222,6 +253,19 @@ const DanhGiaTieuChuan = () => {
                 if (table) {
                     paragraphs.push(parseTable(table));
                 }
+            } else if (node.nodeName === "FIGURE" && node.classList.contains("image")) {
+                const img = document.querySelector('img'); // Assuming an image is available in the DOM
+
+                parseImage(img).then(imageData => {
+                    if (imageData) {
+                        console.log('Image data:', imageData);
+                        paragraphs.push(new Paragraph({
+                            children: [imageData]
+                        }));
+                    } else {
+                        console.error('Failed to process image.');
+                    }
+                });
             } else if (node.nodeName === "UL") {
                 node.childNodes.forEach((li) => {
                     if (li.nodeName === "LI") {
@@ -688,6 +732,10 @@ const DanhGiaTieuChuan = () => {
                             {`
                           td{
                             color : black !important;
+                          }
+                          .image img {
+                             max-width : 100%;
+                             height : auto;
                           }
                         `}
                         </style>
