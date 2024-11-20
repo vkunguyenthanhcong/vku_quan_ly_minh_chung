@@ -8,6 +8,7 @@ const api = axios.create({
         'Content-Type': 'application/json',
     },
 });
+export const urlDefault = `http://${ipAddress}:1309`;
 const isTokenExpired = (token) => {
     if (!token) return true;
 
@@ -597,6 +598,19 @@ export const uploadMinhChung = (formData, token) => {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
 
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//upload image
+export const uploadImage = (formData, token) => {
+    return api.post('/images/upload', formData, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
         },
     }).then(response => response.data)
         .catch(error => {

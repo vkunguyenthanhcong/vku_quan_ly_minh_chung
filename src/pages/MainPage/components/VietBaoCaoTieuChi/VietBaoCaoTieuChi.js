@@ -57,7 +57,7 @@ import {
     getTieuChiById,
     getTieuChuanById,
     savePhieuDanhGiaTieuChi,
-    updatePhieuDanhGiaTieuChi
+    updatePhieuDanhGiaTieuChi, uploadImage, urlDefault
 } from "../../../../services/apiServices";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
@@ -78,6 +78,43 @@ function MentionCustomization(editor) {
             });
         }, converterPriority: 'high'
     });
+}
+class MyUploadAdapter {
+    constructor(loader) {
+        this.loader = loader;
+    }
+
+    async upload() {
+        try {
+            const file = await this.loader.file;
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Replace with your API call to upload the image
+            const imagePath = await uploadImage(formData);
+
+            // Construct the full URL for CKEditor
+            const fullUrl = `${urlDefault}${imagePath}`;
+            console.log(fullUrl);
+            return {
+                default: fullUrl, // CKEditor will use this to display the image
+            };
+        } catch (error) {
+            console.error("Image upload failed", error);
+            return Promise.reject(error);
+        }
+    }
+
+    abort() {
+        // Handle abort if necessary
+    }
+}
+
+// Plugin to integrate the custom adapter with CKEditor
+function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+        return new MyUploadAdapter(loader);
+    };
 }
 
 const VietBaoCaoTieuChi = ({dataTransfer}) => {
@@ -240,6 +277,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     };
 
     const editorConfig = {
+        extraPlugins: [MyCustomUploadAdapterPlugin],
         mention: {
             feeds: [{
                 marker: '[',
