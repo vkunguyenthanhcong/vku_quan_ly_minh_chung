@@ -150,8 +150,7 @@ class MyUploadAdapter {
             const imagePath = await uploadImage(formData); // e.g., '/uploads/1732009349333_14.jpg'
 
             // Construct the full URL for CKEditor
-            const fullUrl = `${urlDefault}${imagePath}`;
-            console.log(fullUrl);
+            const fullUrl = `${imagePath}`;
             return {
                 default: fullUrl, // CKEditor will use this to display the image
             };

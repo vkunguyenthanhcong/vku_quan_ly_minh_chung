@@ -22,6 +22,8 @@ import {
     convertInchesToTwip, ImageRun
 } from 'docx';
 import data from "bootstrap/js/src/dom/data";
+import mammoth from "mammoth";
+import {Buffer} from "buffer";
 const replaceTextInLinks = (html, replacements) => {
     if (!html || !Array.isArray(replacements) || replacements.length === 0) {
         return html; // Return the original HTML if no replacements are provided
@@ -156,75 +158,6 @@ const DanhGiaTieuChuan = () => {
                 });
             }
         };
-        const convertToBase64 = async (url) => {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = (error) => reject(error);
-                    reader.readAsDataURL(blob);
-                });
-            } catch (error) {
-                console.error("Error converting image to Base64:", error);
-                throw error; // Rethrow the error to handle it outside
-            }
-        };
-        async function getBase64Image(imgSrc) {
-            const response = await fetch(imgSrc);
-            const blob = await response.blob();
-            const reader = new FileReader();
-
-            return new Promise((resolve, reject) => {
-                reader.onloadend = () => {
-                    resolve(reader.result);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        }
-        const convertImageToUInt8Array = async (url) => {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("Failed to fetch image");
-
-                const blob = await response.blob();
-
-                // Convert Blob to ArrayBuffer
-                const arrayBuffer = await blob.arrayBuffer();
-
-                // Convert ArrayBuffer to UInt8Array
-                const uint8Array = new Uint8Array(arrayBuffer);
-
-                return uint8Array;
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        };
-
-        const parseImage = async (img) => {
-            const imageUrl = "https://png.pngtree.com/png-vector/20191101/ourmid/pngtree-cartoon-color-simple-male-avatar-png-image_1934459.jpg";
-            const response = await fetch(imageUrl);
-            if (!response.ok) {
-                console.error("Failed to fetch image:", response.statusText);
-                return;
-            }else{
-                const blob = await response.blob();
-                const arrayBuffer = await blob.arrayBuffer();
-                const uint8Array = new Uint8Array(arrayBuffer);
-                return new ImageRun({
-                    type: "png",
-                    data: uint8Array,
-                    transformation: {
-                        width: 200, // Specify image width in pixels
-                        height: 100, // Specify image height in pixels
-                    },
-                })
-            }
-
-        }
         const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false) => {
             const textRuns = [];
 
@@ -273,8 +206,6 @@ const DanhGiaTieuChuan = () => {
             return textRuns;
         };
 
-
-        // Hàm xử lý các node trong HTML
         const parseNode = async (node) => {
             if (node.nodeName === "P") {
                 const textRuns = parseChildNodes(node.childNodes);
@@ -293,16 +224,25 @@ const DanhGiaTieuChuan = () => {
                     paragraphs.push(parseTable(table));
                 }
             } else if (node.nodeName === "FIGURE" && node.classList.contains("image")) {
-                const img = document.querySelector('img');
-                if(img){
-                    const imageRun = await parseImage(img);
+                const img = node.querySelector("img");
+                const url = img.src;
+                const imageData = url.split(",")[1];
+                if (imageData) {
                     paragraphs.push(
                         new Paragraph({
-                            children: [imageRun],
+                            children: [
+                                new ImageRun({
+                                    data: Buffer.from(imageData, "base64"),
+                                    transformation: {
+                                        width: 100,
+                                        height: 100,
+                                    },
+                                }),
+                            ],
                         })
                     );
                 }
-            } else if (node.nodeName === "UL") {
+            }else if (node.nodeName === "UL") {
                 node.childNodes.forEach((li) => {
                     if (li.nodeName === "LI") {
                         const textRuns = parseChildNodes(li.childNodes);
@@ -514,6 +454,7 @@ const DanhGiaTieuChuan = () => {
             ],
         });
 
+
         Packer.toBlob(doc).then(blob => {
             saveAs(blob, 'phieu-danh-gia.docx');
         });
@@ -550,7 +491,8 @@ const DanhGiaTieuChuan = () => {
                         </style>
                         <div className="a4-content">
                             <p className="heading-1 mb-3">
-                                <b className="text-uppercase" style={{fontSize: '14pt'}}>TIÊU CHUẨN {tieuChuan.stt}. {tieuChuan.tenTieuChuan}</b>
+                                <b className="text-uppercase" style={{fontSize: '14pt'}}>TIÊU
+                                    CHUẨN {tieuChuan.stt}. {tieuChuan.tenTieuChuan}</b>
                             </p>
                             <p className="a4-mota">
                                 <div dangerouslySetInnerHTML={{__html: mota}}/>
