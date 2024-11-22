@@ -21,6 +21,7 @@ import {
     VerticalAlign,
     convertInchesToTwip, ImageRun
 } from 'docx';
+import data from "bootstrap/js/src/dom/data";
 const replaceTextInLinks = (html, replacements) => {
     if (!html || !Array.isArray(replacements) || replacements.length === 0) {
         return html; // Return the original HTML if no replacements are provided
@@ -171,21 +172,58 @@ const DanhGiaTieuChuan = () => {
                 throw error; // Rethrow the error to handle it outside
             }
         };
+        async function getBase64Image(imgSrc) {
+            const response = await fetch(imgSrc);
+            const blob = await response.blob();
+            const reader = new FileReader();
+
+            return new Promise((resolve, reject) => {
+                reader.onloadend = () => {
+                    resolve(reader.result);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+        const convertImageToUInt8Array = async (url) => {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to fetch image");
+
+                const blob = await response.blob();
+
+                // Convert Blob to ArrayBuffer
+                const arrayBuffer = await blob.arrayBuffer();
+
+                // Convert ArrayBuffer to UInt8Array
+                const uint8Array = new Uint8Array(arrayBuffer);
+
+                return uint8Array;
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        };
 
         const parseImage = async (img) => {
-            const src = img.src; // The URL of the image
-            const altText = img.alt || ''; // Alt text for the image
-            const width = img.width;
-            const height = img.height;
-            const base64 = await convertToBase64(src);
-            return new ImageRun({
-                data: base64,
-                transformation: {
-                    width: width,
-                    height: height,
-                },
-                altText: altText,
-            });
+            const imageUrl = "https://png.pngtree.com/png-vector/20191101/ourmid/pngtree-cartoon-color-simple-male-avatar-png-image_1934459.jpg";
+            const response = await fetch(imageUrl);
+            if (!response.ok) {
+                console.error("Failed to fetch image:", response.statusText);
+                return;
+            }else{
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+                const uint8Array = new Uint8Array(arrayBuffer);
+                return new ImageRun({
+                    type: "png",
+                    data: uint8Array,
+                    transformation: {
+                        width: 200, // Specify image width in pixels
+                        height: 100, // Specify image height in pixels
+                    },
+                })
+            }
+
         }
         const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false) => {
             const textRuns = [];
@@ -235,8 +273,9 @@ const DanhGiaTieuChuan = () => {
             return textRuns;
         };
 
+
         // Hàm xử lý các node trong HTML
-        const parseNode = (node) => {
+        const parseNode = async (node) => {
             if (node.nodeName === "P") {
                 const textRuns = parseChildNodes(node.childNodes);
                 paragraphs.push(
@@ -254,18 +293,15 @@ const DanhGiaTieuChuan = () => {
                     paragraphs.push(parseTable(table));
                 }
             } else if (node.nodeName === "FIGURE" && node.classList.contains("image")) {
-                const img = document.querySelector('img'); // Assuming an image is available in the DOM
-
-                parseImage(img).then(imageData => {
-                    if (imageData) {
-                        console.log('Image data:', imageData);
-                        paragraphs.push(new Paragraph({
-                            children: [imageData]
-                        }));
-                    } else {
-                        console.error('Failed to process image.');
-                    }
-                });
+                const img = document.querySelector('img');
+                if(img){
+                    const imageRun = await parseImage(img);
+                    paragraphs.push(
+                        new Paragraph({
+                            children: [imageRun],
+                        })
+                    );
+                }
             } else if (node.nodeName === "UL") {
                 node.childNodes.forEach((li) => {
                     if (li.nodeName === "LI") {
@@ -297,12 +333,11 @@ const DanhGiaTieuChuan = () => {
         doc.body.childNodes.forEach((node) => {
             parseNode(node);
         });
-
         return paragraphs;
     };
 
 
-    const handleExportToDocx = () => {
+    const handleExportToDocx = async () => {
         // Create a document
         const doc = new Document({
             numbering: {
@@ -479,234 +514,8 @@ const DanhGiaTieuChuan = () => {
             ],
         });
 
-        // Convert the document to a .docx Blob
         Packer.toBlob(doc).then(blob => {
             saveAs(blob, 'phieu-danh-gia.docx');
-        });
-    };
-
-    const tableData = phieuDanhGia.flatMap((item) => {
-        const mucTieu = ['Khắc phục tồn tại', 'Phát huy điểm mạnh'];
-        const noiDung = [item.noiDungKhacPhuc, item.noiDungPhatHuy];
-        const donVi = [item.donViKhacPhuc, item.donViPhatHuy];
-        const thoiGian = [item.thoiGianKhacPhuc, item.thoiGianPhatHuy];
-        const ghiChu = [item.ghiChuKhacPhuc, item.ghiChuPhatHuy];
-
-        return mucTieu.map((mucTieuItem, i) => ({
-            tt: (i + 1).toString(),
-            mucTieu: mucTieuItem,
-            noiDung: noiDung[i],
-            donVi: donVi[i],
-            thoiGian: thoiGian[i],
-            ghiChu: ghiChu[i],
-        }));
-    });
-
-
-    const createTableKeHoach = () => {
-        const rows = [];
-        const columnWidths = [
-            500, // TT
-            1500, // Mục tiêu
-            3000, // Nội dung
-            1500, // Đơn vị/ cá nhân thực hiện
-            1500, // Thời gian thực hiện hoặc hoàn thành
-            700  // Ghi chú
-        ];
-
-        // Header row
-        const headerCells = [
-            'TT',
-            'Mục tiêu',
-            'Nội dung',
-            'Đơn vị/ cá nhân thực hiện',
-            'Thời gian thực hiện',
-            'Ghi chú'
-        ].map((header, index) => new TableCell({
-            children: [
-                new Paragraph({
-                    children: [
-                        new TextRun({
-                            text: header,
-                            size: 26, // Set size for data cells
-                            font: "Times New Roman", // Set font family
-                            bold: true
-                        }),
-                    ],
-                    spacing: {
-                        line: 360,
-                    },
-                    alignment: AlignmentType.CENTER,
-                }),
-            ],
-            width: {
-                size: columnWidths[index],
-                type: WidthType.DXA,
-            },
-            verticalAlign: VerticalAlign.CENTER,
-        }));
-
-        rows.push(new TableRow({
-            children: headerCells,
-        }));
-
-        // Data rows
-        tableData.forEach(data => {
-            const cells = [
-                data.tt,
-                data.mucTieu,
-                data.noiDung,
-                data.donVi,
-                data.thoiGian,
-                data.ghiChu,
-            ].map((text, index) => new TableCell({
-                children: [
-                    new Paragraph({
-                        children: [
-                            new TextRun({
-                                text: text,
-                                size: 26, // Set size for data cells
-                                font: "Times New Roman", // Set font family
-                            }),
-                        ],
-                        alignment: AlignmentType.JUSTIFIED,
-                        spacing: {
-                            line: 360
-                        },
-
-                    }),
-                ],
-                width: {
-                    size: columnWidths[index],
-                    type: WidthType.DXA,
-                },
-                margins: {
-                    top: convertInchesToTwip(0.1),
-                    bottom: convertInchesToTwip(0.1),
-                    right: convertInchesToTwip(0.1),
-                    left: convertInchesToTwip(0.1),
-                },
-            }));
-
-            rows.push(new TableRow({
-                children: cells,
-            }));
-        });
-
-        return new Table({
-            rows: rows,
-            width: {
-                size: 9117, // Total width from column widths
-                type: WidthType.DXA,
-            },
-
-        });
-    };
-    const createTableMucDanhGia = (n) => {
-        const rows = [];
-        const columnWidths = [
-            1300, // Column widths can be adjusted
-            1300,
-            1300,
-            1300,
-            1300,
-            1300,
-            1300,
-        ];
-        // First row with colspan 7
-        const headerCell = new TableCell({
-            children: [
-                new Paragraph({
-                    children: [
-                        new TextRun({
-                            text: "Thang đánh giá",
-                            bold: true,
-                            size: 26, // Set size (1/2 point)
-                            font: "Times New Roman", // Set font family
-                        }),
-                    ],
-                    spacing: {
-                        before: 100,
-                        line: 360, // Adjust the margin as needed (in 1/20 pt)
-                    },
-                    alignment: AlignmentType.CENTER,
-                }),
-            ],
-            width: {
-                size: 9117, // Set total width of the cell to match the table
-                type: WidthType.DXA,
-            },
-            verticalAlignment: VerticalAlign.CENTER, // Center vertically
-            columnSpan: 7,
-        });
-
-        rows.push(new TableRow({
-            children: [headerCell], // First row with colspan
-        }));
-
-        // Data rows
-        const numberCells = Array.from({length: 7}, (_, index) => new TableCell({
-            children: [
-                new Paragraph({
-                    children: [
-                        new TextRun({
-                            text: `${index + 1}`,
-                            size: 26,
-                            font: "Times New Roman",
-                        }),
-                    ],
-                    spacing: {
-                        before: 100,
-                        line: 360, // Adjust the margin as needed (in 1/20 pt)
-                    },
-                    alignment: AlignmentType.CENTER,
-                }),
-            ],
-            width: {
-                size: columnWidths[index],
-                type: WidthType.DXA,
-            },
-            verticalAlignment: VerticalAlign.CENTER,
-        }));
-
-        rows.push(new TableRow({
-            children: numberCells,
-        }));
-        const checkCells = Array.from({length: 7}, (_, index) => {
-            const cellText = (index + 1 == n) ? "X" : "";
-            return new TableCell({
-                children: [
-                    new Paragraph({
-                        children: [
-                            new TextRun({
-                                text: cellText,
-                                size: 26,
-                                font: "Times New Roman",
-                            }),
-                        ],
-                        alignment: AlignmentType.CENTER,
-                        spacing: {
-                            before: 100,
-                            line: 360, // Adjust the margin as needed (in 1/20 pt)
-                        },
-                    }),
-                ],
-                width: {
-                    size: columnWidths[index],
-                    type: WidthType.DXA,
-                },
-                verticalAlignment: VerticalAlign.CENTER,
-            });
-        });
-        rows.push(new TableRow({
-            children: checkCells,
-        }));
-        return new Table({
-            rows: rows,
-            width: {
-                size: 9117, // Total width from column widths
-                type: WidthType.DXA,
-            },
         });
     };
 
@@ -770,6 +579,7 @@ const DanhGiaTieuChuan = () => {
             ) : (
                 'Loading...'
             )}
+            <img src={image} alt=""/>
 
             <button onClick={handleExportToDocx}
                     style={{position: "fixed", bottom: "20px", right: "20px", cursor: "pointer"}}
