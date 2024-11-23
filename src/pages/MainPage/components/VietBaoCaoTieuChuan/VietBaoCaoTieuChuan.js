@@ -558,6 +558,9 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
                   transition: opacity 0.2s ease-in-out; /* Smooth transition */
                   z-index: 1000; /* Make sure it appears on top */
                 }
+                .ck-content{
+                    font-family: 'Times New Roman', Times, serif !important;
+                }
 
                 `}
             </style>
