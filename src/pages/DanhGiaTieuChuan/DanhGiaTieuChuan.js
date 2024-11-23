@@ -1,7 +1,6 @@
 import React, {useEffect, useState, useRef} from "react";
 import {
-    getAllMinhChung,
-    getAllPhieuDanhGia, getAllPhieuDanhGiaTieuChuan, getAllTieuChi, getPhongBanById, getTieuChiById, getTieuChuanById
+    getAllMinhChung, getAllPhieuDanhGiaTieuChuan, getAllTieuChi, getPhongBanById, getTieuChuanById
 } from "../../services/apiServices";
 
 import {useLocation} from "react-router-dom";
@@ -18,12 +17,10 @@ import {
     TableCell,
     TableRow,
     WidthType,
-    VerticalAlign,
-    convertInchesToTwip, ImageRun
+    VerticalAlign, ImageRun, PageSize, HeadingLevel
 } from 'docx';
-import data from "bootstrap/js/src/dom/data";
-import mammoth from "mammoth";
 import {Buffer} from "buffer";
+import color from "../../components/color";
 const replaceTextInLinks = (html, replacements) => {
     if (!html || !Array.isArray(replacements) || replacements.length === 0) {
         return html; // Return the original HTML if no replacements are provided
@@ -103,7 +100,7 @@ const DanhGiaTieuChuan = () => {
         const paragraphs = [];
 
         // Tạo TextRun cho các node
-        const createTextRun = (node, isBold = false, isItalic = false, isUnderline = false) => {
+        const createTextRun = (node, isBold = false, isItalic = false, isUnderline = false, color = "#000000") => {
             const text = node.textContent || "";
             return new TextRun({
                 text: text,
@@ -112,6 +109,7 @@ const DanhGiaTieuChuan = () => {
                 underline: isUnderline ? {} : undefined, // Hỗ trợ underline
                 size: 26,
                 font: "Times New Roman",
+                color : color
             });
         };
 
@@ -158,13 +156,13 @@ const DanhGiaTieuChuan = () => {
                 });
             }
         };
-        const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false) => {
+        const parseChildNodes = (nodes, isBold = false, isItalic = false, isUnderline = false, color = "#000000") => {
             const textRuns = [];
 
             nodes.forEach((child) => {
                 if (child.nodeType === Node.TEXT_NODE) {
                     if (child.textContent.trim()) {
-                        textRuns.push(createTextRun(child, isBold, isItalic, isUnderline));
+                        textRuns.push(createTextRun(child, isBold, isItalic, isUnderline, color));
                     }
                 } else if (child.nodeType === Node.ELEMENT_NODE) {
                     switch (child.nodeName) {
@@ -228,14 +226,20 @@ const DanhGiaTieuChuan = () => {
                 const url = img.src;
                 const imageData = url.split(",")[1];
                 if (imageData) {
+                    const imgWidth = img.width; // Original image width in pixels
+                    const imgHeight = img.height;
+                    const aspectRatio = imgWidth / imgHeight;
+                    const newWidth = Math.min((((8.27 * 1440) - 1701 - 1134)/1440)*96, imgWidth);
+                    const newHeight = Math.round(newWidth / aspectRatio);
+
                     paragraphs.push(
                         new Paragraph({
                             children: [
                                 new ImageRun({
                                     data: Buffer.from(imageData, "base64"),
                                     transformation: {
-                                        width: 100,
-                                        height: 100,
+                                        width: newWidth,
+                                        height : newHeight
                                     },
                                 }),
                             ],
@@ -256,19 +260,43 @@ const DanhGiaTieuChuan = () => {
                         );
                     }
                 });
-            } else if (node.nodeName === "H2" || node.nodeName === "H1" || node.nodeName === "H3") {
+            } else if (node.nodeName === "H2") {
                 const textRuns = parseChildNodes(node.childNodes);
                 paragraphs.push(
                     new Paragraph({
                         children: textRuns,
                         indent: {firstLine: 720},
+                        heading: HeadingLevel.HEADING_2,
+                        spacing: {line: 360},
+                        alignment: AlignmentType.JUSTIFIED,
+                    })
+                );
+            }
+            else if (node.nodeName === "H1") {
+                const textRuns = parseChildNodes(node.childNodes);
+                paragraphs.push(
+                    new Paragraph({
+                        children: textRuns,
+                        indent: {firstLine: 720},
+                        heading: HeadingLevel.HEADING_1,
+                        spacing: {line: 360},
+                        alignment: AlignmentType.JUSTIFIED,
+                    })
+                );
+            } else if (node.nodeName === "H3") {
+                const textRuns = parseChildNodes(node.childNodes);
+                paragraphs.push(
+                    new Paragraph({
+                        children: textRuns,
+                        indent: {firstLine: 720},
+                        heading: HeadingLevel.HEADING_3,
                         spacing: {line: 360},
                         alignment: AlignmentType.JUSTIFIED,
                     })
                 );
             }
         };
-
+        
         // Xử lý từng node trong body của tài liệu HTML
         doc.body.childNodes.forEach((node) => {
             parseNode(node);
@@ -325,6 +353,10 @@ const DanhGiaTieuChuan = () => {
                 {
                     properties: {
                         page: {
+                            size: {
+                                width: 8.27 * 1440,   // Set to A4 page size
+                                height: 11.69 * 1440,  // Set to A4 page size
+                            },
                             margin: {
                                 left: 1701,  // 3cm = 1701 twips
                                 right: 1134, // 2cm = 1134 twips
@@ -341,10 +373,11 @@ const DanhGiaTieuChuan = () => {
                                     size: 28,
                                     bold: true,
                                     font: "Times New Roman",
+                                    color : "#000000"
                                 }),
                             ],
+                            heading: HeadingLevel.HEADING_1,
                             spacing: {
-                                after: 360,
                                 line: 360,
                             },
                             alignment: AlignmentType.CENTER,
@@ -358,9 +391,11 @@ const DanhGiaTieuChuan = () => {
                                     text: `Đánh giá chung về Tiêu chuẩn ${tieuChuan.stt}`,
                                     size: 26,
                                     font: "Times New Roman",
-                                    bold : true
+                                    bold : true,
+                                    color : "#000000",
                                 })
                             ],
+                            heading: HeadingLevel.HEADING_1,
                             spacing: {
                                 line: 360,
                             },
@@ -486,7 +521,11 @@ const DanhGiaTieuChuan = () => {
                           .image img {
                              max-width : 100%;
                              height : auto;
+                             
                           }
+                          .image {
+                          margin-left: auto;
+                             margin-right: auto;}
                         `}
                         </style>
                         <div className="a4-content">

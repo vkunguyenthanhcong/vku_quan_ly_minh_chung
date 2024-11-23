@@ -94,8 +94,7 @@ class MyUploadAdapter {
             const imagePath = await uploadImage(formData);
 
             // Construct the full URL for CKEditor
-            const fullUrl = `${urlDefault}${imagePath}`;
-            console.log(fullUrl);
+            const fullUrl = `${imagePath}`;
             return {
                 default: fullUrl, // CKEditor will use this to display the image
             };
@@ -452,6 +451,9 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                   pointer-events: none; /* Disable mouse events */
                   transition: opacity 0.2s ease-in-out; /* Smooth transition */
                   z-index: 1000; /* Make sure it appears on top */
+                }
+                .ck-content{
+                    font-family: 'Times New Roman', Times, serif !important;
                 }
 
                 `}

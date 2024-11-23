@@ -45,14 +45,14 @@
 }
 
 .main-container {
-    font-family: 'Lato';
+    font-family: 'Times New Roman', Times, serif;
     width: fit-content;
     margin-left: auto;
     margin-right: auto;
 }
 
 .ck-content {
-    font-family: 'Lato';
+    font-family: 'Times New Roman', Times, serif !important;
     line-height: 1.6;
     word-break: break-word;
 }
@@ -63,7 +63,7 @@
 }
 
 .ck-content h3.category {
-    font-family: 'Oswald';
+    font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
     font-weight: bold;
     color: #555;
@@ -73,7 +73,7 @@
 }
 
 .ck-content h2.document-title {
-    font-family: 'Oswald';
+    font-family: 'Times New Roman', Times, serif;
     font-size: 50px;
     font-weight: bold;
     margin: 0;
@@ -82,7 +82,7 @@
 }
 
 .ck-content h3.document-subtitle {
-    font-family: 'Oswald';
+    font-family: 'Times New Roman', Times, serif;
     font-size: 20px;
     color: #555;
     margin: 0 0 1em;
@@ -113,7 +113,7 @@
 }
 
 .ck-content blockquote.side-quote {
-    font-family: 'Oswald';
+    font-family: 'Times New Roman', Times, serif;
     font-style: normal;
     float: right;
     width: 35%;

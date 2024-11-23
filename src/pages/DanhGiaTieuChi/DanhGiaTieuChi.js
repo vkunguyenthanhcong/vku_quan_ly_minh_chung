@@ -18,8 +18,9 @@ import {
     TableRow,
     WidthType,
     VerticalAlign,
-    convertInchesToTwip
+    convertInchesToTwip, ImageRun
 } from 'docx';
+import {Buffer} from "buffer";
 const replaceTextInLinks = (html, replacements) => {
     if (!html || !Array.isArray(replacements) || replacements.length === 0) {
         return html; // Return the original HTML if no replacements are provided
@@ -220,7 +221,32 @@ const DanhGiaTieuChi = () => {
                         })
                     );
                 }
-            } else if (node.nodeName === "UL") {
+            }
+            else if (node.nodeName === "FIGURE" && node.classList.contains("image")) {
+                const img = node.querySelector("img");
+                const url = img.src;
+                const imageData = url.split(",")[1];
+                if (imageData) {
+                    const imgWidth = img.width; // Original image width in pixels
+                    const imgHeight = img.height;
+                    const aspectRatio = imgWidth / imgHeight;
+                    const newWidth = Math.min((((8.27 * 1440) - 1701 - 1134)/1440)*96, imgWidth);
+                    const newHeight = Math.round(newWidth / aspectRatio);
+                    paragraphs.push(
+                        new Paragraph({
+                            children: [
+                                new ImageRun({
+                                    data: Buffer.from(imageData, "base64"),
+                                    transformation: {
+                                        width: newWidth,
+                                        height : newHeight
+                                    },
+                                }),
+                            ],
+                        })
+                    );
+                }
+            }else if (node.nodeName === "UL") {
                 node.childNodes.forEach((li) => {
                     if (li.nodeName === "LI") {
                         const textRuns = parseChildNodes(li.childNodes);
@@ -293,6 +319,10 @@ const DanhGiaTieuChi = () => {
             sections: [
                 {
                     properties: {
+                        size: {
+                            width: 8.27 * 1440,   // Set to A4 page size
+                            height: 11.69 * 1440,  // Set to A4 page size
+                        },
                         page: {
                             margin: {
                                 left: 1701,  // 3cm = 1701 twips
@@ -484,124 +514,6 @@ const DanhGiaTieuChi = () => {
             saveAs(blob, 'phieu-danh-gia.docx');
         });
     };
-
-    const tableData = phieuDanhGia.flatMap((item) => {
-        const mucTieu = ['Khắc phục tồn tại', 'Phát huy điểm mạnh'];
-        const noiDung = [item.noiDungKhacPhuc, item.noiDungPhatHuy];
-        const donVi = [item.donViKhacPhuc, item.donViPhatHuy];
-        const thoiGian = [item.thoiGianKhacPhuc, item.thoiGianPhatHuy];
-        const ghiChu = [item.ghiChuKhacPhuc, item.ghiChuPhatHuy];
-
-        return mucTieu.map((mucTieuItem, i) => ({
-            tt: (i + 1).toString(),
-            mucTieu: mucTieuItem,
-            noiDung: noiDung[i],
-            donVi: donVi[i],
-            thoiGian: thoiGian[i],
-            ghiChu: ghiChu[i],
-        }));
-    });
-
-
-    const createTableKeHoach = () => {
-        const rows = [];
-        const columnWidths = [
-            500, // TT
-            1500, // Mục tiêu
-            3000, // Nội dung
-            1500, // Đơn vị/ cá nhân thực hiện
-            1500, // Thời gian thực hiện hoặc hoàn thành
-            700  // Ghi chú
-        ];
-
-        // Header row
-        const headerCells = [
-            'TT',
-            'Mục tiêu',
-            'Nội dung',
-            'Đơn vị/ cá nhân thực hiện',
-            'Thời gian thực hiện',
-            'Ghi chú'
-        ].map((header, index) => new TableCell({
-            children: [
-                new Paragraph({
-                    children: [
-                        new TextRun({
-                            text: header,
-                            size: 26, // Set size for data cells
-                            font: "Times New Roman", // Set font family
-                            bold: true
-                        }),
-                    ],
-                    spacing: {
-                        line: 360,
-                    },
-                    alignment: AlignmentType.CENTER,
-                }),
-            ],
-            width: {
-                size: columnWidths[index],
-                type: WidthType.DXA,
-            },
-            verticalAlign: VerticalAlign.CENTER,
-        }));
-
-        rows.push(new TableRow({
-            children: headerCells,
-        }));
-
-        // Data rows
-        tableData.forEach(data => {
-            const cells = [
-                data.tt,
-                data.mucTieu,
-                data.noiDung,
-                data.donVi,
-                data.thoiGian,
-                data.ghiChu,
-            ].map((text, index) => new TableCell({
-                children: [
-                    new Paragraph({
-                        children: [
-                            new TextRun({
-                                text: text,
-                                size: 26, // Set size for data cells
-                                font: "Times New Roman", // Set font family
-                            }),
-                        ],
-                        alignment: AlignmentType.JUSTIFIED,
-                        spacing: {
-                            line: 360
-                        },
-
-                    }),
-                ],
-                width: {
-                    size: columnWidths[index],
-                    type: WidthType.DXA,
-                },
-                margins: {
-                    top: convertInchesToTwip(0.1),
-                    bottom: convertInchesToTwip(0.1),
-                    right: convertInchesToTwip(0.1),
-                    left: convertInchesToTwip(0.1),
-                },
-            }));
-
-            rows.push(new TableRow({
-                children: cells,
-            }));
-        });
-
-        return new Table({
-            rows: rows,
-            width: {
-                size: 9117, // Total width from column widths
-                type: WidthType.DXA,
-            },
-
-        });
-    };
     const createTableMucDanhGia = (n) => {
         const rows = [];
         const columnWidths = [
@@ -733,6 +645,14 @@ const DanhGiaTieuChi = () => {
                           td{
                             color : black !important;
                           }
+                          .image img {
+                             max-width : 100%;
+                             height : auto;
+                          }
+                          .image {
+                          margin-left: auto;
+                             margin-right: auto;}
+                          
                         `}
                         </style>
                         <div className="a4-content">
