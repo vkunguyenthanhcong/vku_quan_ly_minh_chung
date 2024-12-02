@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {
+    copyCtdt,
     createChuongTrinhDaoTao,
     findTieuChuaByMaCtdt,
     getAllChuongTrinhDaoTao,
@@ -207,32 +208,46 @@ const Total = ({maCtdt}) => {
     )
 }
 
-const ListChuongTrinhDaoTao = ({maKdcl}) => {
+const ListChuongTrinhDaoTao = ({maKdcl,setOpen}) => {
     const [chuongTrinhDaoTao, setChuongTrinhDaoTao] = useState([]);
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const fetchData = async () => {
+        try {
+            setOpen(true)
+            const result = await getAllChuongTrinhDaoTao(maKdcl);
+            const filterData = result.filter((item) => item.chuanKdcl && item.chuanKdcl.maKdcl === maKdcl);
+            setChuongTrinhDaoTao(filterData);
+            if (filterData.length > 0) {
+                setMaCtdtGoc(filterData[0].maCtdt);
+            }
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setOpen(false);
+        }
+    };
+    useEffect(() => {
+        fetchData();
+    }, [maKdcl]);
+    const [maCtdtGoc, setMaCtdtGoc] = useState('');
     const goToChuongTrinhDaoTao = (ChuongTrinh_ID) => {
         navigate(`../chi-tiet-chuong-trinh-dao-tao?ChuongTrinh_ID=${ChuongTrinh_ID}`);
     }
     const goToDinhNghiaTieuChuan = (ChuongTrinh_ID) => {
         navigate(`../dinh-nghia-tieu-chuan?ChuongTrinh_ID=${ChuongTrinh_ID}`);
     }
+    const copyChuongTrinhDaoTao = async (maCtdt) => {
+        setOpen(true)
+        const formData = new FormData();
+        formData.append("maCtdt_1", maCtdtGoc);
+        formData.append("maCtdt_2", maCtdt);
+        const response = await copyCtdt(formData);
+        if(response === "OK"){
+            fetchData(); 
+            setOpen(false);
+        }
+    }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await getAllChuongTrinhDaoTao(maKdcl);
-                const filterData = result.filter((item) => item.chuanKdcl && item.chuanKdcl.maKdcl === maKdcl);
-                setChuongTrinhDaoTao(filterData);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [maKdcl]);
 
     return (
         <div style={{marginLeft: '10px'}}>
@@ -245,6 +260,9 @@ const ListChuongTrinhDaoTao = ({maKdcl}) => {
                     <button className="btn btn-success ms-2" onClick={() => goToDinhNghiaTieuChuan(item.maCtdt)}>Định
                         nghĩa tiêu chuẩn
                     </button>
+                    {index === 0 ? (null) : (<button className="btn btn-light ms-2 text-white"
+                                                     onClick={() => copyChuongTrinhDaoTao(item.maCtdt)}>Sao Chép Dữ
+                        Liệu</button>)}
                 </div>
             ))}
         </div>
@@ -342,7 +360,7 @@ const AdminChuongTrinhDaoTao = () => {
                                     </button>
                                 </div>
                             </div>
-                            <ListChuongTrinhDaoTao maKdcl={maKdcl}/>
+                            <ListChuongTrinhDaoTao maKdcl={maKdcl} setOpen={setOpen}/>
                         </div>
                     ))
                 ) : (

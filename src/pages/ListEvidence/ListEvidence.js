@@ -9,7 +9,7 @@ import {Link, useLocation, useNavigate} from 'react-router-dom';
 import htmlDocx from 'html-docx-js/dist/html-docx';
 import './ListEvidence.css';
 import {
-    findTieuChuaByMaCtdt, getAllTieuChi,
+    findTieuChuaByMaCtdt, getAllMinhChung, getAllTieuChi,
     getMinhChungByMaCtdt,
 } from "../../services/apiServices";
 import { saveAs } from 'file-saver';
@@ -24,7 +24,7 @@ const MinhChung = ({ criteriaID, minhChung }) => {
                     <td>{index + 1}</td>
                     <td><Link style={{textDecoration : 'none', color : 'black'}} to={row.linkLuuTru}>{row.parentMaMc}{row.childMaMc}</Link></td>
                     <td>{row.tenMinhChung}</td>
-                    <td>{row.soHieu}<br/>{row.thoiGian}</td>
+                    <td>{row.soHieu}<br/>{row.thoiGian.split('-').reverse().join('-')}</td>
                     <td>{row.donViBanHanh}<br/>{row.caNhan}</td>
                     <td></td>
                 </tr>
@@ -84,8 +84,12 @@ const ListEvidence = () => {
             try {
                 const result = await findTieuChuaByMaCtdt(KhungDaoTao_ID);
                 setTieuChuan(result);
-                const response = await getMinhChungByMaCtdt(KhungDaoTao_ID);
-                setMinhChung(response)
+                const minhChungData = await getAllMinhChung();
+                const filterMinhChung = minhChungData.filter(item =>
+                    result.some(result => result.idTieuChuan === item.idTieuChuan)
+                );
+                setMinhChung(filterMinhChung);
+                console.log(filterMinhChung)
             } catch (error) {
                 setError(error);
             } finally {
@@ -123,110 +127,111 @@ const ListEvidence = () => {
     a.click();
       };
     const exportToPDF = () => {
-        // Tải file pdfMakeVFS.json từ thư mục public
-        fetch('/pdfMakeVFS.json')  // Sử dụng đường dẫn tương đối đến tệp JSON
-          .then(response => response.json())
-          .then(vfs => {
-            // Cấu hình pdfMake với phông chữ tùy chỉnh
-            pdfMake.vfs = vfs;
-    
-            // Định nghĩa font cho pdfMake
-            pdfMake.fonts = {
-              TimesNewRoman: {
-                normal: 'TimesNewRoman.ttf',
-                bold: 'TimesNewRomanBold.ttf',
-                italics: 'TimesNewRoman-Italic.ttf',
-                bolditalics: 'TimesNewRoman-BoldItalic.ttf'
-              }
-            };
-    
-            const table = document.getElementById('myTable');
-       
-            // Lấy tiêu đề cột
-            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
-       
-            // Lấy dữ liệu hàng và xử lý liên kết
-            const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
-              return Array.from(row.querySelectorAll('td, th')).map(cell => {
-                const anchorTag = cell.querySelector('a');
-                const colSpan = cell.colSpan || 1; // Kiểm tra colspan
-                const rowSpan = cell.rowSpan || 1; // Kiểm tra rowspan
-                if (anchorTag) {
-                  return {
-                    text: anchorTag.innerText.trim(),
-                    link: anchorTag.href,
-                    colSpan: colSpan,
-                    rowSpan: rowSpan
-                  };
-                } else {
-                  return { text: cell.innerText.trim(), colSpan: colSpan, rowSpan: rowSpan };
-                }
-              });
-            });
-       
-            // Đảm bảo tất cả các hàng có số cột giống nhau với tiêu đề cột
-            const maxColumns = headers.length;
-            const formattedRows = rows.map(row => {
-              const rowLength = row.length;
-              return [...row, ...Array(maxColumns - rowLength).fill({ text: '', colSpan: 1, rowSpan: 1 })];
-            });
-       
-            // Thêm tiêu đề cột vào dữ liệu bảng
-            const body = [
-              headers.map(header => ({ text: header, colSpan: 1, rowSpan: 1, bold: true })),
-              ...formattedRows
-            ];
-       
-            // Tạo định dạng PDF
-            const docDefinition = {
-              content: [
-                { text: 'DANH MỤC MINH CHỨNG', style: 'header' },
-                {
-                  table: {
-                    headerRows: 1,
-                    widths: [70, 60, 70, 65, 70, 100, 50], // Điều chỉnh kích thước cột cho phù hợp
-                    body: body
-                  },
-                  layout: {
-                    fillColor: function (rowIndex) {
-                      return rowIndex === 0 ? '#f2f2f2' : null; // Màu nền cho tiêu đề
+        fetch('/pdfMakeVFS.json') // Load the JSON file with font definitions
+            .then(response => response.json())
+            .then(vfs => {
+                // Configure pdfMake with custom fonts
+                pdfMake.vfs = vfs;
+
+                pdfMake.fonts = {
+                    TimesNewRoman: {
+                        normal: 'TimesNewRoman.ttf',
+                        bold: 'TimesNewRomanBold.ttf',
+                        italics: 'TimesNewRoman-Italic.ttf',
+                        bolditalics: 'TimesNewRoman-BoldItalic.ttf',
                     },
-                    hLineWidth: function (i) {
-                      return (i === 0 || i === body.length) ? 2 : 1; // Độ dày đường viền
+                };
+
+                // Select the table and extract data
+                const table = document.getElementById('myTable'); // Ensure you get the correct table
+
+                // Extract headers from the first table's thead
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
+
+                // Extract rows from tbody
+                const rows = Array.from(table.querySelectorAll('tbody tr')).map(row =>
+                    Array.from(row.querySelectorAll('td, th')).map(cell => {
+                        const anchorTag = cell.querySelector('a');
+                        const colSpan = cell.colSpan || 1; // Check colspan
+                        const rowSpan = cell.rowSpan || 1; // Check rowspan
+
+                        if (anchorTag) {
+                            return {
+                                text: anchorTag.innerText.trim(),
+                                link: anchorTag.href,
+                                colSpan,
+                                rowSpan,
+                            };
+                        } else {
+                            return { text: cell.innerText.trim(), colSpan, rowSpan };
+                        }
+                    })
+                );
+
+                // Ensure all rows have the same number of columns as the header
+                const maxColumns = headers.length;
+                const formattedRows = rows.map(row => [
+                    ...row,
+                    ...Array(maxColumns - row.length).fill({ text: '', colSpan: 1, rowSpan: 1 }),
+                ]);
+
+                // Prepare the table body with headers only on the first page
+                const body = [
+                    ...formattedRows,
+                ];
+
+                // Define the PDF document structure
+                const docDefinition = {
+                    content: [
+                        { text: 'DANH MỤC MINH CHỨNG', style: 'header' },
+                        {
+                            table: {
+                                headerRows: 1, // Include headers only on the first page
+                                widths: [70, 60, 70, 65, 70, 100, 50], // Adjust column widths
+                                body: body,
+                            },
+                            layout: {
+                                fillColor: function (rowIndex) {
+                                    return rowIndex === 0 ? '#f2f2f2' : null; // Background color for the header row
+                                },
+                                hLineWidth: function (i, node) {
+                                    // Add top border only once for each page
+                                    return i === 0 || i === node.table.body.length ? 2 : 1;
+                                },
+                                vLineWidth: function () {
+                                    return 1; // Vertical line width
+                                },
+                                hLineColor: function () {
+                                    return '#000000'; // Horizontal line color
+                                },
+                                vLineColor: function () {
+                                    return '#000000'; // Vertical line color
+                                },
+                            },
+                        },
+                    ],
+                    styles: {
+                        header: {
+                            fontSize: 18,
+                            bold: true,
+                            margin: [0, 0, 0, 10],
+                            alignment: 'center',
+                            font: 'TimesNewRoman',
+                        },
                     },
-                    vLineWidth: function () {
-                      return 1; // Độ dày đường viền dọc
+                    defaultStyle: {
+                        font: 'TimesNewRoman',
                     },
-                    hLineColor: function () {
-                      return '#000000'; // Màu đường viền ngang
-                    },
-                    vLineColor: function () {
-                      return '#000000'; // Màu đường viền dọc
-                    }
-                  }
-                }
-              ],
-              styles: {
-                header: {
-                  fontSize: 18,
-                  bold: true,
-                  margin: [0, 0, 0, 10],
-                  alignment: 'center',
-                  font: 'TimesNewRoman' // Sử dụng font TimesNewRoman
-                }
-              },
-              defaultStyle: {
-                font: 'TimesNewRoman' // Sử dụng font TimesNewRoman
-              },
-              pageMargins: [20, 40, 20, 20], // Lề trang
-              pageSize: 'A4' // Kích thước trang A4
-            };
-       
-            // Tạo PDF và tải xuống
-            pdfMake.createPdf(docDefinition).download('table_with_colspan.pdf');
-          })
-          .catch(error => console.error('Lỗi khi tải pdfMakeVFS.json:', error));
+                    pageMargins: [20, 40, 20, 20],
+                    pageSize: 'A4',
+                };
+
+                // Generate and download the PDF
+                pdfMake.createPdf(docDefinition).download('table_with_colspan.pdf');
+            })
+            .catch(error => console.error('Error loading pdfMakeVFS.json:', error));
     };
+
     const exportToExcel = async () => {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Sheet1');

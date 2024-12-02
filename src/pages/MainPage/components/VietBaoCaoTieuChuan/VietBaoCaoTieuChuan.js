@@ -50,73 +50,13 @@ import {
     Mention
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
-import {
-    getAllGoiY, getAllKhoMinhChung,
-    getAllMinhChung, getAllMocChuan, getAllPhieuDanhGia, getAllPhieuDanhGiaTieuChuan, getAllTieuChi,
+import {getAllKhoMinhChung,
+    getAllMinhChung, getAllPhieuDanhGia, getAllPhieuDanhGiaTieuChuan, getAllTieuChi,
     getPhongBanById,
-    getTieuChiById,
-    getTieuChuanById,
-    savePhieuDanhGiaTieuChi, savePhieuDanhGiaTieuChuan,
-    updatePhieuDanhGiaTieuChi, updatePhieuDanhGiaTieuChuan, uploadImage, urlDefault
+    getTieuChuanById,savePhieuDanhGiaTieuChuan,updatePhieuDanhGiaTieuChuan, uploadImage
 } from "../../../../services/apiServices";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
-function removeDuplicateParagraphs(htmlString) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlString, 'text/html');
-    const paragraphs = Array.from(doc.querySelectorAll('p, h1, h2, h3, h4, h5, h6, figure, ul, li')); // Collect all target elements
 
-    const uniqueContent = new Set();
-    const uniqueParagraphs = paragraphs.filter(element => {
-        // Check if it's the "Tự đánh giá" content
-        if (element.textContent.trim().startsWith("Tự đánh giá:")) {
-            return true; // Always keep "Tự đánh giá" paragraphs
-        }
-
-        const content = element.outerHTML; // Full HTML of the element
-        if (uniqueContent.has(content)) {
-            return false; // Skip duplicates
-        }
-        uniqueContent.add(content);
-        return true;
-    });
-
-    return uniqueParagraphs.map(element => element.outerHTML).join('');
-}
-
-function cleanHTML(inputHTML) {
-    // Create a temporary container to parse the HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(inputHTML, 'text/html');
-
-    // Select all figure elements
-    const figures = doc.querySelectorAll('figure');
-
-    // If there are more than one figure elements, remove the excess ones
-    if (figures.length > 1) {
-        // Loop through all figure elements starting from the second one and remove them
-        for (let i = 1; i < figures.length; i++) {
-            figures[i].remove();
-        }
-    }
-
-    // Now we have only the first figure, but we need to remove extra <thead> from other tables
-    // Select all tables in the document
-    const tables = doc.querySelectorAll('table');
-
-    // If there are tables, remove the thead in tables except the first one
-    if (tables.length > 1) {
-        for (let i = 1; i < tables.length; i++) {
-            const table = tables[i];
-            const thead = table.querySelector('thead');
-            if (thead) {
-                thead.remove(); // Remove the <thead> element from the extra tables
-            }
-        }
-    }
-
-    // Return the modified HTML string (only the first figure and its table remain intact)
-    return doc.body.innerHTML;
-}
 function MentionCustomization(editor) {
     editor.conversion.for('downcast').attributeToElement({
         model: 'mention', view: (modelAttributeValue, {writer}) => {
@@ -205,13 +145,8 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
     const [booleanMention, setBooleanMention] = useState(false);
     const [idPhieuDanhGia, setIdPhieuDanhGia] = useState(0)
 
-
-
-    const options = [1, 2, 3, 4, 5, 6, 7];
     useEffect(() => {
-        const fetchData = async () => {<figure class="table"></figure>
-
-
+        const fetchData = async () => {
             const response_3 = await getPhongBanById(idPhongBan);
             setNhomCongTac(response_3);
 
@@ -307,7 +242,8 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
 
                                 return liTexts.map(item => `<li>${item}</li>`).join('');
                             } else {
-                                return `<li>${diemManh.trim()}</li>`;
+                                const newString = diemManh.trim().slice(3, -4);
+                                return `<li>${newString}</li>`;
                             }
                         })
                         .join(', ');
@@ -324,7 +260,8 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
 
                                 return liTexts.map(item => `<li>${item}</li>`).join('');
                             } else {
-                                return `<li>${diemTonTai.trim()}</li>`;
+                                const newString = diemTonTai.trim().slice(3, -4);
+                                return `<li>${newString}</li>`;
                             }
                         })
                         .join(', ');
@@ -350,11 +287,8 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
                             return `<tr><td>Tiêu chí ${response.stt}.${tc.stt}</td><td>${item.mucDanhGia}</td></tr>`;
                         })
                         .join('');
-
-
                 }
             });
-
             setMoTa(newMoTa);
             setDiemManh(newDiemManh);
             setDiemYeu(`<ul>${newDiemYeu}</ul>`);

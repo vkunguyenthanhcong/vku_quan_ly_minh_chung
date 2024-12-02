@@ -240,6 +240,20 @@ export const insertNewTieuChuan = (formData, token) => {
             throw error;
         });
 };
+//sao chep ctdt
+export const copyCtdt = (formData, token) => {
+    return api.post(`/ctdt/copydata`, formData, { timeout: 300000 },{
+        headers: {
+            'Content-Type': 'application/json', 
+            Authorization: `Bearer ${token}`
+
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //sua tieu chuan
 export const updateTieuChuan = (formData, token) => {
     return api.put(`/tieuchuan`, formData, {

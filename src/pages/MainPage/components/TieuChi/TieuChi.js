@@ -15,8 +15,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
 const Table_MinhChung = ({setNoCase, idGoiY, idTieuChi,setDataTransfer, dataTransfer, minhChung, fetchData}) => {
-    console.log(minhChung)
-
     const handleClickViewPDF = useClickViewPdfStore((state) => state.handleClickViewPDF);
 
     const handleClick = (idGoiY, idTieuChi) => {
@@ -78,18 +76,18 @@ const Table_MinhChung = ({setNoCase, idGoiY, idTieuChi,setDataTransfer, dataTran
                                 <b>Số hiệu</b>
                             </TableCell>
                             <TableCell
-                                style={{width: '45%'}}
+                                style={{width: '40%'}}
                                 className='p-1'
                             >
-                                <b>Tên VB</b>
+                                <b>Tên văn bản</b>
                             </TableCell>
                             <TableCell
-                                style={{width: '15%'}}
+                                style={{width: '20%'}}
                                 className='p-0'
                             >
                                 <button
                                     style={{width: '100%'}}
-                                    className='btn btn-success'
+                                    className='btn btn-success fw-bold'
                                     onClick={() => handleClick(idGoiY, idTieuChi)}
                                 >
                                     Bổ sung
@@ -117,30 +115,58 @@ const Table_MinhChung = ({setNoCase, idGoiY, idTieuChi,setDataTransfer, dataTran
                                 <TableCell className='p-1'
                                            style={{width: '30%'}}>{row.khoMinhChung.tenMinhChung}</TableCell>
                                 <TableCell className='p-0' style={{width: '20%'}}>
-                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-secondary'
+                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-secondary fw-bold'
                                             onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}>Xem
                                     </button>
-                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger'
+                                    <button style={{width: '100%', marginTop: '5px'}} className='btn btn-danger fw-bold'
                                             onClick={() => deleteMC(row.idMc, row.parentMaMc)}
                                     >Xóa
                                     </button>
                                     <br/>
-                                    {row.childMaMc == "01" ? (null) : (
-                                        <>
-                                            <button style={{width: '100%', marginTop: '5px'}}
-                                                    className='btn btn-primary' onClick={()=>upSlotMC(row.idMc)}>
-                                                <FontAwesomeIcon icon={faArrowUp}/>
-                                            </button>
-                                            <br/>
-                                        </>
-                                    )}
-                                    {row.stt == minhChung.length ? (null) : (<>
-                                        <button style={{width: '100%', marginTop: '5px'}}
-                                                className='btn btn-primary' onClick={()=>downSlotMC(row.idMc)}>
-                                            <FontAwesomeIcon icon={faArrowDown}/>
-                                        </button>
-                                        <br/>
-                                    </>)}
+                                    {(() => {
+                                        if (row.childMaMc === "01") {
+                                            return (
+                                                <button
+                                                    style={{ width: '100%', marginTop: '5px' }}
+                                                    className="btn btn-primary"
+                                                    onClick={() => downSlotMC(row.idMc)}
+                                                >
+                                                    <FontAwesomeIcon icon={faArrowDown} />
+                                                </button>
+                                            );
+                                        } else if (row.childMaMc != minhChung.length) {
+                                            return (
+                                                <>
+                                                    <button
+                                                        style={{ width: '100%', marginTop: '5px' }}
+                                                        className="btn btn-primary"
+                                                        onClick={() => downSlotMC(row.idMc)}
+                                                    >
+                                                        <FontAwesomeIcon icon={faArrowDown} />
+                                                    </button>
+                                                    <button
+                                                        style={{ width: '100%', marginTop: '5px' }}
+                                                        className="btn btn-primary"
+                                                        onClick={() => upSlotMC(row.idMc)}
+                                                    >
+                                                        <FontAwesomeIcon icon={faArrowUp} />
+                                                    </button>
+                                                </>
+                                            );
+                                        } else {
+                                            return (
+                                                <button
+                                                    style={{ width: '100%', marginTop: '5px' }}
+                                                    className="btn btn-primary"
+                                                    onClick={() => upSlotMC(row.idMc)}
+                                                >
+                                                    <FontAwesomeIcon icon={faArrowUp} />
+                                                </button>
+                                            );
+                                        }
+                                    })()}
+
+
                                 </TableCell>
                             </TableRow>
                         );
