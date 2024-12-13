@@ -250,22 +250,43 @@ const ListChuongTrinhDaoTao = ({maKdcl,setOpen}) => {
 
 
     return (
-        <div style={{marginLeft: '10px'}}>
+        <div className="container py-3">
             {chuongTrinhDaoTao.map((item, index) => (
-                <div key={item.maCtdt} style={{marginBottom: '10px'}}>
-                    <p><b>{index + 1}. {item.tenCtdt}</b></p>
-                    <Total maCtdt={item.maCtdt}/>
-                    <button className="btn btn-primary" onClick={() => goToChuongTrinhDaoTao(item.maCtdt)}>Chi tiết
-                    </button>
-                    <button className="btn btn-success ms-2" onClick={() => goToDinhNghiaTieuChuan(item.maCtdt)}>Định
-                        nghĩa tiêu chuẩn
-                    </button>
-                    {index === 0 ? (null) : (<button className="btn btn-light ms-2 text-white"
-                                                     onClick={() => copyChuongTrinhDaoTao(item.maCtdt)}>Sao Chép Dữ
-                        Liệu</button>)}
+                <div key={item.maCtdt} className="mb-4 p-3 border rounded shadow-sm bg-light">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <p className="mb-0 fw-bold">
+                            {index + 1}. {item.tenCtdt}
+                        </p>
+                    </div>
+                    <div className="mt-2">
+                        <Total maCtdt={item.maCtdt}/>
+                    </div>
+                    <div className="mt-3 d-flex align-items-center">
+                        <button
+                            className="btn btn-primary btn-sm"
+                            onClick={() => goToChuongTrinhDaoTao(item.maCtdt)}
+                        >
+                            <i className="fas fa-info-circle me-2"></i>Chi tiết
+                        </button>
+                        <button
+                            className="btn btn-success btn-sm ms-2"
+                            onClick={() => goToDinhNghiaTieuChuan(item.maCtdt)}
+                        >
+                            <i className="fas fa-pencil-alt me-2"></i>Định nghĩa tiêu chuẩn
+                        </button>
+                        {index !== 0 && (
+                            <button
+                                className="btn btn-warning btn-sm ms-2"
+                                onClick={() => copyChuongTrinhDaoTao(item.maCtdt)}
+                            >
+                                <i className="fas fa-copy me-2"></i>Sao Chép Dữ Liệu
+                            </button>
+                        )}
+                    </div>
                 </div>
             ))}
         </div>
+
     );
 };
 
@@ -338,36 +359,41 @@ const AdminChuongTrinhDaoTao = () => {
         return ('Loading...')
     }
     return (
-        <div className="content" style={{background: "white", margin: "20px"}}>
+        <div className="content bg-white p-5">
             <LoadingProcess open={open}/>
-            <PopupForm {...props}/>
-            {
-                chuanKDCL.length > 0 ? (
-                    chuanKDCL.map(({maKdcl, tenKdcl}, index) => (
-                        <div key={maKdcl}>
-                            <div className="row">
-                                <div className="col-3">
-                                    <b>
-                                        <p>{index + 1}. {tenKdcl}</p>
-                                    </b>
-                                </div>
-                                <div className="col-2">
-                                    <button
-                                        className="btn btn-success"
-                                        onClick={() => handleCreateCtdt(maKdcl)}
-                                    >
-                                        Bổ Sung Chương Trình
-                                    </button>
-                                </div>
+            <PopupForm {...props} />
+
+            {chuanKDCL.length > 0 ? (
+                chuanKDCL.map(({maKdcl, tenKdcl}, index) => (
+                    <div key={maKdcl} className="mb-4">
+                        <div className="row align-items-center">
+                            <div className="col-md-8 col-12">
+                                <p className="mb-0 fw-bold">
+                                    {index + 1}. {tenKdcl}
+                                </p>
                             </div>
+                            <div className="col-md-4 col-12 text-md-end text-start mt-2 mt-md-0">
+                                <button
+                                    className="btn btn-success btn-sm p-2"
+                                    onClick={() => handleCreateCtdt(maKdcl)}
+                                >
+                                    <i className="fas fa-plus-circle me-2"></i>Bổ Sung Chương Trình
+                                </button>
+                            </div>
+                        </div>
+                        <div className="mt-3">
                             <ListChuongTrinhDaoTao maKdcl={maKdcl} setOpen={setOpen}/>
                         </div>
-                    ))
-                ) : (
-                    <div>No data available</div> // Provide a message or alternative content when there's no data
-                )
-            }
+                    </div>
+                ))
+            ) : (
+                <div className="text-center py-4">
+                    <i className="fas fa-exclamation-circle fa-2x text-muted"></i>
+                    <p className="mt-3 text-muted">Không có dữ liệu nào hiển thị.</p>
+                </div>
+            )}
         </div>
+
     );
 };
 

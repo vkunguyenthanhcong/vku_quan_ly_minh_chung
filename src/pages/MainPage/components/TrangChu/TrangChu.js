@@ -216,12 +216,13 @@ const TrangChu = () => {
                 ...dataTransfer,
                 TieuChuan_ID: idTieuChuan,
                 KhungCTDT_ID: selectCtdt
-            })
+            });
             setNoCase(2);
-        }
+        };
+
         return (
             <TableContainer>
-                <Table className='font-Inter'>
+                <Table className='font-Inter table-hover'>
                     <TableHead>
                         <TableRow id='table-row-color'>
                             <CustomTableHeadCell>STT</CustomTableHeadCell>
@@ -232,66 +233,107 @@ const TrangChu = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {tieuChuanSelected ? (tieuChuanSelected.map((row, index) => (
-                            <TableRow key={row.id}>
-                                <CustomTableCell>{index + 1}</CustomTableCell>
-                                <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
-                                <CustomTableCell>
-                                    <button className='btn btn-light text-white'
-                                            onClick={() => goToTieuChi(row.idTieuChuan)}>
-                                        Quản lý minh chứng
-                                    </button>
-                                </CustomTableCell>
-                                <CustomTableCell>{totalMinhChung(row.idTieuChuan)} minh
-                                    chứng</CustomTableCell>
-                            </TableRow>
-                        ))) : 'Loading...'}
+                        {tieuChuanSelected ? (
+                            tieuChuanSelected.map((row, index) => (
+                                <TableRow key={row.id || index}>
+                                    <CustomTableCell>{index + 1}</CustomTableCell>
+                                    <CustomTableCell>{row.tenTieuChuan}</CustomTableCell>
+                                    <CustomTableCell>
+                                        <button className='btn btn-outline-success'
+                                                onClick={() => goToTieuChi(row.idTieuChuan)}>
+                                            Quản lý minh chứng
+                                        </button>
+                                    </CustomTableCell>
+                                    <CustomTableCell>{totalMinhChung(row.idTieuChuan)} minh
+                                        chứng</CustomTableCell>
+                                </TableRow>
+                            ))
+                        ) : 'Loading...'}
                     </TableBody>
                 </Table>
             </TableContainer>
-        )
-    }
+        );
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 
     return (
         <div className="content" style={{background: "white", margin: '20px'}}>
-            <p style={{fontSize: '20px'}} className="text-center"><b>HỆ THỐNG QUẢN LÝ BÁO CÁO ĐÁNH GIÁ CƠ SỞ GIÁO DỤC
+            <p style={{fontSize: '20px'}} className="text-center"><b>HỆ THỐNG QUẢN LÝ HOẠT ĐỘNG TỰ ĐÁNH GIÁ
                 ĐẠI HỌC</b></p>
             <hr/>
-            <div className="row">
-                <div className="col-3 col-md-3">
-                    <select name="chucNang" className="form-select" onChange={onChangeSelectChucNang}>
-                        <option value="1">Quản lý tiêu chuẩn</option>
-                        <option value="2">Báo cáo tự dánh giá</option>
-                    </select>
+            <div className="row align-items-center gy-3">
+                <div className="col-md-3">
+                    <div className="form-group">
+                        <label htmlFor="chucNang" className="form-label fw-bold">
+                            <i className="bi bi-tools me-2"></i>Chức năng
+                        </label>
+                        <select
+                            id="chucNang"
+                            name="chucNang"
+                            className="form-select"
+                            onChange={onChangeSelectChucNang}
+                        >
+                            <option value="1">Quản lý tiêu chuẩn</option>
+                            <option value="2">Báo cáo tự đánh giá</option>
+                        </select>
+                    </div>
                 </div>
-                <div className="col-3 col-md-3">
-                    <select name="chuanKdcl" className="form-select" onChange={onChangeSelectChuanKdcl}
-                            value={selectChuanKdcl}>
-                        {chuanKdcl.map((item, index) => (
-                            <option key={index} value={item.maKdcl}>
-                                {item.tenKdcl}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col-3 col-md-3">
-                    <select name="ctdt" className="form-select" onChange={onChangeSelectCtdt} value={selectCtdt}>
-                        <option value="">Chọn chương trình</option>
-                        {chuongTrinhDaoTao
-                            .filter(item => item.chuanKdcl.maKdcl === selectChuanKdcl)
-                            .map((item, index) => (
-                                <option key={index} value={item.maCtdt}>
-                                    {item.tenCtdt}
+                <div className="col-md-3">
+                    <div className="form-group">
+                        <label htmlFor="chuanKdcl" className="form-label fw-bold">
+                            <i className="bi bi-clipboard-check me-2"></i>Chuẩn đánh giá
+                        </label>
+                        <select
+                            id="chuanKdcl"
+                            name="chuanKdcl"
+                            className="form-select"
+                            onChange={onChangeSelectChuanKdcl}
+                            value={selectChuanKdcl}
+                        >
+                            {chuanKdcl.map((item, index) => (
+                                <option key={index} value={item.maKdcl}>
+                                    {item.tenKdcl}
                                 </option>
                             ))}
-                    </select>
+                        </select>
+                    </div>
                 </div>
-                <div className="col-3 col-md-3">
-                    <button className="btn btn-success" onClick={fetchDataFromAPI}>Reset</button>
+                <div className="col-md-3">
+                    <div className="form-group">
+                        <label htmlFor="ctdt" className="form-label fw-bold">
+                            <i className="bi bi-list-task me-2"></i>Chương trình đào tạo
+                        </label>
+                        <select
+                            id="ctdt"
+                            name="ctdt"
+                            className="form-select"
+                            onChange={onChangeSelectCtdt}
+                            value={selectCtdt}
+                        >
+                            <option value="">Chọn chương trình</option>
+                            {chuongTrinhDaoTao
+                                .filter(item => item.chuanKdcl.maKdcl === selectChuanKdcl)
+                                .map((item, index) => (
+                                    <option key={index} value={item.maCtdt}>
+                                        {item.tenCtdt}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
                 </div>
+                <div className="col-md-3 text-md-end">
+                    <button
+                        className="btn btn-success d-flex align-items-center justify-content-center"
+                        onClick={fetchDataFromAPI}
+                    >
+                        <i className="fas fa-sync-alt me-2"></i>
+                        Reset
+                    </button>
             </div>
+            </div>
+
             <hr/>
             {
                 noCase != 1 ? (

@@ -37,9 +37,9 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
     fetchData();
   }, [token]);
   const MenuItem = ({ to, label, isLink }) => (
-    <li className={`${isScreenSmall || !isMenuExpanded ? 'd-flex align-items-center justify-content-center' : ''}`}>
-      <i className="fas fa-graduation-cap" />
-      <span className="text-center">
+    <li className={`${isScreenSmall || !isMenuExpanded ? 'd-flex align-items-center justify-content-center centered-menu-item' : ''}`}>
+      <i className={`${isScreenSmall || !isMenuExpanded ? 'fas fa-graduation-cap' : 'fas fa-graduation-cap me-2'}`} />
+        <span className="text-center">
         {isLink ? (
           <Link style={{ textDecoration: 'none', color: 'white' }} to={to}>
             {label}
@@ -50,18 +50,11 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
       </span>
     </li>
   );
-  
+
   const menuItems = [
     ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản Lý', isLink: true }] : []),
     { to: '/quan-ly', label: 'Trang Chủ', isLink: true }
   ];
-    // const menuItems = [
-    //     ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản lý', isLink: true }] : []),
-    //     { to: '/quan-ly?action=QuanLyTieuChuan', label: 'Quản lý tiêu chuẩn', isLink: true },
-    //     { to: '/quan-ly?action=DinhNghiaTieuChuan', label: 'Định nghĩa tiêu chuẩn', isLink: true },
-    //     { to: '/quan-ly?action=BaoCaoTuDanhGia', label: 'Báo cáo tự đánh giá', isLink: true }
-    // ];
-  
   return (
     <div className={`menu-scroll no-padding ${isScreenSmall ? 'text-center' : ''}`}>
       <i

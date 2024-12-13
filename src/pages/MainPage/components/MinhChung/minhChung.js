@@ -253,7 +253,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
             return (
                 <>
                     {filteredData.length > 0 ? null : (
-                        <button onClick={() => saveDungChung(idKMC, data[0].idMc)} className="btn btn-success mt-2">Dùng
+                        <button onClick={() => saveDungChung(idKMC, data[0].idMc)} className="btn btn-success"><i className="fas fa-plus me-2"></i> Dùng
                             chung</button>)}
                 </>
             );
@@ -264,11 +264,11 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                 {response.length > 0 ? (
                     <DungChung data={response}/>
                 ) : (
-                    <button onClick={() => saveFromKMCtoMC(idKMC, idParent)} style={{marginTop: '5px'}}
+                    <button onClick={() => saveFromKMCtoMC(idKMC, idParent)}
                             className="btn btn-success">
-                        Thêm
+                        <i className="fas fa-plus me-2"></i> Thêm
                     </button>
-                )}
+                    )}
             </>
         );
     };
@@ -279,31 +279,25 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
             style={{background: "white", margin: "20px", padding: "20px"}}
         >
             <LoadingProcess open={open}/>
-            <p style={{fontSize: "20px"}}>
-                Tìm kiếm minh chứng cho Tiêu Chuẩn Mục tiêu và chuẩn đầu ra của chương
-                trình đào tạo
-            </p>
+
+            <h5 className="mb-4">
+                <strong>Tìm kiếm minh chứng cho Tiêu Chuẩn Mục tiêu và chuẩn đầu ra của chương trình đào tạo</strong>
+            </h5>
+
             <button
                 onClick={handleClick}
-                className="btn btn-success"
-                style={{marginLeft: "20px"}}
+                className="btn btn-success mb-4 d-flex align-items-center"
             >
-                Thêm minh chứng
+                <i className="fas fa-plus me-2"></i>Thêm minh chứng
             </button>
-            <br/>
-            <br/>
-            <Row>
+
+            <Row className="g-4">
                 <Col xs={12} md={6}>
                     <TableContainer component={Paper}>
-                        <Table className="font-Inter">
+                        <Table className="table table-striped table-bordered">
                             <TableBody>
                                 <TableRow>
-                                    <TableCell
-                                        className="text-black"
-                                        style={{backgroundColor: "#DEF3FE"}}
-                                    >
-                                        <b>Số văn bản</b>
-                                    </TableCell>
+                                    <TableCell className="bg-light text-dark"><b>Số văn bản</b></TableCell>
                                     <TableCell>
                                         <input
                                             className="form-control"
@@ -312,12 +306,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                             onChange={(e) => setSoVanBan(e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell
-                                        className="text-black"
-                                        style={{backgroundColor: "#DEF3FE"}}
-                                    >
-                                        <b>Trích dẫn</b>
-                                    </TableCell>
+                                    <TableCell className="bg-light text-dark"><b>Trích dẫn</b></TableCell>
                                     <TableCell>
                                         <input
                                             className="form-control"
@@ -327,23 +316,18 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                         />
                                     </TableCell>
                                 </TableRow>
+
                                 <TableRow>
-                                    <TableCell
-                                        className="text-black"
-                                        style={{backgroundColor: "#DEF3FE"}}
-                                    >
-                                        <b>Ngày ban hành</b>
-                                    </TableCell>
+                                    <TableCell className="bg-light text-dark"><b>Ngày ban hành</b></TableCell>
                                     <TableCell>
-                                        <span>Từ ngày</span>
+                                        <label className="form-label">Từ ngày</label>
                                         <input
-                                            className="form-control"
+                                            className="form-control mb-2"
                                             type="date"
                                             value={startDate}
                                             onChange={(e) => setStartDate(e.target.value)}
                                         />
-                                        <br/>
-                                        <span>Đến ngày</span>
+                                        <label className="form-label">Đến ngày</label>
                                         <input
                                             className="form-control"
                                             type="date"
@@ -351,12 +335,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                             onChange={(e) => setEndDate(e.target.value)}
                                         />
                                     </TableCell>
-                                    <TableCell
-                                        className="text-black"
-                                        style={{backgroundColor: "#DEF3FE"}}
-                                    >
-                                        <b>Loại văn bản</b>
-                                    </TableCell>
+                                    <TableCell className="bg-light text-dark"><b>Loại văn bản</b></TableCell>
                                     <TableCell>
                                         <select
                                             id="loaiCongVan"
@@ -376,42 +355,40 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                             </TableBody>
                         </Table>
                     </TableContainer>
+
                     <button
                         style={{width: "100%"}}
-                        className="btn btn-primary"
+                        className="btn btn-primary mt-3 d-flex align-items-center justify-content-center"
                         onClick={search}
                     >
-                        Tìm kiếm
+                        <i className="fas fa-search me-2"></i>Tìm kiếm
                     </button>
+
                     <hr style={{border: "1px solid black"}}/>
-                    <TableContainer component={Paper} className="shadow-none scrollable-table-container">
-                        <Table className="font-Inter">
+
+                    <TableContainer component={Paper} className="scrollable-table-container">
+                        <Table className="table table-hover">
                             <TableBody>
                                 {khoMinhChung.map((row, index) => (
-                                    <TableRow>
-                                        <TableCell>
-                                            <b>{row.soHieu}</b>
-                                        </TableCell>
-                                        <TableCell>
-                                            <b>{row.tenMinhChung}</b>
-                                        </TableCell>
-                                        <TableCell width={150}>
-                                            <b>
+                                    <TableRow key={index}>
+                                        <TableCell><b>{row.soHieu}</b></TableCell>
+                                        <TableCell><b>{row.tenMinhChung}</b></TableCell>
+                                        <TableCell width={200}>
+                                            <div className="btn-group" role="group">
                                                 <button
                                                     className="btn btn-secondary"
                                                     onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}
                                                 >
-                                                    Xem nhanh
+                                                    <i className="fas fa-eye me-1"></i><br/>Xem nhanh
                                                 </button>
-                                            </b>
-                                            <br/>
-                                            <b>
-                                                <button className="btn btn-primary space-5"
-                                                        onClick={() => handleClickEdit(row.idKhoMinhChung)}>Sửa
+                                                <button
+                                                    className="btn btn-primary"
+                                                    onClick={() => handleClickEdit(row.idKhoMinhChung)}
+                                                >
+                                                    <i className="fas fa-edit me-1"></i>Sửa
                                                 </button>
-                                            </b>
-                                            <br/>
-                                            <Button_Them idKMC={row.idKhoMinhChung} idParent={row.linkLuuTru}/>
+                                                <Button_Them idKMC={row.idKhoMinhChung} idParent={row.linkLuuTru}/>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -419,72 +396,53 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                         </Table>
                     </TableContainer>
                 </Col>
+
                 <Col xs={12} md={6}>
-                    <p>
-                        <b>- Tiêu chí: </b>
-                        {tieuChi.tenTieuChi}
-                    </p>
-                    <p>
-                        <b>- Gợi ý minh chứng: </b>
-                        {goiY.tenGoiY}
-                    </p>
-                    <br/>
-                    <TableContainer component={Paper}>
-                        <Table className="font-Inter">
-                            <TableHead style={{backgroundColor: "transparent"}}>
+                    <h6><strong>- Tiêu chí:</strong> {tieuChi.tenTieuChi}</h6>
+                    <h6><strong>- Gợi ý minh chứng:</strong> {goiY.tenGoiY}</h6>
+
+                    <TableContainer component={Paper} className="mt-3">
+                        <Table className="table table-bordered">
+                            <TableHead>
                                 <TableRow>
-                                    <TableCell>Mã</TableCell>
-                                    <TableCell>Tên minh chứng</TableCell>
-                                    <TableCell>Tùy chọn</TableCell>
+                                    <TableCell><strong>Mã</strong></TableCell>
+                                    <TableCell><strong>Tên minh chứng</strong></TableCell>
+                                    <TableCell><strong>Tùy chọn</strong></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {minhChung && minhChung
-                                    .filter(item => item.idGoiY == GoiY_ID)
-                                    .map((item, index) => {
-                                        const filteredItem = item.maDungChung !== 0
-                                            ? minhChung.find(i => i.idMc === item.maDungChung)
-                                            : null;
-                                        const maMinhChungDisplay = item.maDungChung === 0
-                                            ? item.maMinhChung
-                                            : (filteredItem ? filteredItem.maMinhChung : '');
-
-                                        const modifiedString = item.maDungChung === 0
-                                            ? item.maMinhChung.slice(0, -3) + '.'
-                                            : null;
-
-                                        return (
-                                            <TableRow key={index}>
-                                                <TableCell>{maMinhChungDisplay}</TableCell>
-                                                <TableCell>{item.khoMinhChung.tenMinhChung}</TableCell>
-                                                <TableCell>
-                                                    <div>
-                                                        <button
-                                                            className="btn btn-secondary"
-                                                            onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + item.linkLuuTru + "/preview")}
-                                                        >
-                                                            Xem nhanh
-                                                        </button>
-                                                        <br/>
-                                                        <button
-                                                            className="btn btn-danger"
-                                                            style={{marginTop: '5px'}}
-                                                            onClick={() => deleteMC(item.idMc, modifiedString)}
-                                                        >
-                                                            Xóa
-                                                        </button>
-
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
-                                }
+                                {minhChung && minhChung.filter(item => item.idGoiY === GoiY_ID).map((item, index) => {
+                                    const filteredItem = item.maDungChung !== 0 ? minhChung.find(i => i.idMc === item.maDungChung) : null;
+                                    const maMinhChungDisplay = item.maDungChung === 0 ? item.maMinhChung : (filteredItem ? filteredItem.maMinhChung : '');
+                                    return (
+                                        <TableRow key={index}>
+                                            <TableCell>{maMinhChungDisplay}</TableCell>
+                                            <TableCell>{item.khoMinhChung.tenMinhChung}</TableCell>
+                                            <TableCell>
+                                                <div className="btn-group" role="group">
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + item.linkLuuTru + "/preview")}
+                                                    >
+                                                        <i className="fas fa-eye me-1"></i>Xem nhanh
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-danger"
+                                                        onClick={() => deleteMC(item.idMc)}
+                                                    >
+                                                        <i className="fas fa-trash me-1"></i>Xóa
+                                                    </button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Col>
             </Row>
+
             <PdfPreview show={isModalOpen} handleClose={closeModal} link={link}/>
         </div>
     );

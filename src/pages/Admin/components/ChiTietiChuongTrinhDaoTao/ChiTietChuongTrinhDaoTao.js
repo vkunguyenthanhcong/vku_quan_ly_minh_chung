@@ -100,61 +100,94 @@ const ChiTietChuongTrinhDaoTao = () => {
         
     }
     return (
-        <div className="content" style={{ background: "white", margin: "20px" }}>
-            
+        <div className="content p-5 m-3">
             {chuongTrinhDaoTao ? (
                 <>
-                    <h5><b>Giới thiệu Khung chương trình {chuongTrinhDaoTao.tenCtdt}</b></h5>
-                    <p>- Tên chương trình : </p>
-                    <Input className="form-control" value={tenCTDT} onChange={(e) => handleChangeTenCtdt(e.target.value)}/>
-                    <br/><br/>
-                    <p>- Chuẩn ánh giá ĐBCL : <button className="btn btn-secondary">{chuongTrinhDaoTao.chuanKdcl.tenKdcl}</button></p>
+                    <h5 className="fw-bold text-primary">
+                        Giới thiệu Khung chương trình: {chuongTrinhDaoTao.tenCtdt}
+                    </h5>
+                    <div className="mb-4">
+                        <label className="form-label fw-bold">Tên chương trình:</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={tenCTDT}
+                            onChange={(e) => handleChangeTenCtdt(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-4">
+                        <p className="mb-2 fw-bold">Chuẩn ánh giá ĐBCL:</p>
+                        <button className="btn btn-secondary btn-sm">
+                            {chuongTrinhDaoTao.chuanKdcl.tenKdcl}
+                        </button>
+                    </div>
+
                     {chuongTrinhDaoTao?.loai === 1 && (
                         <>
-                            <p>- Thuộc Khoa :</p>
-                            <select
-                                className="form-select"
-                                value={selectedKhoa}
-                                onChange={(e) => handleSelectKhoa(e.target.value)}
-                            >
-                                {khoa.length > 0 ? (
-                                    khoa.map((item) => (
-                                        <option key={item.maKhoa} value={item.maKhoa}>
-                                            {item.tenKhoa}
-                                        </option>
-                                    ))
-                                ) : (
-                                    <option disabled>Không có Khoa</option>
-                                )}
-                            </select>
+                            <div className="mb-4">
+                                <label className="form-label fw-bold">Thuộc Khoa:</label>
+                                <select
+                                    className="form-select"
+                                    value={selectedKhoa}
+                                    onChange={(e) => handleSelectKhoa(e.target.value)}
+                                >
+                                    {khoa.length > 0 ? (
+                                        khoa.map((item) => (
+                                            <option key={item.maKhoa} value={item.maKhoa}>
+                                                {item.tenKhoa}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option disabled>Không có Khoa</option>
+                                    )}
+                                </select>
+                            </div>
 
-                            <p>- Thuộc Ngành :</p>
-                            <select
-                                className="form-select"
-                                value={selectedNganh}
-                                onChange={(e) => handleSelectNganh(e.target.value)}
-                            >
-                                {nganh.length > 0 ? (
-                                    nganh.filter(item => item.maKhoa === selectedKhoa).map((item) => (
-                                        <option key={item.maNganh} value={item.maNganh}>
-                                            {item.tenNganh} - {item.trinhDo}
-                                        </option>
-                                    ))
-                                ) : (
-                                    <option disabled>Không có Ngành</option>
-                                )}
-                            </select>
+                            <div className="mb-4">
+                                <label className="form-label fw-bold">Thuộc Ngành:</label>
+                                <select
+                                    className="form-select"
+                                    value={selectedNganh}
+                                    onChange={(e) => handleSelectNganh(e.target.value)}
+                                >
+                                    {nganh.length > 0 ? (
+                                        nganh
+                                            .filter((item) => item.maKhoa === selectedKhoa)
+                                            .map((item) => (
+                                                <option key={item.maNganh} value={item.maNganh}>
+                                                    {item.tenNganh} - {item.trinhDo}
+                                                </option>
+                                            ))
+                                    ) : (
+                                        <option disabled>Không có Ngành</option>
+                                    )}
+                                </select>
+                            </div>
                         </>
                     )}
-                    <br/>
-                    <button className="btn btn-success" onClick={() => updateCtdt()}>Cập Nhật</button>
-                    <button className="btn btn-danger ms-1" onClick={() => deleteCtdt()}>Xóa</button>
+
+                    <div className="d-flex justify-content-start mt-4">
+                        <button className="btn btn-success me-2" onClick={() => updateCtdt()}>
+                            <i className="fas fa-save me-2"></i>Cập Nhật
+                        </button>
+                        <button className="btn btn-danger" onClick={() => deleteCtdt()}>
+                            <i className="fas fa-trash-alt me-2"></i>Xóa
+                        </button>
+                    </div>
                 </>
             ) : (
-                <p>Loading...</p>
+                <div className="text-center">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="mt-3">Đang tải dữ liệu...</p>
+                </div>
             )}
-            <ConfirmDialog />
+
+            <ConfirmDialog/>
         </div>
+
     );
 }
 export default ChiTietChuongTrinhDaoTao;

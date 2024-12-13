@@ -125,6 +125,23 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             x: `${event.clientX}`,
         });
     };
+    useEffect(() => {
+        // Hàm xử lý sự kiện trước khi reload hoặc thoát
+        const handleBeforeUnload = (event) => {
+            const confirmationMessage = "Bạn có chắc chắn muốn rời khỏi trang này? Các thay đổi chưa lưu sẽ bị mất.";
+            event.preventDefault();
+            event.returnValue = confirmationMessage; // Hiển thị thông báo (trình duyệt cần dòng này)
+            return confirmationMessage; // Một số trình duyệt dùng giá trị trả về này
+        };
+
+        // Thêm sự kiện `beforeunload`
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        // Xóa sự kiện khi component bị hủy
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -146,21 +163,8 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const [diemManh, setDiemManh] = useState('');
     const [diemYeu, setDiemYeu] = useState('');
     const [keHoach, setKeHoach] = useState("<figure class=\"table\"><table><thead><tr><th>TT</th><th>Mục tiêu</th><th>Nội dung</th><th>Đơn vị/ cá nhân thực hiện</th><th>Thời gian thực hiện</th><th>Ghi chú</th></tr></thead></table></figure>");
-
+    const [mucDanhGia, setMucDanhGia] = useState(0);
     const [booleanMention, setBooleanMention] = useState(false);
-    let mentionConfig;
-    const [formData, setFormData] = useState({
-        noiDungKhacPhuc: '',
-        donViKhacPhuc: '',
-        thoiGianKhacPhuc: '',
-        ghiChuKhacPhuc: '',
-        noiDungPhatHuy: '',
-        donViPhatHuy: '',
-        thoiGianPhatHuy: '',
-        ghiChuPhatHuy: '',
-        mucDanhGia: 0
-    });
-
 
     const options = [1, 2, 3, 4, 5, 6, 7];
     const fetchData = async () => {
@@ -238,20 +242,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
                 setDiemManh(firstItem.diemManh);
                 setDiemYeu(firstItem.diemTonTai);
                 setKeHoach(firstItem.keHoach);
-
-                setFormData({
-                    noiDungKhacPhuc: firstItem.noiDungKhacPhuc,
-                    donViKhacPhuc: firstItem.donViKhacPhuc,
-                    thoiGianKhacPhuc: firstItem.thoiGianKhacPhuc,
-                    ghiChuKhacPhuc: firstItem.ghiChuKhacPhuc,
-                    noiDungPhatHuy: firstItem.noiDungPhatHuy,
-                    donViPhatHuy: firstItem.donViPhatHuy,
-                    thoiGianPhatHuy: firstItem.thoiGianPhatHuy,
-                    ghiChuPhatHuy: firstItem.ghiChuPhatHuy,
-                    mucDanhGia: firstItem.mucDanhGia
-                });
-
-
+                setMucDanhGia(firstItem.mucDanhGia);
             } else {
                 setPhieuDanhGia([]);
                 setMoTa('');
@@ -294,7 +285,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             }]
         },
         toolbar: {
-            items: ['undo', 'redo', '|', 'sourceEditing', 'showBlocks', '|', 'heading', '|', 'bold', 'italic', 'underline', '|', 'link', 'insertImage', 'insertTable', 'blockQuote', 'htmlEmbed', '|', 'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'],
+            items: ['undo', 'redo', '|', 'showBlocks', '|', 'heading', '|', 'bold', 'italic', 'underline', '|', 'link', 'insertImage', 'insertTable', 'blockQuote', 'htmlEmbed', '|', 'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'],
             shouldNotGroupWhenFull: false
         },
         fontFamily: {
@@ -354,40 +345,80 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
         }
     }
+    const debounce = (func, delay) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(...args), delay);
+        };
+    };
+    const reloadFromDraft = () => {
+        const draftKey = `draft_tieuChi_${TieuChi_ID}`;
+        const savedDraft = localStorage.getItem(draftKey);
 
-    const handleEditorChange = (event, editor) => {
-        if (editor && editor.getData) {
+        if (savedDraft) {
             try {
-                const data = editor.getData();
-                setMoTa(data);
+                const draftData = JSON.parse(savedDraft); // Parse the JSON string
+                setMoTa(draftData.draft_moTa || ""); // Use default values if data is missing
+                setDiemManh(draftData.draft_diemManh || "");
+                setDiemYeu(draftData.draft_diemYeu || "");
+                setKeHoach(draftData.draft_keHoach || "");
+                setMucDanhGia(draftData.draft_mucDanhGia ?? 0);
             } catch (error) {
-                console.error('Error handling editor change:', error);
+                console.error("Error parsing saved draft data:", error);
             }
         } else {
-            console.error('Editor or editor.getData is not available.');
+            console.log("No draft data found.");
         }
+    }
+    const saveDraftWithID = (updatedData = {}) => {
+        const draftKey = `draft_tieuChi_${TieuChi_ID}`;
+        const draftData = {
+            draft_moTa: updatedData.moTa ?? moTa,
+            draft_diemManh: updatedData.diemManh ?? diemManh,
+            draft_diemYeu: updatedData.diemYeu ?? diemYeu,
+            draft_keHoach: updatedData.keHoach ?? keHoach,
+            draft_mucDanhGia: updatedData.mucDanhGia ?? mucDanhGia ?? 0,
+        };
+        localStorage.setItem(draftKey, JSON.stringify(draftData));
     };
+    const debouncedSaveDraft = debounce(saveDraftWithID, 300);
 
+
+// Editor handlers with meaningful content check
+    const handleEditorChange = (event, editor) => {
+        const data = editor.getData();
+        setMoTa(data);
+
+        debouncedSaveDraft({ moTa: data });
+    };
 
     const handleSetDiemManh = (event, editor) => {
         const data = editor.getData();
-        setDiemManh(data)
-    }
+        setDiemManh(data);
+
+        debouncedSaveDraft({ diemManh: data });
+    };
+
     const handleSetDiemYeu = (event, editor) => {
         const data = editor.getData();
-        setDiemYeu(data)
-    }
+        setDiemYeu(data);
+
+        debouncedSaveDraft({ diemYeu: data });
+    };
+
     const handleSetKeHoach = (event, editor) => {
         const data = editor.getData();
-        setKeHoach(data)
+        setKeHoach(data);
 
-    }
-    const handleSet = (event) => {
-        const {name, value} = event.target;
-        setFormData({
-            ...formData, [name]: value
-        });
+        debouncedSaveDraft({ keHoach: data });
     };
+
+    const handleSetMucDanhGia = (value) => {
+        setMucDanhGia(value);
+        debouncedSaveDraft({ mucDanhGia: value });
+    };
+
 
     const savePhieuDanhGia = async () => {
         try {
@@ -399,15 +430,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             data.append('moTa', moTa);
             data.append('diemManh', diemManh);
             data.append('diemTonTai', diemYeu);
-            data.append('noiDungKhacPhuc', formData.noiDungKhacPhuc);
-            data.append('donViKhacPhuc', formData.donViKhacPhuc);
-            data.append('thoiGianKhacPhuc', formData.thoiGianKhacPhuc);
-            data.append('ghiChuKhacPhuc', formData.ghiChuKhacPhuc);
-            data.append('noiDungPhatHuy', formData.noiDungPhatHuy);
-            data.append('donViPhatHuy', formData.donViPhatHuy);
-            data.append('thoiGianPhatHuy', formData.thoiGianPhatHuy);
-            data.append('ghiChuPhatHuy', formData.ghiChuPhatHuy);
-            data.append('mucDanhGia', formData.mucDanhGia);
+            data.append('mucDanhGia', mucDanhGia);
             data.append("keHoach", keHoach)
             if (phieuDanhGia?.length == 0) {
                 const response = await savePhieuDanhGiaTieuChi(data);
@@ -458,122 +481,101 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
 
                 `}
             </style>
-            {booleanMention == true ? (<div className="content bg-white m-3 p-4">
-                <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHÍ</b></p>
-                <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
-                    <span>Loading...</span>)}</p>
-                <p>Tiêu chuẩn {tieuChuan.stt} : {tieuChuan.tenTieuChuan}</p>
-                <p>Tiêu chí {tieuChi.stt} : {tieuChi.tenTieuChi}</p>
+            {booleanMention ? (
+                <div className="content bg-white m-3 p-4 rounded shadow-sm">
+                    <p className="text-center fs-5 fw-bold">PHIẾU ĐÁNH GIÁ TIÊU CHÍ</p>
+                    <p>
+                        <strong>Nhóm công tác: </strong>
+                        {nhomCongTac ? <span>{nhomCongTac.tenPhongBan}</span> : <span>Loading...</span>}
+                    </p>
+                    <p>
+                        <strong>Tiêu chuẩn {tieuChuan.stt}:</strong> {tieuChuan.tenTieuChuan}
+                    </p>
+                    <p>
+                        <strong>Tiêu chí {tieuChi.stt}:</strong> {tieuChi.tenTieuChi}
+                    </p>
 
-                <p>1. Mô tả</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (
-                                    <CKEditor
-                                        editor={ClassicEditor}
-                                        config={editorConfig}
-                                        onReady={handleEditorReady}
-                                        onChange={handleEditorChange}
-                                        data={moTa}
-                                    />)}
+                    {/* Section 1: Mô tả */}
+                    <p className="mt-3"><strong>1. Mô tả</strong></p>
+                    <div className="main-container border p-2 rounded">
+                        <CKEditor
+                            editor={ClassicEditor}
+                            config={editorConfig}
+                            onReady={handleEditorReady}
+                            onChange={handleEditorChange}
+                            data={moTa}
+                        />
+                    </div>
+
+                    {/* Section 2: Điểm mạnh */}
+                    <p className="mt-3"><strong>2. Điểm mạnh</strong></p>
+                    <div className="main-container border p-2 rounded">
+                        <CKEditor
+                            editor={ClassicEditor}
+                            config={editorConfig}
+                            onChange={handleSetDiemManh}
+                            data={diemManh}
+                        />
+                    </div>
+
+                    {/* Section 3: Điểm tồn tại */}
+                    <p className="mt-3"><strong>3. Điểm tồn tại</strong></p>
+                    <div className="main-container border p-2 rounded">
+                        <CKEditor
+                            editor={ClassicEditor}
+                            config={editorConfig}
+                            onChange={handleSetDiemYeu}
+                            data={diemYeu}
+                        />
+                    </div>
+
+                    {/* Section 4: Kế hoạch hành động */}
+                    <p className="mt-3"><strong>4. Kế hoạch hành động</strong></p>
+                    <div className="main-container border p-2 rounded">
+                        <CKEditor
+                            editor={ClassicEditor}
+                            config={editorConfig}
+                            onChange={handleSetKeHoach}
+                            data={keHoach}
+                        />
+                    </div>
+
+                    {/* Section 5: Mức đánh giá */}
+                    <p className="mt-3"><strong>5. Mức đánh giá</strong></p>
+                    <div className="btn-group w-100" role="group" aria-label="Mức đánh giá">
+                        {Array.from({ length: 7 }, (_, i) => i + 1).map((option) => (
+                            <button
+                                key={option}
+                                type="button"
+                                className={`btn btn-outline-primary ${mucDanhGia === option ? "active" : ""}`}
+                                onClick={() => handleSetMucDanhGia(option)}
+                            >
+                                {option}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="row g-3 mt-4">
+                        {[
+                            { label: "Lưu", onClick: savePhieuDanhGia, className: "btn-success", icon: "fas fa-save" },
+                            { label: "Xem phiếu đánh giá", onClick: viewPhieuDanhGia, className: "btn-primary", icon: "fas fa-eye" },
+                            { label: "Tải lại bản nháp", onClick : reloadFromDraft, className: "btn-warning", icon: "fas fa-redo" },
+                        ].map(({ label, onClick, className, icon }, index) => (
+                            <div className="col-md-4 col-sm-6" key={index}>
+                                <button
+                                    className={`btn ${className} w-100 py-2 d-flex align-items-center justify-content-center`}
+                                    onClick={onClick}
+                                    title={label}
+                                >
+                                    <i className={`${icon} me-2`}></i> {label}
+                                </button>
                             </div>
-                        </div>
-                    </div>
-
-                </div>
-
-
-                <p>2. Điểm mạnh</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleSetDiemManh}
-                                    data={diemManh}
-                                />)}
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
+            ) : null}
 
-                <p className="mt-2">3. Điểm tồn tại</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleSetDiemYeu}
-                                    data={diemYeu}
-                                />)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p className="mt-2">4. Kế hoạch hành động</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleSetKeHoach}
-                                    data={keHoach}
-                                />)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p className="mt-2">5. Mức đánh giá</p>
-
-                {options.map((option) => (<div key={option}>
-                    <input
-                        className="me-1"
-                        type="radio"
-                        name="mucDanhGia"
-                        value={option}
-                        id={option.toString()}
-                        onChange={handleSet}
-                        checked={formData.mucDanhGia == option}
-                    />
-                    <label htmlFor={option.toString()}>{option}</label>
-                </div>))}
-
-                <br/>
-                <div className="row">
-                    <div className="col-1">
-                        <button className="btn btn-success" onClick={savePhieuDanhGia}>
-                            Lưu
-                        </button>
-                    </div>
-                    <div className="col-3">
-                        <button className="btn btn-success" onClick={viewPhieuDanhGia}>
-                            Xem phiếu đánh giá
-                        </button>
-                    </div>
-                </div>
-            </div>) : (null)}
         </div>);
 
 }

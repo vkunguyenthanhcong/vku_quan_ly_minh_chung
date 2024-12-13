@@ -345,28 +345,6 @@ export const getAllTieuChi = (token) => {
             throw error;
         });
 };
-//Tong minh chung trong tieu chi
-export const getTotalMinhChungWithTieuChi = (idTieuChi, token) => {
-    return api.get(`/minhchung/CountMinhChungWithTieuChi/${idTieuChi}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error :', error);
-            throw error;
-        });
-};
-//Tong minh chung trong tieu chuan
-export const getTotalMinhChungWithTieuChuan = (idTieuChuan, token) => {
-    return api.get(`/minhchung/CountMinhChungByTieuChuan/${idTieuChuan}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error :', error);
-            throw error;
-        });
-};
 // Data Moc Chuan theo Tieu Chi
 export const getAllMocChuan = (token) => {
     return api.get(`/mocchuan`, {
@@ -480,17 +458,7 @@ export const getAllGoiY = (token) => {
             throw error;
         });
 };
-// Lay data cua tat ca Minh Chung theo Goi Y
-export const getMinhChungByIdGoiY = (idGoiY,token) => {
-    return api.get(`/minhchung/findByIdGoiY/${idGoiY}`, {
-        headers: { Authorization: `Bearer ${token}` }
-    })
-        .then(response => response.data)
-        .catch(error => {
-            console.error('Error :', error);
-            throw error;
-        });
-};
+
 //Luu Goi Y
 export const saveGoiY = (goiY, token) => {
     return api.post('/goiy', goiY, {
@@ -632,20 +600,7 @@ export const uploadImage = (formData, token) => {
             throw error;
         });
 };
-// create folder CTDT
-export const createFolderCTDT = (tenCtdt, token) => {
-    return api.post('/upload/createFolderCtdt', tenCtdt, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
 
-        },
-    }).then(response => response.data)
-        .catch(error => {
-            console.error('Error:', error);
-            throw error;
-        });
-};
 // Luu Minh Chung
 export const saveMinhChung = (minhChung, token) => {
     return api.post('/khominhchung', minhChung, {

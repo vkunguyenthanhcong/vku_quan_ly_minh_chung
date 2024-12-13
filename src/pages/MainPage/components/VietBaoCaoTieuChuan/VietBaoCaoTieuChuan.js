@@ -498,127 +498,136 @@ const VietBaoCaoTieuChuan = ({dataTransfer}) => {
 
                 `}
             </style>
-            {booleanMention == true ? (<div className="content bg-white m-3 p-4">
-
-                <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHUẨN</b></p>
-                <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
-                    <span>Loading...</span>)}</p>
-                <p>Tiêu chuẩn {tieuChuan.stt} : {tieuChuan.tenTieuChuan}</p>
-
-                <p>1. Mô tả</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (
-                                    <CKEditor
+                {booleanMention == true ? (<div className="content bg-white m-3 p-4">
+    
+                    <p className="text-center"><b>PHIẾU ĐÁNH GIÁ TIÊU CHUẨN</b></p>
+                    <p>Nhóm công tác : {nhomCongTac ? (<span>{nhomCongTac.tenPhongBan}</span>) : (
+                        <span>Loading...</span>)}</p>
+                    <p>Tiêu chuẩn {tieuChuan.stt} : {tieuChuan.tenTieuChuan}</p>
+    
+                    <p>1. Mô tả</p>
+                    <div className="main-container">
+                        <div
+                            className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                            ref={editorContainerRef}
+                        >
+                            <div className="editor-container__editor">
+                                <div ref={editorRef} spellCheck={false}>
+                                    {isLayoutReady && (
+                                        <CKEditor
+                                            editor={ClassicEditor}
+                                            config={editorConfig}
+                                            onReady={handleEditorReady}
+                                            onChange={handleEditorChange}
+                                            data={moTa}
+                                        />)}
+                                </div>
+                            </div>
+                        </div>
+    
+                    </div>
+    
+    
+                    <p>2. Điểm mạnh</p>
+                    <div className="main-container">
+                        <div
+                            className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                            ref={editorContainerRef}
+                        >
+                            <div className="editor-container__editor">
+                                <div ref={editorRef} spellCheck={false}>
+                                    {isLayoutReady && (<CKEditor
                                         editor={ClassicEditor}
                                         config={editorConfig}
-                                        onReady={handleEditorReady}
-                                        onChange={handleEditorChange}
-                                        data={moTa}
+                                        onChange={handleSetDiemManh}
+                                        data={diemManh}
                                     />)}
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                </div>
-
-
-                <p>2. Điểm mạnh</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleSetDiemManh}
-                                    data={diemManh}
-                                />)}
+    
+                    <p className="mt-2">3. Điểm tồn tại</p>
+                    <div className="main-container">
+                        <div
+                            className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                            ref={editorContainerRef}
+                        >
+                            <div className="editor-container__editor">
+                                <div ref={editorRef} spellCheck={false}>
+                                    {isLayoutReady && (<CKEditor
+                                        editor={ClassicEditor}
+                                        config={editorConfig}
+                                        onChange={handleSetDiemYeu}
+                                        data={diemYeu}
+                                    />)}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <p className="mt-2">3. Điểm tồn tại</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleSetDiemYeu}
-                                    data={diemYeu}
-                                />)}
+    
+                    <p className="mt-2">4. Kế hoạch hành động</p>
+                    <div className="main-container">
+                        <div
+                            className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                            ref={editorContainerRef}
+                        >
+                            <div className="editor-container__editor">
+                                <div ref={editorRef} spellCheck={false}>
+                                    {isLayoutReady && (<CKEditor
+                                        editor={ClassicEditor}
+                                        config={editorConfig}
+                                        onChange={handleSetKeHoach}
+                                        data={keHoach}
+                                    />)}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <p className="mt-2">4. Kế hoạch hành động</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleSetKeHoach}
-                                    data={keHoach}
-                                />)}
+    
+                    <p className="mt-2">5. Mức đánh giá</p>
+                    <div className="main-container">
+                        <div
+                            className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
+                            ref={editorContainerRef}
+                        >
+                            <div className="editor-container__editor">
+                                <div ref={editorRef} spellCheck={false}>
+                                    {isLayoutReady && (<CKEditor
+                                        editor={ClassicEditor}
+                                        config={editorConfig}
+                                        onChange={handleChangeMucDanhGia}
+                                        data={mucDanhGia}
+                                    />)}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <p className="mt-2">5. Mức đánh giá</p>
-                <div className="main-container">
-                    <div
-                        className="editor-container editor-container_classic-editor editor-container_include-block-toolbar"
-                        ref={editorContainerRef}
-                    >
-                        <div className="editor-container__editor">
-                            <div ref={editorRef} spellCheck={false}>
-                                {isLayoutReady && (<CKEditor
-                                    editor={ClassicEditor}
-                                    config={editorConfig}
-                                    onChange={handleChangeMucDanhGia}
-                                    data={mucDanhGia}
-                                />)}
+    
+    
+                    <br/>
+                    <div className="row g-3 mt-4">
+                        {[
+                            {label: "Lưu", onClick: savePhieuDanhGia, className: "btn-success", icon: "fas fa-save"},
+                            {
+                                label: "Xem phiếu đánh giá",
+                                onClick: viewPhieuDanhGia,
+                                className: "btn-primary",
+                                icon: "fas fa-eye"
+                            },
+                        ].map(({label, onClick, className, icon}, index) => (
+                            <div className="col-md-4 col-sm-6" key={index}>
+                                <button
+                                    className={`btn ${className} w-100 py-2 d-flex align-items-center justify-content-center`}
+                                    onClick={onClick}
+                                    title={label}
+                                >
+                                    <i className={`${icon} me-2`}></i> {label}
+                                </button>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                </div>
-
-
-                <br/>
-                <div className="row">
-                    <div className="col-1">
-                        <button className="btn btn-success" onClick={savePhieuDanhGia}>
-                            Lưu
-                        </button>
-                    </div>
-                    <div className="col-3">
-                        <button className="btn btn-success" onClick={viewPhieuDanhGia}>
-                            Xem phiếu đánh giá
-                        </button>
-                    </div>
-                </div>
-            </div>) : (null)}
+                </div>) : (null)}
         </div>);
 
 }

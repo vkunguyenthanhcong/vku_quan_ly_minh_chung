@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {getAllUser, getPhongBan, updateUser} from "../../../../services/apiServices";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+import SuccessDialog from "../../../../components/ConfirmDialog/SuccessDialog";
 
 const formatPhoneNumber = (phoneNumber) => {
     // Use a regex to format the phone number
@@ -15,6 +16,11 @@ function QuanLyGiangVien() {
     const [error, setError] = useState(null);
     const [phongBan, setPhongBan] = useState([]);
     const [open, setOpen] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+
+    const handleShowDialog = () => setShowDialog(true);
+    const handleCloseDialog = () => setShowDialog(false)
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -61,10 +67,9 @@ function QuanLyGiangVien() {
             }
             try {
                 const response = await updateUser(formData);
-
                 if(response == "OK"){
-                    setOpen(false)
-                    alert("Cập nhật thành công");
+                    setOpen(false);
+                    handleShowDialog();
                 }
             }catch (e) {
                 setOpen(false)
@@ -80,6 +85,12 @@ function QuanLyGiangVien() {
     }
     return (<div className="content" style={{background: "white", margin: "20px"}}>
         <LoadingProcess open={open}/>
+        <SuccessDialog
+            show={showDialog}
+            onClose={handleCloseDialog}
+            title="Cập Nhật Thành Công"
+            message="Quá trình cập nhật hoàn tất"
+        />
         <TableContainer component={Paper}>
             <Table className="font-Inter">
                 <TableHead>
@@ -92,7 +103,6 @@ function QuanLyGiangVien() {
                         <TableCell className="text-white">Phòng ban</TableCell>
                         <TableCell className="text-white">Hình ảnh</TableCell>
                         <TableCell>
-                            <button className='btn btn-success'>+</button>
                         </TableCell>
                     </TableRow>
                 </TableHead>
@@ -123,10 +133,21 @@ function QuanLyGiangVien() {
                             <img src={item.avatar} width="50" height="50"/>
                         </TableCell>
                         <TableCell>
-                            <button className="btn btn-primary" onClick={() => editGiangVien(item.id)}>Sửa</button>
-                            <br/>
-                            <button className="btn btn-danger mt-2">Xóa</button>
+                            <div className="d-flex flex-column align-items-start gap-2 btn-group-vertical" role="group">
+                                <button
+                                    className="btn btn-outline-primary btn-sm"
+                                    onClick={() => editGiangVien(item.id)}
+                                >
+                                    <i className="fas fa-edit me-2"></i>Sửa
+                                </button>
+                                <button
+                                    className="btn btn-outline-danger btn-sm"
+                                >
+                                    <i className="fas fa-trash-alt me-2"></i>Xóa
+                                </button>
+                            </div>
                         </TableCell>
+
                     </TableRow>)) : ('Loading...')}
                 </TableBody>
             </Table>

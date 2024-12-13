@@ -11,14 +11,13 @@ import {
 } from "@mui/material";
 import {
     getKdclData,
-
     updateTenKdcl,
-    updateNamBanHanh, deleteChuanKDCL,
-    insertNewChuanKdcl, getAllChuongTrinhDaoTao, deleteChuongTrinhDaoTao,
+    updateNamBanHanh,
+    insertNewChuanKdcl, getAllChuongTrinhDaoTao, deleteChuanKDCL,
 } from "../../../../services/apiServices";
 import {useNavigate} from "react-router-dom";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
-import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
+import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 
 const PopupForm = (props) => {
     const [open, setOpen] = useState(false);
@@ -51,11 +50,11 @@ const PopupForm = (props) => {
         open === false ? (
             <Modal show={props.show} onHide={props.handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Bổ sung Chuẩn kiểm định</Modal.Title>
+                    <Modal.Title>Bổ sung chuẩn kiểm định</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form onSubmit={handleSubmit}>
-                        <Form.Group controlId="tenKdcl">
+                        <Form.Group controlId="tenKdcl" className="mb-2">
                             <Form.Label>Tên Chuẩn đánh giá</Form.Label>
                             <Form.Control
                                 type="text"
@@ -67,7 +66,7 @@ const PopupForm = (props) => {
                             />
                         </Form.Group>
 
-                        <Form.Group controlId="namBanHanh">
+                        <Form.Group controlId="namBanHanh" className="mb-2">
                             <Form.Label>Năm áp dụng</Form.Label>
                             <Form.Control
                                 type="text"
@@ -78,7 +77,7 @@ const PopupForm = (props) => {
                                 required
                             />
                         </Form.Group>
-                        <Form.Group controlId="soLuongTieuChuan">
+                        <Form.Group controlId="soLuongTieuChuan" className="mb-2">
                             <Form.Label>Số lượng tiêu chuẩn</Form.Label>
                             <Form.Control
                                 type="number"
@@ -87,10 +86,11 @@ const PopupForm = (props) => {
                                 value={props.formData.soLuongTieuChuan}
                                 onChange={handleChange}
                                 required
+                                min={1}
                             />
                         </Form.Group>
                         <Button variant="success" type="submit" className="mt-3">
-                            Xác nhận
+                            <i className="fas fa-check me-2"></i> Xác nhận
                         </Button>
                     </Form>
                 </Modal.Body>
@@ -130,33 +130,32 @@ const GenericList = ({maKdcl}) => {
 
 
     return (
-        <ul>
+        <div className="btn-group-vertical" role="group">
             {data.map((item, index) => (
-                <li style={{marginBottom: "20px", marginTop: "20px", listStyleType: 'none'}} key={index}>
-                    <button
-                        onClick={() => handleButtonClick(item.maCtdt)}
-                        className="btn btn-primary"
-                    >
-                        {item.tenCtdt}
-                    </button>
-                </li>
+                <button
+                    key={`button-${index}`}
+                    className="btn btn-primary mb-2"
+                >
+                    {item.tenCtdt}
+                </button>
             ))}
-        </ul>
+        </div>
     );
 };
 const ChuanKiemDinh = () => {
     const [formData, setFormData] = useState({
         tenKdcl: '',
         namBanHanh: '',
-        soLuongTieuChuan: 0
+        soLuongTieuChuan: 1
     });
     const navigate = useNavigate();
     const [data, setData] = useState([]);
-
+    const [showDialog, setShowDialog] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [show, setShow] = useState(false);
     const [open, setOpen] = useState(false);
+    const [selectedMaKdcl, setSelectedMaKdcl] = useState('');
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const fetchDataFromAPI = async () => {
@@ -239,27 +238,31 @@ const ChuanKiemDinh = () => {
         setFormData: setFormData
     }
     const handleDeleteChuanKDCL = (maKdcl) => {
-        confirmDialog({
-            message: 'Bạn có chắc chắn muốn xóa?',
-            header: 'Xác nhận',
-            accept: async () => {
-                const response = await deleteChuanKDCL(maKdcl);
-                if(response === "OK"){
-                    alert('Xóa thành công');
-                    props.fetchData();
-                }else{
-                    alert('Có lỗi trong quá trình xử lý');
-                }
-            },
-            reject: () => {
-                console.log('Đã hủy');
-            }
-        });
+        setSelectedMaKdcl(maKdcl);
+        setShowDialog(true);
+    }
+    const deleteCKDCL = async () => {
+        const response = await deleteChuanKDCL(selectedMaKdcl);
+        if (response === "OK") {
+            alert('Xóa thành công');
+            props.fetchData();
+        } else {
+            alert('Có lỗi trong quá trình xử lý');
+        }
     }
 
     return (
         <div className="content" style={{background: "white", margin: "20px"}}>
             <LoadingProcess open={open}/>
+            <ConfirmDialog
+                show={showDialog}
+                onClose={() => setShowDialog(false)}
+                onConfirm={deleteCKDCL}
+                title="Xác nhận xóa"
+                message="Bạn có chắc chắn muốn xóa mục này không? Hành động này không thể hoàn tác."
+                confirmLabel="Xóa"
+                cancelLabel="Hủy"
+            />
             <PopupForm {...props}/>
             <p style={{fontSize: "20px"}}>
                 DANH SÁCH CÁC CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG
@@ -271,22 +274,23 @@ const ChuanKiemDinh = () => {
                         <TableHead>
                             <TableRow id="table-row-color">
                                 <TableCell className="text-white">STT</TableCell>
-                                <TableCell className="text-white">Tên Chuẩn đánh giá</TableCell>
-                                <TableCell className="text-white">Năm áp dụng</TableCell>
-                                <TableCell className="text-white">Tên CTĐT</TableCell>
+                                <TableCell className="text-white">Tên chuẩn đánh giá</TableCell>
+                                <TableCell className="text-white">Thời gian áp dụng</TableCell>
+                                <TableCell className="text-white">Tên chương trình đào tạo</TableCell>
                                 <TableCell className="text-white">Thao Tác</TableCell>
                                 <TableCell>
-                                    <button className='btn btn-success' onClick={handleShow}>+</button>
+                                    <button className='btn btn-success' onClick={handleShow}><b>+</b></button>
                                 </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {data.map((row, index) => (
-                                <TableRow key={row.id}>
+                                <TableRow key={`chuanKiemDinh-${index}`}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>
                                         {row.isEditing ? (
                                             <input
+                                                className="form-control"
                                                 style={{width: '500px'}}
                                                 type="text"
                                                 value={row.tenKdcl}
@@ -302,6 +306,7 @@ const ChuanKiemDinh = () => {
                                     <TableCell>
                                         {row.isEditing ? (
                                             <input
+                                                className="form-control"
                                                 type="text"
                                                 value={row.namBanHanh}
                                                 onChange={(e) =>
@@ -317,22 +322,31 @@ const ChuanKiemDinh = () => {
                                         <GenericList maKdcl={row.maKdcl}/>
                                     </TableCell>
                                     <TableCell className="button-edit">
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() => handleEditClick(row.maKdcl)}
-                                        >
-                                            Chỉnh sửa
-                                        </button>
-                                        <br/>
-                                        <button className="btn btn-danger mt-2"
+                                        <div className="btn-group-vertical" role="group">
+                                            <button
+                                                className="btn btn-primary mb-2 d-flex align-items-center"
+                                                onClick={() => handleEditClick(row.maKdcl)}
+                                                title="Chỉnh sửa"
+                                            >
+                                                <i className="fas fa-edit me-2"></i>Chỉnh sửa
+                                            </button>
+                                            <button
+                                                className="btn btn-danger mb-2 d-flex align-items-center"
                                                 onClick={() => handleDeleteChuanKDCL(row.maKdcl)}
-                                        >Xóa
-                                        </button>
-                                        <br/>
-                                        <button className="btn btn-success mt-2"
-                                                onClick={() => goToPhanCong(row.maKdcl)}>Chia nhóm đánh giá
-                                        </button>
+                                                title="Xóa"
+                                            >
+                                                <i className="fas fa-trash me-2"></i>Xóa
+                                            </button>
+                                            <button
+                                                className="btn btn-success d-flex align-items-center"
+                                                onClick={() => goToPhanCong(row.maKdcl)}
+                                                title="Chia nhóm đánh giá"
+                                            >
+                                                <i className="fas fa-users-cog me-2"></i>Chia nhóm đánh giá
+                                            </button>
+                                        </div>
                                     </TableCell>
+                                    <TableCell></TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

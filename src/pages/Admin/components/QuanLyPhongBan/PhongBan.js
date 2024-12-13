@@ -10,10 +10,10 @@ import {
     Paper,
 } from "@mui/material";
 import { deletePhongBan, editPhongBan, getPhongBan, savePhongBan } from "../../../../services/apiServices";
-import { ConfirmDialog } from 'primereact/confirmdialog';
-import { confirmDialog } from 'primereact/confirmdialog'; 
+import ConfirmDialog from "../../../../components/ConfirmDialog/ConfirmDialog";
 import 'primereact/resources/primereact.min.css';
-const PopupForm = ({ show, handleClose , setPhongBan}) => {
+import SuccessDialog from "../../../../components/ConfirmDialog/SuccessDialog";
+const PopupForm = ({ show, handleClose , setPhongBan, setShowDialogSuccess}) => {
     const [formData, setFormData] = useState({
       tenPhongBan: ''
     });
@@ -31,6 +31,7 @@ const PopupForm = ({ show, handleClose , setPhongBan}) => {
           if(response){
             setPhongBan(response);
             handleClose();
+            setShowDialogSuccess(true);
             setFormData((prevFormData) => ({
                 ...prevFormData,
                 tenPhongBan: '' 
@@ -60,10 +61,11 @@ const PopupForm = ({ show, handleClose , setPhongBan}) => {
                 required
               />
             </Form.Group>
-  
-            <Button variant="success" type="submit" className="mt-3">
-                Xác nhận
-            </Button>
+
+              <Button variant="success" type="submit" className="mt-3">
+                  <i className="fas fa-check me-2"></i>
+                  Xác nhận
+              </Button>
           </Form>
         </Modal.Body>
       </Modal>
@@ -76,7 +78,10 @@ const PhongBan = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [phongBan, setPhongBan] = useState([]);
-    
+    const [idPhongBanSelected, setIdPhongBanSelected] = useState('');
+    const [showDialog, setShowDialog] = useState(false);
+    const [showDialogSuccess, setShowDialogSuccess] = useState(false);
+    const handleCloseDialogSuccess = ()=> {setShowDialogSuccess(false);};
     useEffect(() => {
         const fetchDataFromAPI = async () => {
             try {
@@ -135,44 +140,60 @@ const PhongBan = () => {
             }
         }
     };
-    const xoaPhongBan = (idPhongBan) => {
-        confirmDialog({
-            message: 'Bạn có chắc chắn muốn xóa?',
-            header: 'Xác nhận',
-            accept: async () => {
-                try {
-                    const response = await deletePhongBan(idPhongBan);
-                    if(response){
-                        setPhongBan(response);
-                        alert('Xóa thành công');
-                    }else{
-                        alert('Có lỗi trong quá trình xử lý');
-                    }
-                } catch (error) {
-                    
-                }
-            },
-            reject: () => {
-              console.log('Đã hủy');
-            }
-          });
+    const handleXoaoaPhongBan = (idPhongBan) => {
+        setIdPhongBanSelected(idPhongBan);
+        setShowDialog(true);
     }
+    const xoaPhongBan = async () => {
+        const response = await deletePhongBan(idPhongBanSelected);
+        if(response){
+            setPhongBan(response);
+            setShowDialog(false);
+        }else{
+            alert('Có lỗi trong quá trình xử lý');
+        }
+    }
+
     if(loading === true){return (<p>Loading...</p>)}
     return (
         <div className="content" style={{ background: "white", margin: "20px" }}>
-        <PopupForm show={show} handleClose={handleClose} setPhongBan={setPhongBan}/>
+            <ConfirmDialog
+                show={showDialog}
+                onClose={() => setShowDialog(false)}
+                onConfirm={xoaPhongBan}
+                title="Xác nhận xóa"
+                message="Bạn có chắc chắn muốn xóa mục này không? Hành động này không thể hoàn tác."
+                confirmLabel="Xóa"
+                cancelLabel="Hủy"
+            />
+            <SuccessDialog
+                show={showDialogSuccess}
+                onClose={handleCloseDialogSuccess}
+                title="Thành Công"
+                message="Thêm phòng ban thành công"
+            />
+        <PopupForm show={show} handleClose={handleClose} setPhongBan={setPhongBan} setShowDialogSuccess={setShowDialogSuccess}/>
             <TableContainer component={Paper}>
                 <Table className="font-Inter">
                     <TableHead>
                         <TableRow id="table-row-color">
                             <TableCell className="text-white">STT</TableCell>
-                            <TableCell className="text-white">Tên Phòng Ban</TableCell> 
-                            <TableCell><button className='btn btn-success' onClick={handleShow}>+</button></TableCell>
+                            <TableCell className="text-white">Tên Phòng Ban</TableCell>
+                            <TableCell width={200} className="text-center">
+                                <button
+                                    className="btn btn-success btn-sm"
+                                    onClick={handleShow}
+                                    title="Thêm phòng ban mới"
+                                >
+                                    <i className="fas fa-plus-circle me-2"></i>Thêm phòng ban
+                                </button>
+                            </TableCell>
+
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {phongBan.map((item, index) => (
-                            <TableRow>
+                            <TableRow key={`phonBan-${index}`}>
                                 <TableCell>{index+1}</TableCell>
                                 <TableCell>
                                 {item.isEditing ? (
@@ -191,10 +212,22 @@ const PhongBan = () => {
                                     )}      
                                 </TableCell>
                                 <TableCell>
-                                    <button className="btn btn-primary" onClick={() => handleEditClick(item.idPhongBan)}>Sửa</button>
-                                    <br/>
-                                    <button className="btn btn-danger mt-2" onClick={() => xoaPhongBan(item.idPhongBan)}>Xóa</button>        
+                                    <div className="d-flex flex-column align-items-start btn-group-vertical" role="group">
+                                        <button
+                                            className="btn btn-outline-primary btn-sm mb-2"
+                                            onClick={() => handleEditClick(item.idPhongBan)}
+                                        >
+                                            <i className="fas fa-edit me-2"></i>Sửa
+                                        </button>
+                                        <button
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={() => handleXoaoaPhongBan(item.idPhongBan)}
+                                        >
+                                            <i className="fas fa-trash-alt me-2"></i>Xóa
+                                        </button>
+                                    </div>
                                 </TableCell>
+
                             </TableRow>
                         ))} 
                     </TableBody>

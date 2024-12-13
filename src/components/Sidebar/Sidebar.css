@@ -68,3 +68,8 @@
 table {
   background-color: white;
 }
+.centered-menu-item {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}

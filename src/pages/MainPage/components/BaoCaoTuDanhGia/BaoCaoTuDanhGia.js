@@ -469,45 +469,56 @@ const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
         // navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
     }
     return (
-        <div className="content bg-white m-3 p-4">
+        <div className="content bg-white">
             <style>
-
+                {`
+                .section-header {
+                    font-weight: bold;
+                    margin-bottom: 1rem;
+                }
+                .btn-group-custom .btn {
+                    margin-bottom: 0.5rem; /* Add spacing between buttons on small screens */
+                }
+                `}
             </style>
-            <p>BÁO CÁO TỰ ĐÁNH GIÁ <b>{chuongTrinhDaoTao.tenCtdt}</b></p>
-            <b>Kế hoạch</b>
-            <div className="mt-2">
-                <Row>
-                    <Col md={2} xs={12}>
-                        <button className="btn btn-success">Kế hoạch tự đánh giá</button>
-                    </Col>
-                    <Col md={2} xs={12}>
-                        <button className="btn btn-success">Hội đồng tự đánh giá</button>
-                    </Col>
-                    <Col md={2} xs={12}>
-                        <button className="btn btn-success">Các nhóm chuyên trách</button>
-                    </Col>
-                </Row>
+
+            {/* Header Section */}
+            <h4 className="text-center text-uppercase mb-4">Báo Cáo Tự Đánh Giá</h4>
+            <p className="text-center"><b>{chuongTrinhDaoTao.tenCtdt}</b></p>
+
+            {/* Kế hoạch Section */}
+            <div className="mb-4">
+                <h5 className="section-header">Kế hoạch</h5>
+                <div className="btn-group-custom d-flex flex-wrap">
+                    <button className="btn btn-outline-success me-2 flex-grow-1">Kế hoạch tự đánh giá</button>
+                    <button className="btn btn-outline-success me-2 flex-grow-1">Hội đồng tự đánh giá</button>
+                    <button className="btn btn-outline-success flex-grow-1">Các nhóm chuyên trách</button>
+                </div>
             </div>
-            <br/>
-            <b>Viết báo cáo</b>
-            <div className="mt-2">
-                <Row>
-                    <Col md={3} xs={12}>
-                        <button className="btn btn-success" onClick={() => goToVietBaoCao()}>Viết báo cáo tiêu chuẩn / tiêu chí
-                        </button>
-                    </Col>
-                </Row>
+
+            {/* Viết báo cáo Section */}
+            <div className="mb-4">
+                <h5 className="section-header">Viết báo cáo</h5>
+                <button
+                    className="btn btn-outline-primary w-100 py-2"
+                    onClick={() => goToVietBaoCao()}
+                >
+                    <i className="fas fa-pen me-2"></i> Viết báo cáo tiêu chuẩn / tiêu chí
+                </button>
             </div>
-            <br/>
-            <b>Tổng hợp</b>
-            <div className="mt-2">
-                <Row>
-                    <Col md={2} xs={12}>
-                        <button className="btn btn-primary" onClick={() => handleExportToDocx()}>Tổng hợp</button>
-                    </Col>
-                </Row>
+
+            {/* Tổng hợp Section */}
+            <div>
+                <h5 className="section-header">Tổng hợp</h5>
+                <button
+                    className="btn btn-outline-info w-100 py-2"
+                    onClick={() => handleExportToDocx()}
+                >
+                    <i className="fas fa-file-export me-2"></i> Tổng hợp
+                </button>
             </div>
         </div>
+
     );
 }
 export default BaoCaoTuDanhGia;

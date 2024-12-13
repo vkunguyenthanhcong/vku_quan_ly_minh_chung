@@ -16,33 +16,54 @@ const TrangChuAdmin = () => {
         navigate('quan-ly-giang-vien')
     }
     return (
-        <div className="content" style={{background: "white", margin: "20px"}}>
-            <div>
-                <p>QUẢN LÝ CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</p>
-                <hr/>
-                <button className='btn btn-success' onClick={goToChuanKiemDinh}>Quản lý và chia nhóm đánh giá</button>
-            </div>
+        <div className="content bg-white p-4 m-3">
+            <h5 className="text-center fw-bold mb-4">Quản lý</h5>
 
-            <div className="mt-4">
-                <p>QUẢN LÝ CHƯƠNG TRÌNH ĐÀO TẠO</p>
-                <hr/>
-                <button style={{marginRight: '10px'}} className='btn btn-success' onClick={goToChuongTrinhDaoTao}>Quản
-                    lý
-                </button>
+            <div className="row g-4">
+                {/* Quản lý Chuẩn Kiểm Định */}
+                <div className="col-md-6">
+                    <div className="p-3 border rounded bg-light">
+                        <h6 className="fw-bold text-primary">QUẢN LÝ CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</h6>
+                        <hr/>
+                        <button className="btn btn-success w-100" onClick={goToChuanKiemDinh}>
+                            <i className="fas fa-users-cog me-2"></i>Quản lý và chia nhóm đánh giá
+                        </button>
+                    </div>
+                </div>
 
-            </div>
-            <div className="mt-4">
-                <p>QUẢN LÝ PHÒNG BAN</p>
-                <hr/>
-                <button className='btn btn-success' onClick={goToQuanLyPhongBan}>Quản lý</button>
-            </div>
+                {/* Quản lý Chương Trình Đào Tạo */}
+                <div className="col-md-6">
+                    <div className="p-3 border rounded bg-light">
+                        <h6 className="fw-bold text-primary">QUẢN LÝ CHƯƠNG TRÌNH ĐÀO TẠO</h6>
+                        <hr/>
+                        <button className="btn btn-success w-100" onClick={goToChuongTrinhDaoTao}>
+                            <i className="fas fa-chalkboard-teacher me-2"></i>Quản lý
+                        </button>
+                    </div>
+                </div>
 
-            <div className="mt-4">
-                <p>QUẢN LÝ GIẢNG VIÊN</p>
-                <hr/>
-                <button className='btn btn-success' onClick={goToQuanLyGiangVien}>Quản lý</button>
-            </div>
+                {/* Quản lý Phòng Ban */}
+                <div className="col-md-6">
+                    <div className="p-3 border rounded bg-light">
+                        <h6 className="fw-bold text-primary">QUẢN LÝ PHÒNG BAN</h6>
+                        <hr/>
+                        <button className="btn btn-success w-100" onClick={goToQuanLyPhongBan}>
+                            <i className="fas fa-building me-2"></i>Quản lý
+                        </button>
+                    </div>
+                </div>
 
+                {/* Quản lý Giảng Viên */}
+                <div className="col-md-6">
+                    <div className="p-3 border rounded bg-light">
+                        <h6 className="fw-bold text-primary">QUẢN LÝ GIẢNG VIÊN</h6>
+                        <hr/>
+                        <button className="btn btn-success w-100" onClick={goToQuanLyGiangVien}>
+                            <i className="fas fa-user-tie me-2"></i>Quản lý
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
