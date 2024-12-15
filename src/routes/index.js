@@ -30,6 +30,7 @@ import DinhNghiaTieuChuan from "../pages/Admin/components/DinhNghiaTieuChuan/Din
 import PublicRoute from "../services/PublicRoute";
 import VietBaoCaoTieuChuan from "../pages/MainPage/components/VietBaoCaoTieuChuan/VietBaoCaoTieuChuan";
 import DanhGiaTieuChuan from "../pages/DanhGiaTieuChuan/DanhGiaTieuChuan";
+import SignUpLecturer from "../pages/HomePage/Components/DangNhapForm/RegisterForm";
 
 const routes = [
   {
@@ -52,6 +53,10 @@ const routes = [
   {
     path: "/",
     element: <PublicRoute element={<HomePage />} />,
+  },
+  {
+    path: "/dang-ky",
+    element: <PublicRoute element={<SignUpLecturer/>} />,
   },
   {
     path: "/danh-muc-minh-chung",

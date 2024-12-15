@@ -8,6 +8,7 @@ const api = axios.create({
         'Content-Type': 'application/json',
     },
 });
+
 export const urlDefault = `http://${ipAddress}:1309`;
 const isTokenExpired = (token) => {
     if (!token) return true;
@@ -50,12 +51,36 @@ export const getThongTinDangNhap = (token) => {
             throw error;
         });
 };
+
 export const updateUser = (formData, token) => {
     return api.put(`http://${ipAddress}:1309/admin/update`, formData, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
 
+        }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+
+export const registerUser = (formData) => {
+    return api.post(`../auth/register`, formData, {
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+export const uploadImageAvatar = (file) => {
+    const formData = new FormData();
+    formData.append('file', file);  // 'file' is the name of the field expected by the server
+
+    return api.post('../public/upload/avatar', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data' // This is optional; axios will handle it automatically
         }
     }).then(response => response.data)
         .catch(error => {
@@ -714,12 +739,20 @@ export const getNganh = (token) => {
 };
 
 //phong ban
-
 export const getPhongBan = (token) => {
     return api.get(`/phongban`, {
         headers: {
             Authorization: `Bearer ${token}`
         }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+export const getPhongBanWithoutToken = () => {
+    return api.get(`../public/phongban`, {
     })
         .then(response => response.data)
         .catch(error => {

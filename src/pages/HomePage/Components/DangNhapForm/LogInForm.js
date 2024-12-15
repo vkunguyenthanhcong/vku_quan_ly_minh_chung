@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './LogInForm.css';
-import { Row, Col } from 'react-bootstrap';
-import { login } from '../../../../services/apiServices';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../../../../services/apiServices';
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 
 const LogInForm = ({ isVisible, onClose }) => {
@@ -19,13 +18,16 @@ const LogInForm = ({ isVisible, onClose }) => {
         try {
             const userData = await login(email, password);
             if (userData.token) {
+                // Save user data in localStorage
                 localStorage.setItem('token', userData.token);
                 localStorage.setItem('role', userData.role);
                 localStorage.setItem('phongBan', userData.phongBan.idPhongBan);
                 setOpen(false);
-                if (localStorage.getItem("role") === "ADMIN") {
+
+                // Navigate based on user role
+                if (userData.role === "ADMIN") {
                     navigate('/admin');
-                } else if (localStorage.getItem("role") === "USER") {
+                } else if (userData.role === "USER") {
                     navigate('/quan-ly');
                 }
             } else {
@@ -38,26 +40,16 @@ const LogInForm = ({ isVisible, onClose }) => {
             setTimeout(() => {
                 setOpen(false);
                 setError('');
-            }, 3*60*1000);
+            }, 3 * 60 * 1000); // Clear error after 3 minutes
         }
     };
 
-    // Xử lý thay đổi email
-    const handleEmailChange = (e) => {
-        setEmail(e.target.value);
-    };
-
-    // Xử lý thay đổi mật khẩu
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-    };
-
-    // Chuyển đổi trạng thái hiển thị mật khẩu
+    // Toggle password visibility
     const handleTogglePassword = () => {
         setShowPassword((prevState) => !prevState);
     };
 
-    // Không hiển thị form nếu `isVisible` là false
+    // Do not display the form if `isVisible` is false
     if (!isVisible) return null;
 
     return (
@@ -68,20 +60,19 @@ const LogInForm = ({ isVisible, onClose }) => {
                 <div className="text-center mb-4">
                     <img
                         className="login-logo"
-
-                        src={require("../../../../components/images/Logo-Truong-Dai-hoc-CNTT-va-Truyen-thong-Viet-Han-Dai-hoc-Da-Nang.png")} // Replace with your logo path
+                        src={require("../../../../components/images/Logo-Truong-Dai-hoc-CNTT-va-Truyen-thong-Viet-Han-Dai-hoc-Da-Nang.png")}
                         alt="VKU Logo"
                     />
                 </div>
 
-                <form onSubmit={(e) => handleSubmit(e, email, password)}>
+                <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label className="form-label">Email</label>
                         <input
                             type="email"
                             className="form-control"
                             value={email}
-                            onChange={handleEmailChange}
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Nhập email"
                             required
                         />
@@ -94,7 +85,7 @@ const LogInForm = ({ isVisible, onClose }) => {
                                 type={showPassword ? "text" : "password"}
                                 className="form-control"
                                 value={password}
-                                onChange={handlePasswordChange}
+                                onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Nhập mật khẩu"
                                 required
                             />
@@ -110,22 +101,25 @@ const LogInForm = ({ isVisible, onClose }) => {
 
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <input type="checkbox" id="rememberMe"/>
+                            <input type="checkbox" id="rememberMe" />
                             <label htmlFor="rememberMe" className="ms-2">Ghi nhớ đăng nhập</label>
                         </div>
                         <p className="mb-0">
                             Không có tài khoản?{" "}
-                            <a href="/register" className="register-link">Đăng ký</a>
+                            <a href="/dang-ky" className="register-link">Đăng ký</a>
                         </p>
                     </div>
 
                     <div className="text-center">
                         <button type="submit" className="btn btn-success w-100">Đăng Nhập</button>
                     </div>
+
+                    {error && <p className="text-danger mt-3">{error}</p>}
                 </form>
+
+                {open && <LoadingProcess />}
             </div>
         </div>
-
     );
 };
 
