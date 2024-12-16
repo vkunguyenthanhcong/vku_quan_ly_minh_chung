@@ -5,26 +5,13 @@ import { getThongTinDangNhap } from '../../services/apiServices';
 
 const Navbar = ({ toggleMenuWidth }) => {
   const currentYear = new Date().getFullYear();
-  const token = localStorage.getItem('token');
   const [user, setUser] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const userData = await getThongTinDangNhap(token);
-        setUser(userData.user);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [token]);
+    setUser({"fullName" : localStorage.getItem("fullName"), "avatar" : localStorage.getItem("avatar")});
+  }, []);
   return (
     <div className='nav-menu' style={{paddingTop : '10px', paddingBottom : '10px'}}>
       <ul className='d-flex justify-content-end align-items-center' style={{marginRight : '50px', flexWrap : 'wrap'}}>

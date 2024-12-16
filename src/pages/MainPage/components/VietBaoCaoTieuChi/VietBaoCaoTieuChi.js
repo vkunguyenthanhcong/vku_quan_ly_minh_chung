@@ -233,7 +233,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
 
         const response_4 = await getAllPhieuDanhGia();
         if (response_4) {
-            const filterPhieuDanhGia = response_4.filter((item) => item.idTieuChuan == TieuChuan_ID && item.idTieuChi == TieuChi_ID);
+            const filterPhieuDanhGia = response_4.filter((item) => item.idTieuChuan === TieuChuan_ID && item.idTieuChi === TieuChi_ID);
             if (filterPhieuDanhGia && filterPhieuDanhGia.length > 0) {
                 const firstItem = filterPhieuDanhGia[0];
 
@@ -432,7 +432,8 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
             data.append('diemTonTai', diemYeu);
             data.append('mucDanhGia', mucDanhGia);
             data.append("keHoach", keHoach)
-            if (phieuDanhGia?.length == 0) {
+            if (phieuDanhGia?.length === 0) {
+                data.append("nguoiVietBaoCao", localStorage.getItem("fullName"));
                 const response = await savePhieuDanhGiaTieuChi(data);
                 if (response === "OK") {
                     fetchData()

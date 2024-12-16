@@ -710,6 +710,19 @@ export const login = (email, password) => {
             throw error;
         });
 };
+//check is accept
+export const checkIsAccept = (token) => {
+    return api.get(`../auth/isAccept`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            throw error;
+        });
+};
 //khoa
 export const getKhoa = (token) => {
     return api.get(`/khoa`, {
@@ -720,6 +733,29 @@ export const getKhoa = (token) => {
         .then(response => response.data)
         .catch(error => {
             console.error('Error fetching data:', error);
+            throw error;
+        });
+};
+//xoa khoa
+export const deleteKhoa = (maKhoa, token) => {
+    return api.delete(`/khoa/${maKhoa}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//edit khoa
+export const editKhoa = (formData,maKhoa, token) => {
+    return api.put(`/khoa/${maKhoa}`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
             throw error;
         });
 };
@@ -783,6 +819,18 @@ export const savePhongBan = (phongBan, token) => {
     }).then(response => response.data)
         .catch(error => {
             console.error('Error:', error);
+            throw error;
+        });
+};
+//save khoa
+export const saveKhoa = (khoa, token) => {
+    return api.post('/khoa', khoa, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
             throw error;
         });
 };

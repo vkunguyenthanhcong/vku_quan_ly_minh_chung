@@ -503,7 +503,36 @@ const DanhGiaTieuChi = () => {
                         ...[].concat(
                             ...phieuDanhGia.map((item) => createTableMucDanhGia(item.mucDanhGia))
                         ),
-
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: 'Người Viết Báo Cáo',
+                                    size: 26,
+                                    font: "Times New Roman",
+                                    bold: true
+                                })
+                            ],
+                            spacing: {
+                                before: 360,
+                                line: 1080,
+                            },
+                            alignment: AlignmentType.END
+                        }),
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: `${phieuDanhGia.map((item) => item.nguoiVietBaoCao)}`,
+                                    size: 26,
+                                    font: "Times New Roman",
+                                    bold: true
+                                })
+                            ],
+                            spacing: {
+                                before: 360,
+                                line: 360,
+                            },
+                            alignment: AlignmentType.END
+                        }),
                     ],
                 },
             ],
@@ -639,7 +668,9 @@ const DanhGiaTieuChi = () => {
             </style>
             {phieuDanhGia && phieuDanhGia.length > 0 ? (
                 phieuDanhGia.map((item, index) => (
+
                     <div ref={contentRef} className="a4-size" id="phieudanhgia" key={index}>
+
                         <style>
                             {`
                           td{
@@ -664,7 +695,8 @@ const DanhGiaTieuChi = () => {
                             <p className="a4-tab" style={{textAlign: "justify"}}><b>Tiêu
                                 chuẩn {tieuChuan.stt} : {tieuChuan.tenTieuChuan}</b>
                             </p>
-                            <p className="a4-tab" style={{textAlign: "justify"}}><b>Tiêu chí {tieuChi.stt} : {tieuChi.tenTieuChi}</b>
+                            <p className="a4-tab" style={{textAlign: "justify"}}><b>Tiêu
+                                chí {tieuChi.stt} : {tieuChi.tenTieuChi}</b>
                             </p>
                             <p className="a4-tab"><b>1. Mô tả</b></p>
                             <p className="a4-mota">
@@ -717,6 +749,7 @@ const DanhGiaTieuChi = () => {
                                 </tbody>
                             </table>
                             <p className="text-end mt-5"><b>Người Viết Báo Cáo</b></p>
+                            <p className="text-end mt-5"><b>{item.nguoiVietBaoCao}</b></p>
                         </div>
                     </div>
                 ))

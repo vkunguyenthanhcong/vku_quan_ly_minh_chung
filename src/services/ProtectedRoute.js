@@ -15,12 +15,13 @@ const isTokenExpired = (token) => {
     }
 };
 
-const checkAuthAndRole = (requiredRoles) => {
+const checkAuthAndRole =  (requiredRoles) => {
     const token = localStorage.getItem('token');
     if (!token || isTokenExpired(token)) {
         console.log('Token is missing or expired');
         return false; // Token is either missing or expired
     }
+
     const userRole = localStorage.getItem('role');
     return requiredRoles.includes(userRole);
 };

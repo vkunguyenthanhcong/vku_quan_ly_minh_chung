@@ -15,6 +15,9 @@ const TrangChuAdmin = () => {
     const goToQuanLyGiangVien = () => {
         navigate('quan-ly-giang-vien')
     }
+    const goToQuanLyKhoa = () => {
+        navigate('khoa')
+    }
     return (
         <div className="content bg-white p-4 m-3">
             <h5 className="text-center fw-bold mb-4">Quản lý</h5>
@@ -60,6 +63,28 @@ const TrangChuAdmin = () => {
                         <hr/>
                         <button className="btn btn-success w-100" onClick={goToQuanLyGiangVien}>
                             <i className="fas fa-user-tie me-2"></i>Quản lý
+                        </button>
+                    </div>
+                </div>
+
+                {/* Quản lý Khoa */}
+                <div className="col-md-6">
+                    <div className="p-3 border rounded bg-light">
+                        <h6 className="fw-bold text-primary">QUẢN LÝ KHOA</h6>
+                        <hr/>
+                        <button className="btn btn-success w-100" onClick={goToQuanLyKhoa}>
+                            <i className="fas fa-briefcase me-2"></i>Quản lý
+                        </button>
+                    </div>
+                </div>
+
+                {/* Quản lý Nganh */}
+                <div className="col-md-6">
+                    <div className="p-3 border rounded bg-light">
+                        <h6 className="fw-bold text-primary">QUẢN LÝ NGÀNH</h6>
+                        <hr/>
+                        <button className="btn btn-success w-100" onClick={goToQuanLyGiangVien}>
+                            <i className="fas fa-book me-2"></i>Quản lý
                         </button>
                     </div>
                 </div>

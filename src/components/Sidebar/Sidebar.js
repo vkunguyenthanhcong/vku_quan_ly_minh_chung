@@ -8,7 +8,6 @@ import { getThongTinDangNhap } from '../../services/apiServices';
 
 
 const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
-  const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,20 +21,8 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const userData = await getThongTinDangNhap(token);
-        setUser(userData.user);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [token]);
+    setUser({"fullName" : localStorage.getItem("fullName"), "avatar" : localStorage.getItem("avatar")});
+  }, []);
   const MenuItem = ({ to, label, isLink }) => (
     <li className={`${isScreenSmall || !isMenuExpanded ? 'd-flex align-items-center justify-content-center centered-menu-item' : ''}`}>
       <i className={`${isScreenSmall || !isMenuExpanded ? 'fas fa-graduation-cap' : 'fas fa-graduation-cap me-2'}`} />

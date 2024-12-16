@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import './LogInForm.css';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../../../../services/apiServices';
+import {getThongTinDangNhap, login} from '../../../../services/apiServices';
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+import Notification from "../../../../components/ConfirmDialog/Notification";
 
 const LogInForm = ({ isVisible, onClose }) => {
     const [email, setEmail] = useState('');
@@ -11,29 +12,38 @@ const LogInForm = ({ isVisible, onClose }) => {
     const [open, setOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const [denied, setDenied] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setOpen(true);
         try {
             const userData = await login(email, password);
-            if (userData.token) {
-                // Save user data in localStorage
-                localStorage.setItem('token', userData.token);
-                localStorage.setItem('role', userData.role);
-                localStorage.setItem('phongBan', userData.phongBan.idPhongBan);
-                setOpen(false);
+            if(!userData.isAccept){
+                setDenied(true);
+            }else{
+                if (userData.token) {
+                    // Save user data in localStorage
+                    localStorage.setItem('token', userData.token);
+                    localStorage.setItem('role', userData.role);
+                    localStorage.setItem('phongBan', userData.phongBan.idPhongBan);
 
-                // Navigate based on user role
-                if (userData.role === "ADMIN") {
-                    navigate('/admin');
-                } else if (userData.role === "USER") {
-                    navigate('/quan-ly');
+                    const user = await getThongTinDangNhap(userData.token);
+                    localStorage.setItem("fullName", user.user.fullName);
+                    localStorage.setItem("avatar", user.user.avatar);
+                    setOpen(false);
+
+                    // Navigate based on user role
+                    if (userData.role === "ADMIN") {
+                        navigate('/admin');
+                    } else if (userData.role === "USER") {
+                        navigate('/quan-ly');
+                    }
+                } else {
+                    alert("Đăng Nhập Thất Bại. Vui Lòng Kiểm Tra Lại Tài Khoản Hoặc Mật Khẩu!!!");
+                    setError(userData.message);
+                    setOpen(false);
                 }
-            } else {
-                alert("Đăng Nhập Thất Bại. Vui Lòng Kiểm Tra Lại Tài Khoản Hoặc Mật Khẩu!!!");
-                setError(userData.message);
-                setOpen(false);
             }
         } catch (error) {
             setError(error.message);
@@ -118,6 +128,7 @@ const LogInForm = ({ isVisible, onClose }) => {
                 </form>
 
                 {open && <LoadingProcess />}
+                {denied && <Notification title="Từ Chối Truy Cập" message="Bạn chưa có quyền truy cập vào hệ thống. Liên hệ quản trị viên để được giải quyết"  onClose={setDenied}/>}
             </div>
         </div>
     );

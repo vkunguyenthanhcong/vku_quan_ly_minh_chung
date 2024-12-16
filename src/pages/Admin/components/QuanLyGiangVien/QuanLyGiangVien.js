@@ -56,6 +56,19 @@ function QuanLyGiangVien() {
             )
         );
     };
+    const handleChangeIsAccept = (userId, event) => {
+        const newAccept = event.target.checked;
+        setUser((prevUsers) =>
+            prevUsers.map((user) =>
+                user.id === userId // Match based on itemId
+                    ? {
+                        ...user,
+                        isAccept: newAccept, // Update isAccept property
+                    }
+                    : user
+            )
+        );
+    };
     const editGiangVien = async (idGiangVien) => {
         setOpen(true)
         const filterGiangVien = user.find((item) => item.id === idGiangVien);
@@ -64,6 +77,7 @@ function QuanLyGiangVien() {
             const formData = {
                 id : filterGiangVien.id,
                 idPhongBan : filterGiangVien.phongBan.idPhongBan,
+                isAccept : filterGiangVien.isAccept
             }
             try {
                 const response = await updateUser(formData);
@@ -101,6 +115,7 @@ function QuanLyGiangVien() {
                         <TableCell className="text-white">Số điện thoại</TableCell>
 
                         <TableCell className="text-white">Phòng ban</TableCell>
+                        <TableCell className="text-white">Quyền truy cập</TableCell>
                         <TableCell className="text-white">Hình ảnh</TableCell>
                         <TableCell>
                         </TableCell>
@@ -129,11 +144,19 @@ function QuanLyGiangVien() {
                                     </option>))}
                             </select>
                         </TableCell>
+                        <TableCell className="text-center align-middle">
+                            <input
+                                className="form-check-input mx-auto"
+                                type="checkbox"
+                                checked={item.isAccept} // Reflect the current state
+                                onChange={(event) => handleChangeIsAccept(item.id, event)}
+                            />
+                        </TableCell>
                         <TableCell>
                             <img src={item.avatar} width="50" height="50"/>
                         </TableCell>
                         <TableCell>
-                            <div className="d-flex flex-column align-items-start gap-2 btn-group-vertical" role="group">
+                        <div className="d-flex flex-column align-items-start gap-2 btn-group-vertical" role="group">
                                 <button
                                     className="btn btn-outline-primary btn-sm"
                                     onClick={() => editGiangVien(item.id)}
