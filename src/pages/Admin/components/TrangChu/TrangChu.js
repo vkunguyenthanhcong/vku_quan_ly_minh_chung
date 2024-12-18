@@ -20,7 +20,17 @@ const TrangChuAdmin = () => {
     }
     return (
         <div className="content bg-white p-4 m-3">
-            <h5 className="text-center fw-bold mb-4">Quản lý</h5>
+        <style>
+                {
+                    `.btn {
+                          font-size : 14px;
+                          padding-top : 12px;
+                          padding-bottom : 12px;
+                        }
+                        `
+                }
+            </style>
+            <h5 className="text-center fw-bold mb-4">QUẢN LÝ HỆ THỐNG</h5>
 
             <div className="row g-4">
                 {/* Quản lý Chuẩn Kiểm Định */}
@@ -28,7 +38,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ CHUẨN KIỂM ĐỊNH CHẤT LƯỢNG</h6>
                         <hr/>
-                        <button className="btn btn-success w-100" onClick={goToChuanKiemDinh}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToChuanKiemDinh}>
                             <i className="fas fa-users-cog me-2"></i>Quản lý và chia nhóm đánh giá
                         </button>
                     </div>
@@ -39,7 +49,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ CHƯƠNG TRÌNH ĐÀO TẠO</h6>
                         <hr/>
-                        <button className="btn btn-success w-100" onClick={goToChuongTrinhDaoTao}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToChuongTrinhDaoTao}>
                             <i className="fas fa-chalkboard-teacher me-2"></i>Quản lý
                         </button>
                     </div>
@@ -50,7 +60,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ PHÒNG BAN</h6>
                         <hr/>
-                        <button className="btn btn-success w-100" onClick={goToQuanLyPhongBan}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToQuanLyPhongBan}>
                             <i className="fas fa-building me-2"></i>Quản lý
                         </button>
                     </div>
@@ -61,7 +71,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ GIẢNG VIÊN</h6>
                         <hr/>
-                        <button className="btn btn-success w-100" onClick={goToQuanLyGiangVien}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToQuanLyGiangVien}>
                             <i className="fas fa-user-tie me-2"></i>Quản lý
                         </button>
                     </div>
@@ -72,7 +82,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ KHOA</h6>
                         <hr/>
-                        <button className="btn btn-success w-100" onClick={goToQuanLyKhoa}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToQuanLyKhoa}>
                             <i className="fas fa-briefcase me-2"></i>Quản lý
                         </button>
                     </div>
@@ -83,7 +93,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ NGÀNH</h6>
                         <hr/>
-                        <button className="btn btn-success w-100" onClick={goToQuanLyGiangVien}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToQuanLyGiangVien}>
                             <i className="fas fa-book me-2"></i>Quản lý
                         </button>
                     </div>

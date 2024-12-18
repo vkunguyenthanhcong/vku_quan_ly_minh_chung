@@ -19,6 +19,7 @@ const LogInForm = ({ isVisible, onClose }) => {
         setOpen(true);
         try {
             const userData = await login(email, password);
+          
             if(!userData.isAccept){
                 setDenied(true);
             }else{
@@ -29,10 +30,10 @@ const LogInForm = ({ isVisible, onClose }) => {
                     localStorage.setItem('phongBan', userData.phongBan.idPhongBan);
 
                     const user = await getThongTinDangNhap(userData.token);
+                    
                     localStorage.setItem("fullName", user.user.fullName);
                     localStorage.setItem("avatar", user.user.avatar);
                     setOpen(false);
-
                     // Navigate based on user role
                     if (userData.role === "ADMIN") {
                         navigate('/admin');
@@ -127,7 +128,7 @@ const LogInForm = ({ isVisible, onClose }) => {
                     {error && <p className="text-danger mt-3">{error}</p>}
                 </form>
 
-                {open && <LoadingProcess />}
+                {open ? <LoadingProcess open={open}/> : null}
                 {denied && <Notification title="Từ Chối Truy Cập" message="Bạn chưa có quyền truy cập vào hệ thống. Liên hệ quản trị viên để được giải quyết"  onClose={setDenied}/>}
             </div>
         </div>
