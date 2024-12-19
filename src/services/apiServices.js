@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-const ipAddress = "192.168.1.49"
+const ipAddress = "localhost"
 const api = axios.create({
     baseURL: `http://${ipAddress}:1309/api`, // Replace with your API base URL
     timeout: 200000, // Optional: set a timeout for requests
@@ -746,9 +746,32 @@ export const deleteKhoa = (maKhoa, token) => {
             throw error;
         });
 };
+//xoa nganh
+export const deleteNganh = (maNganh, token) => {
+    return api.delete(`/nganh/${maNganh}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
 //edit khoa
 export const editKhoa = (formData,maKhoa, token) => {
     return api.put(`/khoa/${maKhoa}`, formData, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            console.error('Error:', error);
+            throw error;
+        });
+};
+//edit nganh
+export const editNganh = (formData,maNganh, token) => {
+    return api.put(`/nganh/${maNganh}`, formData, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
@@ -825,6 +848,19 @@ export const savePhongBan = (phongBan, token) => {
 //save khoa
 export const saveKhoa = (khoa, token) => {
     return api.post('/khoa', khoa, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+    }).then(response => response.data)
+        .catch(error => {
+            throw error;
+        });
+};
+
+//save nganh
+export const saveNganh = (nganh, token) => {
+    return api.post('/nganh', nganh, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`

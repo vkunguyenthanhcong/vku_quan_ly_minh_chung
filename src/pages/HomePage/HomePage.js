@@ -3,16 +3,18 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import './HomePage.css';
 import LogInForm from './Components/DangNhapForm/LogInForm';
+import LoadingProcess from '../../components/LoadingProcess/LoadingProcess';
 
 const Homepage = () => {
   const [isLogInVisible, setIsLogInVisible] = useState(false);
-
+  const [open, setOpen] = useState(false);
   const showLogIn = () => setIsLogInVisible(true);
   const hideLogIn = () => setIsLogInVisible(false);
 
   return (
-      <Container fluid style={{ height: '100vh' }}>
-        <LogInForm isVisible={isLogInVisible} onClose={hideLogIn} />
+      <Container fluid style={{ height: '100vh' }}> 
+      <LoadingProcess open={open}/>
+        <LogInForm isVisible={isLogInVisible} setOpen={setOpen} onClose={hideLogIn} />
         <Row className="no-gutters h-100">
           <Col xs={12} md={8} className="text-white d-flex no-padding d-none d-md-flex">
             <div>

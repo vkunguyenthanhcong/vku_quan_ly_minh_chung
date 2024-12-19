@@ -18,6 +18,9 @@ const TrangChuAdmin = () => {
     const goToQuanLyKhoa = () => {
         navigate('khoa')
     }
+    const goToQuanLyNganh = () => {
+        navigate('nganh')
+    }
     return (
         <div className="content bg-white p-4 m-3">
         <style>
@@ -93,7 +96,7 @@ const TrangChuAdmin = () => {
                     <div className="p-3 border rounded bg-light">
                         <h6 className="fw-bold text-primary">QUẢN LÝ NGÀNH</h6>
                         <hr/>
-                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToQuanLyGiangVien}>
+                        <button className="btn btn-success w-100 text-uppercase fw-bold" onClick={goToQuanLyNganh}>
                             <i className="fas fa-book me-2"></i>Quản lý
                         </button>
                     </div>

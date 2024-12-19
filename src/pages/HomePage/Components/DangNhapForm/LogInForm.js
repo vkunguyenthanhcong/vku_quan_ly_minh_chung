@@ -4,15 +4,16 @@ import { useNavigate } from 'react-router-dom';
 import {getThongTinDangNhap, login} from '../../../../services/apiServices';
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 import Notification from "../../../../components/ConfirmDialog/Notification";
+import zIndex from '@mui/material/styles/zIndex';
 
-const LogInForm = ({ isVisible, onClose }) => {
+const LogInForm = ({ isVisible,setOpen,  onClose }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [open, setOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const [denied, setDenied] = useState(false);
+    const [wrong, setWrong] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,7 +35,7 @@ const LogInForm = ({ isVisible, onClose }) => {
                     localStorage.setItem("fullName", user.user.fullName);
                     localStorage.setItem("avatar", user.user.avatar);
                     setOpen(false);
-                    // Navigate based on user role
+
                     if (userData.role === "ADMIN") {
                         navigate('/admin');
                     } else if (userData.role === "USER") {
@@ -64,7 +65,9 @@ const LogInForm = ({ isVisible, onClose }) => {
     if (!isVisible) return null;
 
     return (
+        <>
         <div className="login-overlay">
+        
             <div className="login-form">
                 <button className="close-btn" onClick={onClose}>&times;</button>
 
@@ -128,10 +131,12 @@ const LogInForm = ({ isVisible, onClose }) => {
                     {error && <p className="text-danger mt-3">{error}</p>}
                 </form>
 
-                {open ? <LoadingProcess open={open}/> : null}
+                
                 {denied && <Notification title="Từ Chối Truy Cập" message="Bạn chưa có quyền truy cập vào hệ thống. Liên hệ quản trị viên để được giải quyết"  onClose={setDenied}/>}
+                {wrong && <Notification title="Sai Thông Tin Đăng Nhập" message="Bạn vui lòng kiểm tra lại tài khoản và mật khẩu"  onClose={setWrong}/>}
             </div>
         </div>
+        </>
     );
 };
 

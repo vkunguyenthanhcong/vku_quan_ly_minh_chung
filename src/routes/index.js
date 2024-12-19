@@ -32,6 +32,7 @@ import VietBaoCaoTieuChuan from "../pages/MainPage/components/VietBaoCaoTieuChua
 import DanhGiaTieuChuan from "../pages/DanhGiaTieuChuan/DanhGiaTieuChuan";
 import SignUpLecturer from "../pages/HomePage/Components/DangNhapForm/RegisterForm";
 import Khoa from "../pages/Admin/components/Khoa/Khoa";
+import Nganh from '../pages/Admin/components/Nganh/Nganh';
 
 const routes = [
   {
@@ -83,7 +84,8 @@ const routes = [
       { path: "phan-cong", element: <ProtectedRoute element={<PhanCongBaoCao />} requiredRoles={["ADMIN"]} /> },
       { path: "quan-ly-giang-vien", element: <ProtectedRoute element={<QuanLyGiangVien />} requiredRoles={["ADMIN"]} /> },
       { path: "dinh-nghia-tieu-chuan", element: <ProtectedRoute element={<DinhNghiaTieuChuan />} requiredRoles={["ADMIN"]} /> },
-      { path: "khoa", element: <ProtectedRoute element={<Khoa />} requiredRoles={["ADMIN"]} /> }
+      { path: "khoa", element: <ProtectedRoute element={<Khoa />} requiredRoles={["ADMIN"]} /> },
+      { path: "nganh", element: <ProtectedRoute element={<Nganh />} requiredRoles={["ADMIN"]} /> }
     ],
   }
 ];

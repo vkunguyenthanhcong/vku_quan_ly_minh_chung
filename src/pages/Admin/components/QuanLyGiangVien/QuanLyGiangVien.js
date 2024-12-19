@@ -81,7 +81,7 @@ function QuanLyGiangVien() {
             }
             try {
                 const response = await updateUser(formData);
-                if(response == "OK"){
+                if(response === "OK"){
                     setOpen(false);
                     handleShowDialog();
                 }

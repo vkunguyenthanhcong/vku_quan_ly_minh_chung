@@ -10,7 +10,7 @@ import {
     Paper,
 } from "@mui/material";
 import "./minhChung.css";
-import {useLocation, useNavigate} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {Col, Row} from "react-bootstrap";
 import {
     deleteMinhChung, findTieuChuaByMaCtdt, getAllGoiY,
@@ -49,7 +49,6 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     const [open, setOpen] = useState(false);
 
     const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
     const GoiY_ID = dataTransfer.GoiY_ID;
     const TieuChi_ID = dataTransfer.TieuChi_ID;
     const TieuChuan_ID = dataTransfer.TieuChuan_ID;
@@ -68,10 +67,10 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                 .filter(item => idTieuChuanArray.includes(item.idTieuChuan))
                 .map(item => {
                     const maMinhChung = `${item.parentMaMc || 'H1'}${item.childMaMc || ''}`;
-                    const idMocChuan = goiYAll.find((gy) => gy.idGoiY == item.idGoiY).idMocChuan;
-                    const idTieuChi = mocChuanData.find((mc) => mc.idMocChuan == idMocChuan).idTieuChi;
+                    const idMocChuan = goiYAll.find((gy) => gy.idGoiY === item.idGoiY).idMocChuan;
+                    const idTieuChi = mocChuanData.find((mc) => mc.idMocChuan === idMocChuan).idTieuChi;
                     const khoMinhChung = khoMinhChungData.find(kmc => kmc.idKhoMinhChung === item.idKhoMinhChung);
-                    if (item.maDungChung != 0) {
+                    if (item.maDungChung !== 0) {
                         const matchingItem = minhChungData.find(mc => mc.idMc === item.maDungChung);
 
                         if (matchingItem) {
@@ -108,7 +107,6 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     useEffect(() => {
         fetchData();
     }, []);
-    const navigate = useNavigate();
     const handleClick = () => {
         setNoCase(4);
         setDataTransfer({
@@ -182,13 +180,13 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                     dataMinhChung.append("folderIdParent", tieuChi.idGoogleDrive);
 
                     const filter = minhChung?.filter(item =>
-                        item.maDungChung == 0 && item.idTieuChi == TieuChi_ID
+                        item.maDungChung === 0 && item.idTieuChi === TieuChi_ID
                     );
                     dataMinhChung.append("childMaMc", format2Number(filter.length + 1));
 
-                    const response_1 = await saveFromKMCtoMinhChung(dataMinhChung);
-                    if(response_1 === "OK"){
-                        setOpen(false)
+                    const result = await saveFromKMCtoMinhChung(dataMinhChung);
+                    if(result === "OK"){
+                        result(false)
                         fetchData();
                     }
                 }
@@ -222,7 +220,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
         try {
             setOpen(true);
             const response = await deleteMinhChung(idMc, parentMaMc);
-            if (response == "OK") {
+            if (response === "OK") {
                 setOpen(false);
                 fetchData();
             } else {
@@ -246,15 +244,14 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
     }
     const Button_Them = ({idKMC, idParent}) => {
 
-        const response = minhChung.filter(item => item.khoMinhChung.idKhoMinhChung == idKMC);
+        const response = minhChung.filter(item => item.khoMinhChung.idKhoMinhChung === idKMC);
         // Component DungChung nhận props là data
         const DungChung = ({data}) => {
-            const filteredData = data.filter(item => item.idTieuChi == TieuChi_ID);
+            const filteredData = data.filter(item => item.idTieuChi === TieuChi_ID);
             return (
                 <>
                     {filteredData.length > 0 ? null : (
-                        <button onClick={() => saveDungChung(idKMC, data[0].idMc)} className="btn btn-success"><i className="fas fa-plus me-2"></i> Dùng
-                            chung</button>)}
+                        <button onClick={() => saveDungChung(idKMC, data[0].idMc)} className="btn btn-success"><i className="fas fa-plus"></i></button>)}
                 </>
             );
         };
@@ -266,7 +263,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                 ) : (
                     <button onClick={() => saveFromKMCtoMC(idKMC, idParent)}
                             className="btn btn-success">
-                        <i className="fas fa-plus me-2"></i> Thêm
+                        <i className="fas fa-plus"></i>
                     </button>
                     )}
             </>
@@ -373,19 +370,18 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                     <TableRow key={index}>
                                         <TableCell><b>{row.soHieu}</b></TableCell>
                                         <TableCell><b>{row.tenMinhChung}</b></TableCell>
-                                        <TableCell width={200}>
-                                            <div className="btn-group" role="group">
+                                        <TableCell className="" width={200}>
+                                            <div className="btn-group justify-content-center d-flex" role="group">
                                                 <button
                                                     className="btn btn-secondary"
                                                     onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + row.linkLuuTru + "/preview")}
                                                 >
-                                                    <i className="fas fa-eye me-1"></i><br/>Xem nhanh
-                                                </button>
+                                                    <i className="fas fa-eye"></i></button>
                                                 <button
                                                     className="btn btn-primary"
                                                     onClick={() => handleClickEdit(row.idKhoMinhChung)}
                                                 >
-                                                    <i className="fas fa-edit me-1"></i>Sửa
+                                                    <i className="fas fa-edit me-1"></i>
                                                 </button>
                                                 <Button_Them idKMC={row.idKhoMinhChung} idParent={row.linkLuuTru}/>
                                             </div>
@@ -419,18 +415,17 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
                                             <TableCell>{maMinhChungDisplay}</TableCell>
                                             <TableCell>{item.khoMinhChung.tenMinhChung}</TableCell>
                                             <TableCell>
-                                                <div className="btn-group" role="group">
+                                                <div className="btn-group justify-content-center d-flex" role="group">
                                                     <button
                                                         className="btn btn-secondary"
                                                         onClick={() => handleClickViewPDF("https://drive.google.com/file/d/" + item.linkLuuTru + "/preview")}
                                                     >
-                                                        <i className="fas fa-eye me-1"></i>Xem nhanh
-                                                    </button>
+                                                        <i className="fas fa-eye me-1"></i></button>
                                                     <button
                                                         className="btn btn-danger"
                                                         onClick={() => deleteMC(item.idMc)}
                                                     >
-                                                        <i className="fas fa-trash me-1"></i>Xóa
+                                                        <i className="fas fa-trash me-1"></i>
                                                     </button>
                                                 </div>
                                             </TableCell>
