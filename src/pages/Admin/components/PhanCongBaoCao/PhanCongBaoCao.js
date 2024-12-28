@@ -151,6 +151,9 @@ const TieuChuan = ({sttBatDau, sttKetThuc}) => {
     )
 }
 const PhanCongBaoCao = () => {
+    useEffect(() => {
+        document.title = 'Phân Công Báo Cáo | VKU';
+      },[])
     const [chuanKdcl, setChuanKdcl] = useState([]);
     const [phongBan, setPhongBan] = useState([]);
     const [loading, setLoading] = useState(true);

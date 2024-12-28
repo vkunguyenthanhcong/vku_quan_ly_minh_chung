@@ -124,6 +124,9 @@ const PopupForm = ({ show, handleClose , setNganh, setShowDialogSuccess, setUnav
     );
 };
 const Nganh = () => {
+    useEffect(() => {
+        document.title = 'Ngành | VKU';
+      },[])
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [nganh, setNganh] = useState([]);

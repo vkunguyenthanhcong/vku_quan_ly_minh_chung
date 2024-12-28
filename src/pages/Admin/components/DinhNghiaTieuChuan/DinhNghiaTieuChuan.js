@@ -152,6 +152,9 @@ const PopupForm = ({show, handleClose, fetchData, formData, setFormData}) => {
     );
 };
 const DinhNghiaTieuChuan = () => {
+    useEffect(() => {
+        document.title = 'Định Nghĩa Tiêu Chuẩn | VKU';
+      },[])
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const ChuongTrinh_ID = queryParams.get('ChuongTrinh_ID');

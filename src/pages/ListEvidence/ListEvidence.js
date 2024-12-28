@@ -73,7 +73,7 @@ pdfMake.vfs = {
 const ListEvidence = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const KhungDaoTao_ID = queryParams.get('KhungDaoTao_ID');
+    const KhungDaoTao_ID = queryParams.get('KhungCTDT_ID');
     const [tieuChuan, setTieuChuan] = useState([]);
     const [minhChung, setMinhChung] = useState([])
     const [loading, setLoading] = useState(true);
@@ -89,7 +89,6 @@ const ListEvidence = () => {
                     result.some(result => result.idTieuChuan === item.idTieuChuan)
                 );
                 setMinhChung(filterMinhChung);
-                console.log(filterMinhChung)
             } catch (error) {
                 setError(error);
             } finally {

@@ -468,6 +468,9 @@ const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
         setNoCase(2)
         // navigate(`../viet-bao-cao?KhungCTDT_ID=${KhungCTDT_ID}`)
     }
+    const tongHopBaoCao = () =>{
+        navigate(`../danh-muc-minh-chung?KhungCTDT_ID=${KhungCTDT_ID}`);
+    }
     return (
         <div className="content bg-white">
             <style>
@@ -492,7 +495,7 @@ const BaoCaoTuDanhGia = ({KhungCTDT_ID, setNoCase}) => {
                 <div className="btn-group-custom d-flex flex-wrap">
                     <button className="btn btn-outline-success me-2 flex-grow-1">Kế hoạch tự đánh giá</button>
                     <button className="btn btn-outline-success me-2 flex-grow-1">Hội đồng tự đánh giá</button>
-                    <button className="btn btn-outline-success flex-grow-1">Các nhóm chuyên trách</button>
+                    <button className="btn btn-outline-success flex-grow-1" onClick={tongHopBaoCao}>Tổng hợp minh chứng</button>
                 </div>
             </div>
 

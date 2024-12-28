@@ -5,7 +5,7 @@ import { RouterProvider } from 'react-router-dom';
 
 const App = () => (
   useEffect(() => {
-    document.title = 'VKU | Quản Lý Minh Chứng';
+    document.title = 'Quản Lý Minh Chứng | VKU';
   }, []),
     <RouterProvider router={router} />
 );

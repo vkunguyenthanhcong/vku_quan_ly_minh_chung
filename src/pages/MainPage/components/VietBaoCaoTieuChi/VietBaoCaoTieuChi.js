@@ -60,6 +60,9 @@ import {
     updatePhieuDanhGiaTieuChi, uploadImage, urlDefault
 } from "../../../../services/apiServices";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
+import SuccessDialog from "../../../../components/ConfirmDialog/SuccessDialog";
+import Notification from "../../../../components/ConfirmDialog/Notification";
+
 
 function MentionCustomization(editor) {
     editor.conversion.for('downcast').attributeToElement({
@@ -126,7 +129,7 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
         });
     };
     useEffect(() => {
-        // Hàm xử lý sự kiện trước khi reload hoặc thoát
+        
         const handleBeforeUnload = (event) => {
             const confirmationMessage = "Bạn có chắc chắn muốn rời khỏi trang này? Các thay đổi chưa lưu sẽ bị mất.";
             event.preventDefault();
@@ -158,6 +161,11 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     const [tieuChi, setTieuChi] = useState([])
     const [minhChung, setMinhChung] = useState([])
     const [nhomCongTac, setNhomCongTac] = useState(null)
+    const [success, setSuccess] = useState(false);
+    const showSuccess = () => {setSuccess(true)}
+    const hideSuccess = () => {setSuccess(false)}
+    const [textSuccess, setTextSuccess] = useState({"title" : "", "message" : ""});
+    const [emptyText, setEmptyText] = useState(false);
 
     const [moTa, setMoTa] = useState('');
     const [diemManh, setDiemManh] = useState('');
@@ -422,28 +430,35 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
 
     const savePhieuDanhGia = async () => {
         try {
-            const data = new FormData();
-            data.append('idPhongBan', idPhongBan);
-            data.append('idTieuChuan', TieuChuan_ID);
-            data.append('idTieuChi', TieuChi_ID);
+            if(moTa.trim === "" && diemManh.trim === "" && diemYeu.trim === "" && mucDanhGia === 0){
+                setTextSuccess({"title" : "Lưu Thất Bại", "message" : "Tất cả các dữ liệu không được để trống"});
+                setEmptyText(true);
+            }else{
+                const data = new FormData();
+                data.append('idPhongBan', idPhongBan);
+                data.append('idTieuChuan', TieuChuan_ID);
+                data.append('idTieuChi', TieuChi_ID);
 
-            data.append('moTa', moTa);
-            data.append('diemManh', diemManh);
-            data.append('diemTonTai', diemYeu);
-            data.append('mucDanhGia', mucDanhGia);
-            data.append("keHoach", keHoach)
-            if (phieuDanhGia?.length === 0) {
-                data.append("nguoiVietBaoCao", localStorage.getItem("fullName"));
-                const response = await savePhieuDanhGiaTieuChi(data);
-                if (response === "OK") {
-                    fetchData()
-                    alert('Lưu thành công')
-                }
-            } else {
-                data.append('idPhieuDanhGia', phieuDanhGia[0].idPhieuDanhGiaTieuChi)
-                const response = await updatePhieuDanhGiaTieuChi(data);
-                if (response === "OK") {
-                    alert('Lưu thành công')
+                data.append('moTa', moTa);
+                data.append('diemManh', diemManh);
+                data.append('diemTonTai', diemYeu);
+                data.append('mucDanhGia', mucDanhGia);
+                data.append("keHoach", keHoach)
+                if (phieuDanhGia?.length === 0) {
+                    data.append("nguoiVietBaoCao", localStorage.getItem("fullName"));
+                    const response = await savePhieuDanhGiaTieuChi(data);
+                    if (response === "OK") {
+                        fetchData()
+                        setTextSuccess({"title" : "Lưu Thành Công", "message" : "Hệ thông đã lưu thành công báo cáo"});
+                        showSuccess();
+                    }
+                } else {
+                    data.append('idPhieuDanhGia', phieuDanhGia[0].idPhieuDanhGiaTieuChi)
+                    const response = await updatePhieuDanhGiaTieuChi(data);
+                    if (response === "OK") {
+                        setTextSuccess({"title" : "Cập Nhật Thành Công", "message" : "Hệ thông đã cập nhật thành công báo cáo"});
+                        showSuccess();
+                    }
                 }
             }
 
@@ -458,6 +473,8 @@ const VietBaoCaoTieuChi = ({dataTransfer}) => {
     return (
         <div onMouseMove={handleMouseMove}>
             <LoadingProcess open={show}/>
+            {emptyText ? <Notification title={textSuccess.title} message={textSuccess.message} onClose={setEmptyText}/> : null}
+            <SuccessDialog show={success} onClose={hideSuccess} title={textSuccess.title} message={textSuccess.message}/>
             <style>
                 {`
                 .mention::after {

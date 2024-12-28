@@ -40,7 +40,8 @@ const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {
 
   const menuItems = [
     ...(role === "ADMIN" ? [{ to: '/admin', label: 'Quản Lý', isLink: true }] : []),
-    { to: '/quan-ly', label: 'Trang Chủ', isLink: true }
+    { to: '/quan-ly', label: 'Trang Chủ', isLink: true }, 
+    { to: '/ca-nhan', label: 'Cá Nhân', isLink: true }
   ];
   return (
     <div className={`menu-scroll no-padding ${isScreenSmall ? 'text-center' : ''}`}>

@@ -291,6 +291,9 @@ const ListChuongTrinhDaoTao = ({maKdcl,setOpen}) => {
 };
 
 const AdminChuongTrinhDaoTao = () => {
+    useEffect(() => {
+        document.title = 'Chương Trình Đào Tạo | VKU';
+      },[])
     const [chuanKDCL, setChuanKDCL] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

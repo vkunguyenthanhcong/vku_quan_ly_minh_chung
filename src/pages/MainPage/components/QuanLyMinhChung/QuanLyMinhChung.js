@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
-import DialogTitle from '@mui/material/DialogTitle';
-import Dialog from '@mui/material/Dialog';
 import './QuanLyMinhChung.css';
-import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import {
     getAllDonViBanHanh,
@@ -22,7 +17,6 @@ import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess
 const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
     const token = localStorage.getItem('token');
     const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
     const EvidenceID = dataTransfer.idMc;
 
     const GoiY_ID = dataTransfer.GoiY_ID;
@@ -35,14 +29,13 @@ const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
     const closeModal = () => setIsModalOpen(false);
 
     const [open, setOpen] = React.useState(false);
-    const navigate = useNavigate();
     const [loaiMinhChung, setLoaiMinhChung] = useState([]);
     const [donViBanHanh, setDonViBanHanh] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [selectedLoai, setSelectedLoai] = useState('');
-    const [selectedDonVi, setSelectedDonVi] = useState('');
+    const [selectedLoai, setSelectedLoai] = useState(0);
+    const [selectedDonVi, setSelectedDonVi] = useState(0);
     const [soCongVan, setSoCongVan] = useState('');
     const [trichYeu, setTrichYeu] = useState('');
 
@@ -58,13 +51,10 @@ const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
     const fetchData = async () => {
         setLoading(true); // Set loading state at the beginning
         try {
-            const [loaiMinhChungResponse, donViBanHanhResponse] = await Promise.all([
-                getAllLoaiMinhChung(token),
-                getAllDonViBanHanh(token),
-            ]);
-
-            setLoaiMinhChung(loaiMinhChungResponse);
-            setDonViBanHanh(donViBanHanhResponse);
+            const loaiMcData = await getAllLoaiMinhChung();
+            const dvbhData = await getAllDonViBanHanh();
+            setLoaiMinhChung(loaiMcData);
+            setDonViBanHanh(dvbhData);
 
         } catch (error) {
             setError(error.message || 'An error occurred while fetching data.');
@@ -79,11 +69,11 @@ const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
         }else{
             const response = await getKhoMinhChungWithId(EvidenceID);
             if(response == ''){
-                // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
                 setNoCase(3);
             }else{
                 setSelectedLoai(response.idLoai);
                 setSelectedDonVi(response.idDvbh);
+                console.log(response.idDvbh)
                 setSoCongVan(response.soHieu);
                 setTrichYeu(response.tenMinhChung);
                 setNgayPhatHanh(response.thoigian);
@@ -108,17 +98,14 @@ const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
                 minhChung.append('idDvbh', selectedDonVi);
                 minhChung.append('soHieu', soCongVan);
                 minhChung.append('tenMinhChung', trichYeu);
-                minhChung.append('thoigian', ngayPhatHanh);
+                minhChung.append('thoiGian', ngayPhatHanh);
                 minhChung.append('linkLuuTru', uploadedFile);
 
                 const response_1 = await updateKhoMinhChung(EvidenceID, minhChung);
-                if(response_1 == "OK"){
+                if(response_1 === "OK"){
                     setOpen(false);
                     setNoCase(3);
                 }
-
-                // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
-
             }else{
                 const formData = new FormData();
                 formData.append("file", file);
@@ -146,7 +133,7 @@ const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
                         const response_1 = await updateKhoMinhChung(EvidenceID,minhChung, token);
 
                         // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
-                        if(response_1 == "OK"){
+                        if(response_1 === "OK"){
                             setOpen(false);
                             setNoCase(3);
                         }
@@ -179,13 +166,13 @@ const QuanLyMinhChung = ({dataTransfer, setNoCase}) =>{
                     minhChung.append('idDvbh', selectedDonVi);
                     minhChung.append('soHieu', soCongVan);
                     minhChung.append('tenMinhChung', trichYeu);
-                    minhChung.append('thoigian', ngayPhatHanh);
+                    minhChung.append('thoiGian', ngayPhatHanh);
                     minhChung.append('linkLuuTru', response.url);
 
                     const response_1 = await saveMinhChung(minhChung, token);
 
                     // navigate(`../minh-chung?GoiY_ID=${GoiY_ID}&TieuChi_ID=${TieuChi_ID}&TieuChuan=${TieuChuan_ID}&KhungCTDT_ID=${KhungCTDT_ID}`);
-                    if(response_1 == "OK"){
+                    if(response_1 === "OK"){
                         setOpen(false);
                         setNoCase(3);
                     }

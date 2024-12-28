@@ -143,6 +143,9 @@ const GenericList = ({maKdcl}) => {
     );
 };
 const ChuanKiemDinh = () => {
+    useEffect(() => {
+        document.title = 'Chuẩn Kiểm Định | VKU';
+      },[])
     const [formData, setFormData] = useState({
         tenKdcl: '',
         namBanHanh: '',

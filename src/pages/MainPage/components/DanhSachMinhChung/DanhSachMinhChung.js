@@ -24,7 +24,6 @@ const DanhSachMinhChung = () => {
         const fetchData = async () => {
             try {
                 const result = await getMinhChungKhongDungChung();
-                console.log(result)
                 setMinhChung(result);
             } catch (err) {
                 setError(err);

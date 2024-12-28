@@ -20,34 +20,45 @@ const LogInForm = ({ isVisible,setOpen,  onClose }) => {
         setOpen(true);
         try {
             const userData = await login(email, password);
-          
-            if(!userData.isAccept){
-                setDenied(true);
-            }else{
-                if (userData.token) {
-                    // Save user data in localStorage
-                    localStorage.setItem('token', userData.token);
-                    localStorage.setItem('role', userData.role);
-                    localStorage.setItem('phongBan', userData.phongBan.idPhongBan);
-
-                    const user = await getThongTinDangNhap(userData.token);
-                    
-                    localStorage.setItem("fullName", user.user.fullName);
-                    localStorage.setItem("avatar", user.user.avatar);
+    
+            if (userData.statusCode === 500 && userData.message === "No value present") {
+                setOpen(false);
+                setWrong(true);
+                setError("Email không tồn tại");
+            } else if (userData.statusCode === 500 && userData.message === "Bad credentials") {
+                setOpen(false);
+                setWrong(true);
+                setError("Sai mật khẩu. Vui lòng kiểm tra lại thông tin đăng nhập");
+            } else {
+                if (!userData.isAccept) {
                     setOpen(false);
-
-                    if (userData.role === "ADMIN") {
-                        navigate('/admin');
-                    } else if (userData.role === "USER") {
-                        navigate('/quan-ly');
-                    }
+                    setDenied(true);
                 } else {
-                    alert("Đăng Nhập Thất Bại. Vui Lòng Kiểm Tra Lại Tài Khoản Hoặc Mật Khẩu!!!");
-                    setError(userData.message);
-                    setOpen(false);
+                    if (userData.token) {
+                        // Save user data in localStorage
+                        localStorage.setItem('token', userData.token);
+                        localStorage.setItem('role', userData.role);
+                        localStorage.setItem('phongBan', userData.phongBan.idPhongBan);
+    
+                        const user = await getThongTinDangNhap(userData.token);
+    
+                        localStorage.setItem("fullName", user.user.fullName);
+                        localStorage.setItem("avatar", user.user.avatar);
+                        setOpen(false);
+    
+                        if (userData.role === "ADMIN") {
+                            navigate('/admin');
+                        } else if (userData.role === "USER") {
+                            navigate('/quan-ly');
+                        }
+                    } else {
+                        setError(userData.message);
+                        setOpen(false);
+                    }
                 }
             }
         } catch (error) {
+            setOpen(false);
             setError(error.message);
             setTimeout(() => {
                 setOpen(false);
@@ -55,6 +66,7 @@ const LogInForm = ({ isVisible,setOpen,  onClose }) => {
             }, 3 * 60 * 1000); // Clear error after 3 minutes
         }
     };
+    
 
     // Toggle password visibility
     const handleTogglePassword = () => {
@@ -83,7 +95,7 @@ const LogInForm = ({ isVisible,setOpen,  onClose }) => {
                     <div className="mb-3">
                         <label className="form-label">Email</label>
                         <input
-                            type="email"
+                            type="text"
                             className="form-control"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -133,7 +145,8 @@ const LogInForm = ({ isVisible,setOpen,  onClose }) => {
 
                 
                 {denied && <Notification title="Từ Chối Truy Cập" message="Bạn chưa có quyền truy cập vào hệ thống. Liên hệ quản trị viên để được giải quyết"  onClose={setDenied}/>}
-                {wrong && <Notification title="Sai Thông Tin Đăng Nhập" message="Bạn vui lòng kiểm tra lại tài khoản và mật khẩu"  onClose={setWrong}/>}
+                {wrong && <Notification title="Sai Thông Tin Đăng Nhập" message={error}  onClose={setWrong}/>}
+                
             </div>
         </div>
         </>

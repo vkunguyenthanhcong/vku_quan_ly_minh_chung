@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { deleteChuongTrinhDaoTao, getKhoa, getNganh, getThongTinCTDT, updateChuongTrinhDaoTao } from "../../../../services/apiServices";
-import { Input } from "@mui/material";
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { confirmDialog } from 'primereact/confirmdialog'; 
 import 'primereact/resources/primereact.min.css';
 const ChiTietChuongTrinhDaoTao = () => {
+    useEffect(() => {
+        document.title = 'Chi Tiết Chương Trình Đào Tạo | VKU';
+      },[])
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const ChuongTrinh_ID = queryParams.get('ChuongTrinh_ID');

@@ -1,11 +1,14 @@
 // src/Homepage.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import './HomePage.css';
 import LogInForm from './Components/DangNhapForm/LogInForm';
 import LoadingProcess from '../../components/LoadingProcess/LoadingProcess';
 
 const Homepage = () => {
+  useEffect(() => {
+    document.title = 'Trang Chủ | VKU';
+  },[])
   const [isLogInVisible, setIsLogInVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const showLogIn = () => setIsLogInVisible(true);

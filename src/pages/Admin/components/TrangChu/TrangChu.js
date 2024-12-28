@@ -2,6 +2,9 @@ import React, {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 
 const TrangChuAdmin = () => {
+    useEffect(() => {
+        document.title = 'Quản Lý | VKU';
+      },[])
     const navigate = useNavigate();
     const goToChuanKiemDinh = () => {
         navigate('chuan-kiem-dinh');

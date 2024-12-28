@@ -72,6 +72,9 @@ const PopupForm = ({ show, handleClose , setPhongBan, setShowDialogSuccess}) => 
     );
   };
 const PhongBan = () => {
+    useEffect(() => {
+        document.title = 'Phòng Ban | VKU';
+      },[])
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);

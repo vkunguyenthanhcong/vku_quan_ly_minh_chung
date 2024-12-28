@@ -33,6 +33,8 @@ import DanhGiaTieuChuan from "../pages/DanhGiaTieuChuan/DanhGiaTieuChuan";
 import SignUpLecturer from "../pages/HomePage/Components/DangNhapForm/RegisterForm";
 import Khoa from "../pages/Admin/components/Khoa/Khoa";
 import Nganh from '../pages/Admin/components/Nganh/Nganh';
+import MainPageCaNhan from '../pages/CaNhan/MainPage';
+import CaNhan from '../pages/CaNhan/CaNhan';
 
 const routes = [
   {
@@ -50,6 +52,13 @@ const routes = [
       { path: "viet-bao-cao", element: <ProtectedRoute element={<VietBaoCao />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "viet-bao-cao-tieu-chi", element: <ProtectedRoute element={<VietBaoCaoTieuChi />} requiredRoles={["USER", "ADMIN"]} /> },
       { path: "viet-bao-cao-tieu-chuan", element: <ProtectedRoute element={<VietBaoCaoTieuChuan />} requiredRoles={["USER", "ADMIN"]} /> }
+    ],
+  },
+  {
+    path: "/ca-nhan/",
+    element: <ProtectedRoute element={<CaNhan />} requiredRoles={["USER", "ADMIN"]} />, // Example role check for non-admin sections
+    children: [
+      { path: "", element: <ProtectedRoute element={<MainPageCaNhan />} requiredRoles={["USER", "ADMIN"]} /> },
     ],
   },
   {

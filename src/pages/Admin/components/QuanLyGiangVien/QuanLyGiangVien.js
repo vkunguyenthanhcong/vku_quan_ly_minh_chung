@@ -10,7 +10,9 @@ const formatPhoneNumber = (phoneNumber) => {
 };
 
 function QuanLyGiangVien() {
-
+    useEffect(() => {
+        document.title = 'Quản Lý Giảng Viên | VKU';
+      },[])
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

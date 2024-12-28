@@ -109,6 +109,9 @@ const PopupForm = ({ show, handleClose , setKhoa, setShowDialogSuccess, setUnava
     );
 };
 const Khoa = () => {
+    useEffect(() => {
+        document.title = 'Khoa | VKU';
+      },[])
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [khoa, setKhoa] = useState([]);
