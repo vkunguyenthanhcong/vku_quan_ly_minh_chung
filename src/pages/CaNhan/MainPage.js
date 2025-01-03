@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getThongTinDangNhap } from "../../services/apiServices";
+import { urlDefault } from "../../services/apiServices";
 const MainPageCaNhan = () => {
     const [user, setUser] = useState(null);
+    const [ipAddress, setIpAddress] = useState();
     useEffect(() => {
         const fetchData = async () => {
             const userData = await getThongTinDangNhap(localStorage.getItem("token"));
-            console.log(userData);
             setUser(userData.user);
         }
         fetchData();
@@ -21,7 +22,7 @@ const MainPageCaNhan = () => {
                 <div className="col-md-3 text-center">
                     <img
                     className="rounded-circle border"
-                    src={user && user.avatar}
+                    src={user && urlDefault + user.avatar}
                     width={150}
                     height={150}
                     alt="User Avatar"

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {getAllUser, getPhongBan, updateUser} from "../../../../services/apiServices";
+import {getAllUser, getPhongBan, updateUser, urlDefault} from "../../../../services/apiServices";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 import SuccessDialog from "../../../../components/ConfirmDialog/SuccessDialog";
@@ -155,7 +155,7 @@ function QuanLyGiangVien() {
                             />
                         </TableCell>
                         <TableCell>
-                            <img src={item.avatar} width="50" height="50"/>
+                            <img src={urlDefault+item.avatar} width="50" height="50"/>
                         </TableCell>
                         <TableCell>
                         <div className="d-flex flex-column align-items-start gap-2 btn-group-vertical" role="group">

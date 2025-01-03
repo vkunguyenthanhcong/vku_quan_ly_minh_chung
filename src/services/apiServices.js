@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-const ipAddress = "localhost"
+const ipAddress = "172.16.0.123"
 const api = axios.create({
     baseURL: `http://${ipAddress}:1309/api`, // Replace with your API base URL
     timeout: 200000, // Optional: set a timeout for requests

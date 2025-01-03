@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import './LogInForm.css';
 import { useNavigate } from 'react-router-dom';
 import {getThongTinDangNhap, login} from '../../../../services/apiServices';
-import LoadingProcess from "../../../../components/LoadingProcess/LoadingProcess";
 import Notification from "../../../../components/ConfirmDialog/Notification";
-import zIndex from '@mui/material/styles/zIndex';
+import { urlDefault } from '../../../../services/apiServices';
 
 const LogInForm = ({ isVisible,setOpen,  onClose }) => {
     const [email, setEmail] = useState('');
@@ -43,7 +42,7 @@ const LogInForm = ({ isVisible,setOpen,  onClose }) => {
                         const user = await getThongTinDangNhap(userData.token);
     
                         localStorage.setItem("fullName", user.user.fullName);
-                        localStorage.setItem("avatar", user.user.avatar);
+                        localStorage.setItem("avatar", urlDefault + user.user.avatar);
                         setOpen(false);
     
                         if (userData.role === "ADMIN") {

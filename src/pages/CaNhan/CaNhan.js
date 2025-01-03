@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Navbar from '../../components/Navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
+import { urlDefault } from '../../services/apiServices';
 import { Outlet } from 'react-router-dom';
 const CaNhan = () => {
     const [isMenuExpanded, setMenuExpanded] = useState(true);

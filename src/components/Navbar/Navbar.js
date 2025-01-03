@@ -25,7 +25,8 @@ const Navbar = ({ toggleMenuWidth }) => {
             style={{
               width: '29px',
               marginRight: '10px',
-              maxHeight: '29px',
+              maxHeight: '40px',
+              height : '30px',
               borderRadius: '50%',
             }}
             alt={user ? `${user.fullName}` : 'User Avatar'}

@@ -98,6 +98,7 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
             setKhoMinhChung(khoMinhChungData);
             setGoiY(goiYData);
             setTieuChi(tieuChiData);
+            setLoading(false);
         } catch (err) {
             setError(err);
         } finally {
@@ -186,8 +187,8 @@ const MinhChung = ({KhungCTDT_ID, dataTransfer, setDataTransfer ,setNoCase}) => 
 
                     const result = await saveFromKMCtoMinhChung(dataMinhChung);
                     if(result === "OK"){
-                        result(false)
                         fetchData();
+                        setOpen(false);
                     }
                 }
             } catch (err) {

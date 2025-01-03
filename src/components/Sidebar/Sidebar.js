@@ -4,7 +4,6 @@ import { Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Sidebar.css'; // Import custom CSS for sidebar styling
 import { Link, useNavigate } from 'react-router-dom';
-import { getThongTinDangNhap } from '../../services/apiServices';
 
 
 const Sidebar = ({ isMenuExpanded, toggleMenuWidth, isScreenSmall }) => {

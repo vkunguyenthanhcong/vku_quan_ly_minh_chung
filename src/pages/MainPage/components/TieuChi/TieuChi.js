@@ -209,7 +209,6 @@ const Table_MocChuan = ({ idTieuChi, setNoCase, setDataTransfer, dataTransfer, m
     const [mocChuan, setMocChuan] = useState([]);
     useEffect(() => {
         const filter = mc.filter((item) => item.idTieuChi === idTieuChi);
-        console.log(filter)
         setMocChuan(filter);
     }, [idTieuChi, mc])
     return (
